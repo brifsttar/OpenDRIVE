@@ -1,0 +1,6 @@
+[submodule "Source/ThirdParty/RoadManager/module"]
+	path = Source/ThirdParty/RoadManager/module
+	url = git@gitlab.com:vhcd/virtual-driver.git
+[submodule "Source/ThirdParty/RoadManager/modules/esmini"]
+	path = Source/ThirdParty/RoadManager/modules/esmini
+	url = git@gitlab.com:vhcd/virtual-driver.git
