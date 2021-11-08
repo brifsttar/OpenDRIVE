@@ -1,7 +1,6 @@
+# Default for UE4
 Binaries
 Build
-Content/Carla
-Content/Marketplace
 DerivedDataCache
 Intermediate
 Saved
@@ -16,3 +15,9 @@ Packaged
 *.suo
 *.xcodeproj
 *.xcworkspace
+
+# Auto-generated SteamVR json
+steamvr_ue_editor_app.json
+
+# Disabled ini file, for SteamVR + nDisplay compat
+*.DISABLED.ini
