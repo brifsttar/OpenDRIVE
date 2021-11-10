@@ -16,5 +16,14 @@ public class OpenDRIVE : ModuleRules
 				"Projects"
 			}
 		);
+
+
+		PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
+				"CoreUObject",
+				"Engine",
+			}
+		);
 	}
 }
