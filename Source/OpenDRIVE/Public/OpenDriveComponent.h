@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "odrUePositionable.h"
 #include "CoordTranslate.h"
 #include "OpenDriveComponent.generated.h"
 
@@ -17,9 +16,12 @@ class OPENDRIVE_API UOpenDriveComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-public:
-	TUniquePtr<odrUePositionable> _Odr;
+private:
+	// Cache for position
+	mutable roadmanager::Position _TrackPosCache;
+	mutable FVector _XyzPosCache;
 
+public:
 	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
 	int RoadId_;
 
@@ -35,8 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
 	float H_;
 
-	// Sets default values for this component's properties
 	UOpenDriveComponent();
+
+	roadmanager::Position OdrPosition() const;
 
 	void SetTrackPosition(const roadmanager::Position &p);
 
@@ -47,10 +50,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	void ResetOdrComp();
-
-	odrUePositionable* GetOdr() const { return _Odr.Get(); }
 
 	/**
 	* Computes the current OpenDRIVE position and updates the public position variables accordingly

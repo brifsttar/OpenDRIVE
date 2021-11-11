@@ -11,7 +11,7 @@ UOpenDriveComponent::UOpenDriveComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	_TrackPosCache.SetSnapLaneTypes(roadmanager::Lane::LaneType::LANE_TYPE_ANY);
 	// ...
 }
 
@@ -20,7 +20,6 @@ UOpenDriveComponent::UOpenDriveComponent()
 void UOpenDriveComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	ResetOdrComp();
 }
 
 
@@ -32,14 +31,9 @@ void UOpenDriveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-void UOpenDriveComponent::ResetOdrComp() {
-	_Odr = MakeUnique<odrUePositionable>(dynamic_cast<AActor*>(GetOwner()));
-}
-
 void UOpenDriveComponent::GetPosition() {
 	if (!GetOwner()) return;
-	if (!_Odr) ResetOdrComp();
-	roadmanager::Position p = _Odr->OdrPosition();
+	roadmanager::Position p = OdrPosition();
 	RoadId_ = p.GetTrackId();
 	LaneId_ = p.GetLaneId();
 	S_ = p.GetS() * MetersToUu();
@@ -49,14 +43,25 @@ void UOpenDriveComponent::GetPosition() {
 
 void UOpenDriveComponent::SetPosition() {
 	if (!GetOwner()) return;
-	if (!_Odr) ResetOdrComp();
 	SetTrackPosition(RoadId_, LaneId_, S_, T_, H_);
 }
 
+roadmanager::Position UOpenDriveComponent::OdrPosition() const {
+	if (!GetOwner()) return _TrackPosCache;
+	FVector p = CoordTranslate::UeToOdr::Location(GetOwner()->GetActorLocation());
+	FVector r = CoordTranslate::UeToOdr::Rotation(GetOwner()->GetActorRotation().Euler());
+	if (p != _XyzPosCache) {
+		_XyzPosCache = p;
+		_TrackPosCache.SetInertiaPos(p.X, p.Y, p.Z, r.X, r.Y, r.Z);
+	}
+	return _TrackPosCache;
+}
+
 void UOpenDriveComponent::SetTrackPosition(const roadmanager::Position &p) {
-	AActor* owner = dynamic_cast<AActor*>(GetOwner());
-	owner->SetActorTransform(CoordTranslate::OdrToUe::ToTransfrom(p));
-	_Odr->SetOdrPosition(p);
+	if (!GetOwner()) return;
+	GetOwner()->SetActorTransform(CoordTranslate::OdrToUe::ToTransfrom(p));
+	_TrackPosCache = p;
+	_TrackPosCache.SetSnapLaneTypes(roadmanager::Lane::LaneType::LANE_TYPE_ANY);
 }
 
 void UOpenDriveComponent::SetTrackPosition(int TrackId, int LaneId, float S, float Offset, float H) {
@@ -66,8 +71,7 @@ void UOpenDriveComponent::SetTrackPosition(int TrackId, int LaneId, float S, flo
 }
 
 bool UOpenDriveComponent::MoveAlongS(float S, int Strategy) {
-	if (!_Odr) ResetOdrComp();
-	roadmanager::Position p = _Odr->OdrPosition();
+	roadmanager::Position p = OdrPosition();
 	roadmanager::Position::ErrorCode ret;
 	ret = p.MoveAlongS(S * UuToMeters(), 0., roadmanager::Junction::JunctionStrategyType(Strategy));
 	SetTrackPosition(p);
@@ -75,53 +79,45 @@ bool UOpenDriveComponent::MoveAlongS(float S, int Strategy) {
 }
 
 void UOpenDriveComponent::ResetPosition() {
-	ResetOdrComp();
+	SetTrackPosition(roadmanager::Position());
 }
 
 int UOpenDriveComponent::GetRoadId() const {
-	if (!_Odr) return -1;
-	return _Odr->OdrPosition().GetTrackId();
+	return OdrPosition().GetTrackId();
 }
 
 int UOpenDriveComponent::GetLaneId() const {
-	if (!_Odr) return -1;
-	return _Odr->OdrPosition().GetLaneId();
+	return OdrPosition().GetLaneId();
 }
 
 float UOpenDriveComponent::GetS() const {
-	if (!_Odr) return NAN;
-	return _Odr->OdrPosition().GetS() * MetersToUu();
+	return OdrPosition().GetS() * MetersToUu();
 }
 
 float UOpenDriveComponent::GetT() const {
-	if (!_Odr) return NAN;
-	return _Odr->OdrPosition().GetOffset() * MetersToUu();
+	return OdrPosition().GetOffset() * MetersToUu();
 }
 
 float UOpenDriveComponent::GetH() const {
-	if (!_Odr) return NAN;
-	return FMath::RadiansToDegrees(_Odr->OdrPosition().GetHRelativeDrivingDirection());
+	return FMath::RadiansToDegrees(OdrPosition().GetHRelativeDrivingDirection());
 }
 
 int UOpenDriveComponent::GetJunctionId() const {
-	if (!_Odr) return -1;
-	roadmanager::Road* r = _Odr->OdrPosition().GetRoad();
+	roadmanager::Road* r = OdrPosition().GetRoad();
 	return r ? r->GetJunction() : -1;
 }
 
 float UOpenDriveComponent::GetNextJunctionDistance() const {
-	if (!_Odr) return NAN;
-	return _Odr->OdrPosition().GetNextJunction().distance * MetersToUu();
+	return OdrPosition().GetNextJunction().distance * MetersToUu();
 }
 
 int UOpenDriveComponent::GetNextJunctionId() const {
-	if (!_Odr) return -1;
-	return _Odr->OdrPosition().GetNextJunction().junction->GetId();
+	return OdrPosition().GetNextJunction().junction->GetId();
 }
 
 bool UOpenDriveComponent::IsJunctionDistanceLessThan(float Dist, int JunctionId) const {
 	Dist *= UuToMeters();
-	roadmanager::Position::NextJunction next = _Odr->OdrPosition().GetNextJunction();
+	roadmanager::Position::NextJunction next = OdrPosition().GetNextJunction();
 	bool isLess = next.distance < Dist;
 	if (JunctionId == -1) {
 		return isLess;
@@ -135,5 +131,11 @@ float UOpenDriveComponent::SDistanceTo(const UOpenDriveComponent* Other) const {
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("UOpenDriveComponent::SDistanceTo(): No other point"));
 		return NAN;
 	}
-	return _Odr->SDistanceTo(Other->GetOdr()) * MetersToUu();
+	roadmanager::PositionDiff diff;
+	roadmanager::Position otherPos = Other->OdrPosition();
+	if (OdrPosition().Delta(&otherPos, diff)) {
+		return diff.ds * MetersToUu();
+	} else {
+		return std::numeric_limits<double>::quiet_NaN();
+	}
 }

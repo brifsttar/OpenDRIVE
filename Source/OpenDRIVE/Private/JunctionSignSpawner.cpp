@@ -39,18 +39,14 @@ AJunctionSignSpawner::AJunctionSignSpawner()
 	OpenDrive->SetupAttachment(RootComponent);
 }
 
-void AJunctionSignSpawner::SpawnJunctionSigns()
-{
-	if (!OpenDrive->GetOdr()) {
-		OpenDrive->ResetOdrComp();
-	}
+void AJunctionSignSpawner::SpawnJunctionSigns() {
 	if (!JunctionSignClass) {
 		return;
 	}
 
 	// Find all roads connected to the junction
 	std::set<roadmanager::Road*> trafficLightRoads;
-	roadmanager::Position p = OpenDrive->GetOdr()->OdrPosition();
+	roadmanager::Position p = OpenDrive->OdrPosition();
 	int junctionId = p.GetRoad()->GetJunction();
 	roadmanager::Junction *j = p.GetOpenDrive()->GetJunctionById(junctionId);
 	if (!j)  return;

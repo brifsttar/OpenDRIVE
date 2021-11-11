@@ -25,8 +25,8 @@ public class RoadManager : ModuleRules
 		{
 			PublicAdditionalLibraries.AddRange(
 				new string[] {
-					Path.Combine(RoadManagerLibDir, "RoadManager", "Release", "RoadManager.lib"),
-					Path.Combine(RoadManagerLibDir, "CommonMini", "Release", "CommonMini.lib")
+					Path.Combine(RoadManagerLibDir, "RoadManager", "RelWithDebInfo", "RoadManager.lib"),
+					Path.Combine(RoadManagerLibDir, "CommonMini", "RelWithDebInfo", "CommonMini.lib")
 				}
 			);
         }
