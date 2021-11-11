@@ -21,6 +21,11 @@
 			"LoadingPhase": "Default"
 		},
 		{
+			"Name": "OpenDRIVELoader",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
 			"Name": "OpenDRIVEEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"

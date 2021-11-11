@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class OpenDRIVE : ModuleRules
+public class OpenDRIVELoader : ModuleRules
 {
-	public OpenDRIVE(ReadOnlyTargetRules Target) : base(Target)
+	public OpenDRIVELoader(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -12,7 +12,6 @@ public class OpenDRIVE : ModuleRules
 			new string[]
 			{
 				"Core",
-				"OpenDRIVELoader",
 				"RoadManager",
 				"Projects"
 			}

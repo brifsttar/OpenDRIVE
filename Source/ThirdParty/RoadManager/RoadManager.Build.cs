@@ -23,12 +23,10 @@ public class RoadManager : ModuleRules
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-			PublicAdditionalLibraries.AddRange(
-				new string[] {
-					Path.Combine(RoadManagerLibDir, "RoadManager", "RelWithDebInfo", "RoadManager.lib"),
-					Path.Combine(RoadManagerLibDir, "CommonMini", "RelWithDebInfo", "CommonMini.lib")
-				}
-			);
+            string DllPath = Path.Combine(RoadManagerLibDir, "RoadManager", "RelWithDebInfo");
+            PublicAdditionalLibraries.Add(Path.Combine(DllPath, "RoadManager.lib"));
+            PublicDelayLoadDLLs.Add("RoadManager.dll");
+            RuntimeDependencies.Add(Path.Combine(DllPath, "RoadManager.dll"));
         }
 	}
 }
