@@ -13,7 +13,7 @@ class ALandscapeProxy;
  * 
  */
 UCLASS(Abstract, hideCategories = (Object), Blueprintable)
-class VIRTUALDRIVEREDITOR_API UOpenDrive2Landscape : public UActorActionUtility
+class OPENDRIVEEDITOR_API UOpenDrive2Landscape : public UActorActionUtility
 {
 	GENERATED_BODY()
 

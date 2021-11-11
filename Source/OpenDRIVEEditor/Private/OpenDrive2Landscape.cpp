@@ -8,7 +8,7 @@
 #include "LandscapeProxy.h"
 #include "RoadManager.hpp"
 #include "CoordTranslate.h"
-#include "Public/ScenarioScriptActor.h"
+#include "OpenDriveScriptActor.h"
 
 
 UOpenDrive2Landscape::UOpenDrive2Landscape() {
@@ -30,7 +30,7 @@ void UOpenDrive2Landscape::SculptLandscape(float RoadZOffset, float Falloff, ULa
 	   roadmanager is to load it from file.
 	   Getting rid of the singleton would probably make things easier, but good luck implementing that
 	*/
-	std::string OdrPath = AScenarioScriptActor::GetOpenDrive()->GetOpenDriveFilename();
+	std::string OdrPath = AOpenDriveScriptActor::GetOpenDrive()->GetOpenDriveFilename();
 	bool ret = roadmanager::Position::LoadOpenDrive(OdrPath.c_str());
 	if (!ret) {
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Failed to load OpenDRIVE file %s"), OdrPath.c_str()));
