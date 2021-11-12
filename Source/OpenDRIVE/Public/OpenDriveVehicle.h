@@ -31,13 +31,13 @@ protected:
 	double LengthBack() const;
 
 public:
-	double VdSpeed() const;
-	double VdAcceleration() const;
-	double VdSteerAngle() const;
-	double VdSteerAngleMax() const;
-	double VdWheelbase() const;
-	double VdTime() const;
-	FVector VdPosition() const;
+	// Legacy methods that I'll (re)move over time
+	double OdrSpeed() const;
+	double OdrAcceleration() const;
+	double OdrSteerAngle() const;
+	double OdrSteerAngleMax() const;
+	double OdrWheelbase() const;
+
 	// Overrides speed value for cluster slaves, since they don't have PhysX vehicle model
 	void SetSpeedOverride(float Speed) { _SpeedOverride = Speed; }
 
@@ -104,13 +104,13 @@ public:
 	* Returns the current speed (cm/s)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
-	float Speed() const { return VdSpeed() * MetersToUu(); }
+	float Speed() const { return OdrSpeed() * MetersToUu(); }
 
 	/**
 	* Returns the current acceleration (cm/s²)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
-	float Acceleration() const { return VdAcceleration() * MetersToUu(); }
+	float Acceleration() const { return OdrAcceleration() * MetersToUu(); }
 
 		
 };

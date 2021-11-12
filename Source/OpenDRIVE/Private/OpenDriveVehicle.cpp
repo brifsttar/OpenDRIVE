@@ -38,7 +38,7 @@ double UOpenDriveVehicle::LengthBack() const {
 	return o - x;
 }
 
-double UOpenDriveVehicle::VdSpeed() const {
+double UOpenDriveVehicle::OdrSpeed() const {
 	if (_Car->GetMesh()->IsSimulatingPhysics()) {
 		return _Car->GetVehicleMovement()->GetForwardSpeed() * CoordTranslate::UuToMeters();
 	} else {
@@ -46,28 +46,29 @@ double UOpenDriveVehicle::VdSpeed() const {
 	}
 }
 
-double UOpenDriveVehicle::VdAcceleration() const {
+double UOpenDriveVehicle::OdrAcceleration() const {
+	float t = _Car->GetGameTimeSinceCreation();
 	if (_PrevTime == 0.0) {
-		_PrevTime = VdTime();
-		_PrevSpeed = VdSpeed();
+		_PrevTime = t;
+		_PrevSpeed = OdrSpeed();
 	}
-	if (_PrevTime != VdTime()) {
-		_Acc = (VdSpeed() - _PrevSpeed) / (VdTime() - _PrevTime);
-		_PrevTime = VdTime();
-		_PrevSpeed = VdSpeed();
+	if (_PrevTime != t) {
+		_Acc = (OdrSpeed() - _PrevSpeed) / (t - _PrevTime);
+		_PrevTime = t;
+		_PrevSpeed = OdrSpeed();
 	}
 	return _Acc;
 }
 
-double UOpenDriveVehicle::VdSteerAngle() const {
+double UOpenDriveVehicle::OdrSteerAngle() const {
 	return -FMath::DegreesToRadians(_Car->GetVehicleMovement()->Wheels[0]->GetSteerAngle());
 }
 
-double UOpenDriveVehicle::VdSteerAngleMax() const {
+double UOpenDriveVehicle::OdrSteerAngleMax() const {
 	return FMath::DegreesToRadians(_Car->GetVehicleMovement()->Wheels[0]->SteerAngle);
 }
 
-double UOpenDriveVehicle::VdWheelbase() const {
+double UOpenDriveVehicle::OdrWheelbase() const {
 	FName wFrontName = _Car->GetVehicleMovement()->WheelSetups[0].BoneName;
 	FName wBackName = _Car->GetVehicleMovement()->WheelSetups[3].BoneName;
 	float wFrontPos = NAN, wBackPos = NAN;
@@ -79,14 +80,6 @@ double UOpenDriveVehicle::VdWheelbase() const {
 		if (c->ConstraintBone2 == wBackName) wBackPos = c->Pos2.X;
 	}
 	return std::abs(wFrontPos - wBackPos) * CoordTranslate::UuToMeters();
-}
-
-double UOpenDriveVehicle::VdTime() const {
-	return _Car->GetGameTimeSinceCreation();
-}
-
-FVector UOpenDriveVehicle::VdPosition() const {
-	return CoordTranslate::UeToOdr::Location(_Car->GetActorLocation());
 }
 
 float UOpenDriveVehicle::RoadDistanceTo(const UOpenDriveVehicle *Other) const {
