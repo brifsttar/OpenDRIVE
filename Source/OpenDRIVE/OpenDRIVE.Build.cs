@@ -23,6 +23,7 @@ public class OpenDRIVE : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				"PhysXVehicles",
 				"Engine",
 			}
 		);
