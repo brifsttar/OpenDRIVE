@@ -25,17 +25,6 @@ void UOpenDrive2Landscape::SculptLandscape(float RoadZOffset, float Falloff, ULa
 		Landscapes.Add(Landscape);
 	}
 
-	/* AScenarioScriptActor is from another module/DLL that has its own roadmanager, where the
-	   OpenDrive singleton is loaded. The only way to also initialize the singleton from this DLL's
-	   roadmanager is to load it from file.
-	   Getting rid of the singleton would probably make things easier, but good luck implementing that
-	*/
-	std::string OdrPath = AOpenDriveScriptActor::GetOpenDrive()->GetOpenDriveFilename();
-	bool ret = roadmanager::Position::LoadOpenDrive(OdrPath.c_str());
-	if (!ret) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString::Printf(TEXT("Failed to load OpenDRIVE file %s"), OdrPath.c_str()));
-		return;
-	}
 	roadmanager::OpenDrive *Odr = roadmanager::Position::GetOpenDrive();
 	roadmanager::Road *road = 0;
 	roadmanager::Position p;
