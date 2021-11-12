@@ -11,7 +11,6 @@ public class RoadManager : ModuleRules
 
 		string RoadManagerDir = Path.Combine(ModuleDirectory, "modules", "esmini");
 		string RoadManagerSrcDir = Path.Combine(RoadManagerDir, "EnvironmentSimulator", "Modules");
-		string RoadManagerLibDir = Path.Combine(RoadManagerDir, "buildVS2019_64_v141", "EnvironmentSimulator", "Modules");
 
 		PublicIncludePaths.AddRange(
 			new string[] {
@@ -23,10 +22,9 @@ public class RoadManager : ModuleRules
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-            string DllPath = Path.Combine(RoadManagerLibDir, "RoadManager", "RelWithDebInfo");
-            PublicAdditionalLibraries.Add(Path.Combine(DllPath, "RoadManager.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "lib", "RelWithDebInfo", "RoadManager.lib"));
             PublicDelayLoadDLLs.Add("RoadManager.dll");
-            RuntimeDependencies.Add(Path.Combine(DllPath, "RoadManager.dll"));
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "bin", "RelWithDebInfo", "RoadManager.dll"));
         }
 	}
 }

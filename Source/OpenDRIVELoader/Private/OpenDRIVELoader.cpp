@@ -7,7 +7,7 @@
 
 void FOpenDRIVELoaderModule::StartupModule() {
 	FString BaseDir = IPluginManager::Get().FindPlugin("OpenDRIVE")->GetBaseDir();
-	FString LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/RoadManager/modules/esmini/buildVS2019_64_v141/EnvironmentSimulator/Modules/RoadManager/RelWithDebInfo/RoadManager.dll"));
+	FString LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/RoadManager/bin/RelWithDebInfo/RoadManager.dll"));
 	RoadManagerHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
 }
 
