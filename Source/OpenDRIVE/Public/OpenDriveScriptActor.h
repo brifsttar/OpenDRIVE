@@ -21,10 +21,10 @@ class OPENDRIVE_API AOpenDriveScriptActor : public ALevelScriptActor
 public:
 	AOpenDriveScriptActor();
 
-	UPROPERTY(EditAnywhere, Category = "Scenario")
+	UPROPERTY(EditAnywhere, Category = "OpenDRIVE")
 	UOpenDriveAsset *OpenDriveAsset;
 
-	UPROPERTY(/*VisibleAnywhere, BlueprintReadOnly, Category = "Scenario"*/)
+	UPROPERTY(/*VisibleAnywhere, BlueprintReadOnly, Category = "OpenDRIVE"*/)
 	FFilePath OpenDriveFile;
 
 #if WITH_EDITOR
