@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
+#include "OpenDriveAsset.h"
 #include "RoadManager.hpp"
 #include "OpenDriveScriptActor.generated.h"
 
@@ -20,10 +21,11 @@ class OPENDRIVE_API AOpenDriveScriptActor : public ALevelScriptActor
 public:
 	AOpenDriveScriptActor();
 
-	UPROPERTY(EditAnywhere, Category = "Scenario", meta = (FilePathFilter = "xodr"))
-	FFilePath OpenDriveFile;
+	UPROPERTY(EditAnywhere, Category = "Scenario")
+	UOpenDriveAsset *OpenDriveAsset;
 
-	static roadmanager::OpenDrive *GetOpenDrive();
+	UPROPERTY(/*VisibleAnywhere, BlueprintReadOnly, Category = "Scenario"*/)
+	FFilePath OpenDriveFile;
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
@@ -33,10 +35,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	virtual void Tick(float DeltaSeconds) override;
 
 	void LoadOpenDrive();
 
