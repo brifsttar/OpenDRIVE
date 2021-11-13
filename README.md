@@ -9,6 +9,30 @@ This plugin allows you to manipulate your [OpenDRIVE](https://www.asam.net/stand
 git clone --recurse-submodules git@github.com:brifsttar/OpenDRIVE.git
 ```
 
+## How to use
+
+There are a few steps to follow before jumping into the features.
+
+### Import the OpenDRIVE file
+
+The plugin adds a new `OpenDRIVE` asset type, meaning you can (and should) import your `.xodr` file into the engine. The import process is similar to all other types of assets, so the [official documentation](https://docs.unrealengine.com/4.27/en-US/WorkingWithContent/Importing/HowTo/) should be able to guide you.
+
+### Change your default Level Script Actor
+
+Since OpenDRIVE files are tightly linked to their related scenes, the current workflow is to set the OpenDRIVE asset used for each world/level. To do that, you have to use the plugin's own `Level Script Actor`.
+
+This is done via the `Project Settings`, see the screenshot below.
+
+![OpenDRIVE Level Script Actor](Resources/odr_level.jpg)
+
+### Add the OpenDRIVE file to your level
+
+Once you've set the plugin `Level Script Actor`as default, you can create a new level, and set its `OpenDRIVE Asset` via a property in the [Level Blueprint](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/UserGuide/Types/LevelBlueprint/).
+
+![OpenDRIVE Level Script Actor](Resources/odr_lvl_bp.jpg)
+
+Once that is done, your OpenDRIVE file should be properly loaded, and you can start using the plugin's features, or add your own using the full power of [esmini](https://github.com/esmini/esmini)'s [RoadManager](https://github.com/esmini/esmini/tree/master/EnvironmentSimulator/Modules/RoadManager).
+
 ## Features
 
 ### OpenDRIVE Component
@@ -39,7 +63,7 @@ A basic spline with an added feature to align all spline point to their lane cen
 
 ![Junction Spawner](Resources/odr_junction_spawn.gif)
 
-This Blueprint can spawn any actor (usually signs or traffic lights) for all road incoming to a junction. You can also set offsets on the sign's track coordinate.
+This Blueprint can spawn any actor (usually signs or traffic lights) for all roads incoming to a junction. You can also set offsets on the sign's track coordinate.
 
 No signs (or any prop) are included in this plugin. But you can check out [Der Sky](https://www.unrealengine.com/marketplace/en-US/profile/Der+Sky)'s Marketplace products, which probably has what you need.
 
