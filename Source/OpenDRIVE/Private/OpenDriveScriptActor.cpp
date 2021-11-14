@@ -27,11 +27,11 @@ void AOpenDriveScriptActor::PostEditChangeProperty(FPropertyChangedEvent& e) {
 
 void AOpenDriveScriptActor::CheckForErrors() {
 	Super::CheckForErrors();
+	FMessageLog MapCheck("MapCheck");
 
 	if (!GetLevel()) return;
 	if (GetLevel()->IsPersistentLevel()) return;
 	if (!OpenDriveFile.FilePath.IsEmpty() || OpenDriveAsset) {
-		FMessageLog MapCheck("MapCheck");
 		MapCheck.Warning()
 			->AddToken(FUObjectToken::Create(this))
 			->AddToken(FTextToken::Create(FText::FromString("is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored")));
@@ -55,6 +55,7 @@ void AOpenDriveScriptActor::LoadOpenDrive() {
 		}
 	} else {
 		// Legacy file loading
+		UE_LOG(OpenDriveLog, Warning, TEXT("%s uses deprecated OpenDriveFile, use OpenDriveAsset instead"), *(GetFName().ToString()));
 		FString RelPath = FPaths::ProjectContentDir() + OpenDriveFile.FilePath;
 		FString FullPath = IFileManager::Get().ConvertToAbsolutePathForExternalAppForRead(*RelPath);
 		if (!roadmanager::Position::LoadOpenDrive(TCHAR_TO_UTF8(*(FullPath)))) {
