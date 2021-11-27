@@ -19,8 +19,11 @@ AOpenDriveTrajectory::AOpenDriveTrajectory() {
 void AOpenDriveTrajectory::AlignPointsWithLanes() {
 	int count = Spline->GetNumberOfSplinePoints();
 	FVector oldPos, newPos;
+	FRotator newRot;
 	for (int i = 0; i < count; i++) {
 		oldPos = Spline->GetWorldLocationAtSplinePoint(i);
+		FVector AT = Spline->GetArriveTangentAtSplinePoint(i, ESplineCoordinateSpace::World);
+		FVector LT = Spline->GetLeaveTangentAtSplinePoint(i, ESplineCoordinateSpace::World);
 		roadmanager::Position trackPos = CoordTranslate::UeToOdr::FromLocation(oldPos);
 		trackPos.SetOffset(0);
 		// You want to hear a boring story? Here's one:
@@ -39,7 +42,15 @@ void AOpenDriveTrajectory::AlignPointsWithLanes() {
 		// That's a very good question you're asking here, for which I sadly have no answer.
 		// Have a nice day!
 		newPos = CoordTranslate::OdrToUe::ToLocation(trackPos);
-		Spline->SetWorldLocationAtSplinePoint(i, newPos);
+		Spline->SetLocationAtSplinePoint(i, newPos, ESplineCoordinateSpace::World);
+		trackPos.SetHeadingRelative(0.);
+		newRot = CoordTranslate::OdrToUe::ToRotation(trackPos);
+		AT = FVector(AT.Size(), 0.f, 0.f);
+		LT = FVector(LT.Size(), 0.f, 0.f);
+		AT = newRot.RotateVector(AT);
+		LT = newRot.RotateVector(LT);
+		Spline->SetTangentsAtSplinePoint(i, AT, LT, ESplineCoordinateSpace::World);
+
 	}
 }
 
