@@ -1,3 +1,3 @@
 [submodule "Source/ThirdParty/RoadManager/modules/esmini"]
 	path = Source/ThirdParty/RoadManager/modules/esmini
-	url = git@gitlab.com:brifsttar/RoadManager.git
+	url = https://gitlab.com/brifsttar/RoadManager.git
