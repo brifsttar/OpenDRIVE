@@ -39,9 +39,9 @@ void AOpenDriveScriptActor::BeginPlay() {
 }
 
 void AOpenDriveScriptActor::LoadOpenDrive() {
-	if (Cast<AOpenDriveWorldSettings>(GetWorldSettings())) {
+	if (AOpenDriveWorldSettings *Settings = Cast<AOpenDriveWorldSettings>(GetWorldSettings())) {
 		// Don't load if we're using the new World Settings class, it handles all that itself
-		return;
+		if (Settings->OpenDriveAsset) return;
 	} else {
 		UE_LOG(OpenDriveLog, Warning, TEXT("%s uses deprecated AOpenDriveScriptActor, please use AOpenDriveWorldSettings instead"), *(GetFName().ToString()));
 	}
