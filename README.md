@@ -17,19 +17,22 @@ There are a few steps to follow before jumping into the features.
 
 The plugin adds a new `OpenDRIVE` asset type, meaning you can (and should) import your `.xodr` file into the engine. The import process is similar to all other types of assets, so the [official documentation](https://docs.unrealengine.com/4.27/en-US/WorkingWithContent/Importing/HowTo/) should be able to guide you.
 
-### Change your default Level Script Actor
+### Change your default World Settings class
 
-Since OpenDRIVE files are tightly linked to their related scenes, the current workflow is to set the OpenDRIVE asset used for each world/level. To do that, you have to use the plugin's own `Level Script Actor`.
+Since OpenDRIVE files are tightly linked to their related scenes, the current workflow is to set the OpenDRIVE asset used for each world/level. To do that, you have to use the plugin's own `World Settings` class.
 
-This is done via the `Project Settings`, see the screenshot below.
+This is done by adding the following to your `DefaultEngine.ini`.
 
-![OpenDRIVE Level Script Actor](Resources/odr_level.jpg)
+```ini
+[/Script/Engine.Engine]
+WorldSettingsClassName=/Script/OpenDRIVE.OpenDriveWorldSettings
+```
 
 ### Add the OpenDRIVE file to your level
 
-Once you've set the plugin `Level Script Actor`as default, you can create a new level, and set its `OpenDRIVE Asset` via a property in the [Level Blueprint](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/Blueprints/UserGuide/Types/LevelBlueprint/).
+Once you've set the plugin `World Settings` class as default, you can open or create a level, and set its `OpenDRIVE Asset` via a property in the [World Settings](https://docs.unrealengine.com/4.27/en-US/Basics/Levels/WorldSettings/) tab.
 
-![OpenDRIVE Level Script Actor](Resources/odr_lvl_bp.jpg)
+![OpenDRIVE World Settings](Resources/odr_world_settings.jpg)
 
 Once that is done, your OpenDRIVE file should be properly loaded, and you can start using the plugin's features, or add your own using the full power of [esmini](https://github.com/esmini/esmini)'s [RoadManager](https://github.com/esmini/esmini/tree/master/EnvironmentSimulator/Modules/RoadManager).
 

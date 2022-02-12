@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
 #include "OpenDriveAsset.h"
-#include "RoadManager.hpp"
 #include "OpenDriveScriptActor.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(OpenDriveLog, Log, All);
@@ -13,23 +12,19 @@ DECLARE_LOG_CATEGORY_EXTERN(OpenDriveLog, Log, All);
 /**
  * 
  */
-UCLASS()
+UCLASS(/*Deprecated*/)
 class OPENDRIVE_API AOpenDriveScriptActor : public ALevelScriptActor
 {
 	GENERATED_BODY()
 
 public:
-	AOpenDriveScriptActor();
-
-	UPROPERTY(EditAnywhere, Category = "OpenDRIVE")
+	UPROPERTY(/*EditAnywhere, Category = "OpenDRIVE"*/)
 	UOpenDriveAsset *OpenDriveAsset;
 
 	UPROPERTY(/*VisibleAnywhere, BlueprintReadOnly, Category = "OpenDRIVE"*/)
 	FFilePath OpenDriveFile;
 
 #if WITH_EDITOR
-	void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
-
 	virtual void CheckForErrors() override;
 #endif
 

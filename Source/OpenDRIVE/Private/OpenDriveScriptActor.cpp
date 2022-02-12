@@ -2,32 +2,26 @@
 
 
 #include "OpenDriveScriptActor.h"
+#include "OpenDriveWorldSettings.h"
 #include "Misc/UObjectToken.h"
 #include "Misc/MapErrors.h"
 #include "Roadmanager.hpp"
 
 DEFINE_LOG_CATEGORY(OpenDriveLog);
 
-AOpenDriveScriptActor::AOpenDriveScriptActor() {
-	PrimaryActorTick.bCanEverTick = true;
-}
-
 #if WITH_EDITOR
-void AOpenDriveScriptActor::PostEditChangeProperty(FPropertyChangedEvent& e) {
-	Super::PostEditChangeProperty(e);
-
-	FName PropertyName = (e.MemberProperty != NULL) ? e.MemberProperty->GetFName() : NAME_None;
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(AOpenDriveScriptActor, OpenDriveFile)) {
-		FPaths::MakePathRelativeTo(OpenDriveFile.FilePath, *(FPaths::ProjectContentDir()));
-		LoadOpenDrive();
-	} else if (PropertyName == GET_MEMBER_NAME_CHECKED(AOpenDriveScriptActor, OpenDriveAsset)) {
-		LoadOpenDrive();
-	}
-}
-
 void AOpenDriveScriptActor::CheckForErrors() {
 	Super::CheckForErrors();
 	FMessageLog MapCheck("MapCheck");
+
+	//if (!Cast<AOpenDriveWorldSettings>(GetWorldSettings())) {
+	//	MapCheck.Warning()
+	//		->AddToken(FUObjectToken::Create(this))
+	//		->AddToken(FTextToken::Create(FText::FromString("uses deprecated AOpenDriveScriptActor, please use AOpenDriveWorldSettings instead")));
+	//}
+	//MapCheck.Warning()
+	//	->AddToken(FUObjectToken::Create(this))
+	//	->AddToken(FTextToken::Create(FText::FromString("uses deprecated AOpenDriveScriptActor, please redirect it to ALevelScriptActor")));
 
 	if (!GetLevel()) return;
 	if (GetLevel()->IsPersistentLevel()) return;
@@ -45,6 +39,12 @@ void AOpenDriveScriptActor::BeginPlay() {
 }
 
 void AOpenDriveScriptActor::LoadOpenDrive() {
+	if (Cast<AOpenDriveWorldSettings>(GetWorldSettings())) {
+		// Don't load if we're using the new World Settings class, it handles all that itself
+		return;
+	} else {
+		UE_LOG(OpenDriveLog, Warning, TEXT("%s uses deprecated AOpenDriveScriptActor, please use AOpenDriveWorldSettings instead"), *(GetFName().ToString()));
+	}
 	if (OpenDriveFile.FilePath.IsEmpty() && !OpenDriveAsset) return;
 	if (GetLevel() && !GetLevel()->IsPersistentLevel()) {
 		UE_LOG(OpenDriveLog, Warning, TEXT("%s is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored"), *(GetFName().ToString()));
