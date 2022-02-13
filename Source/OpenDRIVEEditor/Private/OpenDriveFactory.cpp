@@ -29,10 +29,7 @@ UObject *UOpenDriveFactory::FactoryCreateFile(
 	FString OdrContent;
 
 	if (!FFileHelper::LoadFileToString(OdrContent, *Filename)) return nullptr;
-	FString FullName = "ODR_";
-	FullName.Append(InName.ToString());
-	OdrAsset = NewObject<UOpenDriveAsset>(InParent, InClass, FName(*FullName), Flags);
-	if (!OdrAsset) return nullptr;
+	OdrAsset = NewObject<UOpenDriveAsset>(InParent, InClass, InName, Flags);
 	OdrAsset->XodrContent = OdrContent;
 	roadmanager::OpenDrive Odr;
 	Odr.LoadOpenDriveContent(TCHAR_TO_UTF8(*(OdrContent)));
