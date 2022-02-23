@@ -2,8 +2,8 @@
 
 
 #include "OpenDriveVehicle.h"
-#include "WheeledVehicle.h"
-#include "WheeledVehicleMovementComponent.h"
+#include "WheeledVehiclePawn.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 
 UOpenDriveVehicle::UOpenDriveVehicle() {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -12,7 +12,10 @@ UOpenDriveVehicle::UOpenDriveVehicle() {
 void UOpenDriveVehicle::PostLoad() {
 	Super::PostLoad();
 	if (!GetOwner()) return;
-	_Car = dynamic_cast<AWheeledVehicle *>(GetOwner());
+	_Car = dynamic_cast<AWheeledVehiclePawn*>(GetOwner());
+	if (_Car) {
+		_MovComp = Cast<UChaosWheeledVehicleMovementComponent>(_Car->GetVehicleMovementComponent());
+	}
 }
 
 FBoxSphereBounds UOpenDriveVehicle::GetBounds() const {
@@ -40,7 +43,7 @@ double UOpenDriveVehicle::LengthBack() const {
 
 double UOpenDriveVehicle::OdrSpeed() const {
 	if (_Car->GetMesh()->IsSimulatingPhysics()) {
-		return _Car->GetVehicleMovement()->GetForwardSpeed() * CoordTranslate::UuToMeters();
+		return _MovComp->GetForwardSpeed() * CoordTranslate::UuToMeters();
 	} else {
 		return _SpeedOverride;
 	}
@@ -61,16 +64,16 @@ double UOpenDriveVehicle::OdrAcceleration() const {
 }
 
 double UOpenDriveVehicle::OdrSteerAngle() const {
-	return -FMath::DegreesToRadians(_Car->GetVehicleMovement()->Wheels[0]->GetSteerAngle());
+	return -FMath::DegreesToRadians(_MovComp->Wheels[0]->GetSteerAngle());
 }
 
 double UOpenDriveVehicle::OdrSteerAngleMax() const {
-	return FMath::DegreesToRadians(_Car->GetVehicleMovement()->Wheels[0]->SteerAngle);
+	return FMath::DegreesToRadians(_MovComp->Wheels[0]->MaxSteerAngle);
 }
 
 double UOpenDriveVehicle::OdrWheelbase() const {
-	FName wFrontName = _Car->GetVehicleMovement()->WheelSetups[0].BoneName;
-	FName wBackName = _Car->GetVehicleMovement()->WheelSetups[3].BoneName;
+	FName wFrontName = _MovComp->WheelSetups[0].BoneName;
+	FName wBackName = _MovComp->WheelSetups[3].BoneName;
 	float wFrontPos = NAN, wBackPos = NAN;
 	for (auto &c : _Car->GetMesh()->Constraints) {
 		//todo That probably doesn't work for all cars...

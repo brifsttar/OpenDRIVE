@@ -19,7 +19,8 @@ public:
 	virtual void PostLoad() override;
 
 private:
-	class AWheeledVehicle *_Car;
+	class AWheeledVehiclePawn* _Car;
+	class UChaosWheeledVehicleMovementComponent* _MovComp;
 	mutable double _PrevSpeed = 0.;
 	mutable double _PrevTime = 0.;
 	mutable double _Acc = 0.;
