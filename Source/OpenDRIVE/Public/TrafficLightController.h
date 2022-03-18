@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TrafficLightInterface.h"
 #include "JunctionSignSpawner.h"
 #include "TrafficLightController.generated.h"
 
@@ -14,7 +13,7 @@ struct FTrafficLightGroup {
 
 	// For some reason this doesn't work. It can be set via BP, but not in the editor window.
 	//UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<TScriptInterface<ITrafficLightInterface>> TrafficLights;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<AActor*> TrafficLights;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<class ATrafficLight*> TrafficLights;
 
 	/**
 	* Green light start time (s)
