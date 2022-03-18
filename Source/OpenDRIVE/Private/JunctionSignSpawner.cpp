@@ -59,7 +59,7 @@ void AJunctionSignSpawner::SpawnJunctionSigns() {
 
 	if (bClearExisting) {
 		for (auto &t : JunctionSigns) {
-			t->Destroy();
+			if (IsValid(t)) t->Destroy();
 		}
 		JunctionSigns.Empty();
 	}
