@@ -90,6 +90,7 @@ void ATrafficLightController::UpdateLights()
 
 		// Applying state
 		for (auto& tl : g.TrafficLights) {
+			if (!IsValid(tl)) continue;
 			tl->SetTrafficLightState(state);
 			tl->SetPedestrianLightState(pedState);
 		}
