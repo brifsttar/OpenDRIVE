@@ -61,11 +61,3 @@ FVector CoordTranslate::UeToOdr::Rotation(const FVector &P) {
 		FMath::DegreesToRadians( P.Y)
 	);
 }
-
-float CoordTranslate::UuToMeters() {
-	return 1.f / MetersToUu();
-}
-
-float CoordTranslate::MetersToUu() {
-	return 100.f;
-}
