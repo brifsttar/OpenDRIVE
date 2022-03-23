@@ -9,6 +9,7 @@ ATrafficLight::ATrafficLight() {
 
 
 	Scene = CreateDefaultSubobject<USceneComponent>("Root");
+	Scene->SetMobility(EComponentMobility::Movable);
 	Scene->SetupAttachment(RootComponent);
 
 	OpenDrive = CreateDefaultSubobject<UOpenDriveComponent>(TEXT("OpenDrive"));
