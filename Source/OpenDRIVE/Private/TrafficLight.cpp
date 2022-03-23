@@ -4,8 +4,7 @@
 #include "TrafficLight.h"
 #include "OpenDriveComponent.h"
 
-ATrafficLight::ATrafficLight()
-{
+ATrafficLight::ATrafficLight() {
 	PrimaryActorTick.bCanEverTick = true;
 
 
