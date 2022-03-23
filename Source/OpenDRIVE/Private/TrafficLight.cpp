@@ -4,12 +4,12 @@
 #include "TrafficLight.h"
 #include "OpenDriveComponent.h"
 
-ATrafficLight::ATrafficLight()
-{
+ATrafficLight::ATrafficLight() {
 	PrimaryActorTick.bCanEverTick = true;
 
 
 	Scene = CreateDefaultSubobject<USceneComponent>("Root");
+	Scene->SetMobility(EComponentMobility::Movable);
 	Scene->SetupAttachment(RootComponent);
 
 	OpenDrive = CreateDefaultSubobject<UOpenDriveComponent>(TEXT("OpenDrive"));
