@@ -35,7 +35,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 	class USceneComponent* Scene;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UOpenDriveComponent* OpenDrive;
 
 	UPROPERTY(BlueprintAssignable);
