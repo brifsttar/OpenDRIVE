@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	AJunctionSignSpawner();
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UOpenDriveComponent* OpenDrive;
 
 	UPROPERTY(EditDefaultsOnly)
