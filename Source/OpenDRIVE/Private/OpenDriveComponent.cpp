@@ -15,22 +15,6 @@ UOpenDriveComponent::UOpenDriveComponent()
 	// ...
 }
 
-
-// Called when the game starts
-void UOpenDriveComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-
-// Called every frame
-void UOpenDriveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UOpenDriveComponent::GetPosition() {
 	if (!GetOwner()) return;
 	roadmanager::Position p = OdrPosition();
