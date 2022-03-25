@@ -9,6 +9,18 @@ UOpenDriveVehicle::UOpenDriveVehicle() {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UOpenDriveVehicle::TickComponent(
+	float DeltaTime,
+	ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction
+) {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (PrevRoadId != GetRoadId()) {
+		PrevRoadId = GetRoadId();
+		OnNewRoad.Broadcast(PrevRoadId);
+	}
+}
+
 void UOpenDriveVehicle::PostLoad() {
 	Super::PostLoad();
 	if (!GetOwner()) return;
