@@ -112,13 +112,13 @@ public:
 	* Returns the current speed (cm/s)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
-	float Speed() const { return OdrSpeed() * MetersToUu(); }
+	float Speed() const { return MetersToUu(OdrSpeed()); }
 
 	/**
 	* Returns the current acceleration (cm/s²)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
-	float Acceleration() const { return OdrAcceleration() * MetersToUu(); }
+	float Acceleration() const { return MetersToUu(OdrAcceleration()); }
 
 		
 };

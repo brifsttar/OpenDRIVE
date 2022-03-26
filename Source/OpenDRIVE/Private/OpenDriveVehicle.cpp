@@ -52,7 +52,7 @@ double UOpenDriveVehicle::LengthBack() const {
 
 double UOpenDriveVehicle::OdrSpeed() const {
 	if (_Car->GetMesh()->IsSimulatingPhysics()) {
-		return _Car->GetVehicleMovement()->GetForwardSpeed() * CoordTranslate::UuToMeters();
+		return CoordTranslate::UuToMeters(_Car->GetVehicleMovement()->GetForwardSpeed());
 	} else {
 		return _SpeedOverride;
 	}
@@ -91,7 +91,7 @@ double UOpenDriveVehicle::OdrWheelbase() const {
 		if (c->ConstraintBone1 == wBackName) wBackPos = c->Pos2.X;
 		if (c->ConstraintBone2 == wBackName) wBackPos = c->Pos2.X;
 	}
-	return std::abs(wFrontPos - wBackPos) * CoordTranslate::UuToMeters();
+	return CoordTranslate::UuToMeters(std::abs(wFrontPos - wBackPos));
 }
 
 float UOpenDriveVehicle::RoadDistanceTo(const UOpenDriveVehicle *Other) const {

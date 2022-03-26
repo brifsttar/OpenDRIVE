@@ -21,9 +21,9 @@ FRotator CoordTranslate::OdrToUe::ToRotation(const roadmanager::Position &P) {
 
 FVector CoordTranslate::OdrToUe::Location(const FVector &P) {
 	return FVector(
-		 P.X * MetersToUu(),
-		-P.Y * MetersToUu(),
-		 P.Z * MetersToUu()
+		MetersToUu( P.X),
+		MetersToUu(-P.Y),
+		MetersToUu( P.Z)
 	);
 }
 
@@ -33,9 +33,9 @@ FVector CoordTranslate::OdrToUe::Rotation(const FVector &P) {
 
 roadmanager::Position CoordTranslate::UeToOdr::FromTransfrom(const FTransform &P) {
 	return roadmanager::Position(
-		 P.GetLocation().X * UuToMeters(),
-		-P.GetLocation().Y * UuToMeters(),
-		 P.GetLocation().Z * UuToMeters(),
+		UuToMeters( P.GetLocation().X),
+		UuToMeters(-P.GetLocation().Y),
+		UuToMeters( P.GetLocation().Z),
 		FMath::DegreesToRadians(-P.GetRotation().Rotator().Yaw  ),
 		FMath::DegreesToRadians( P.GetRotation().Rotator().Roll ),
 		FMath::DegreesToRadians( P.GetRotation().Rotator().Pitch)
@@ -48,9 +48,9 @@ roadmanager::Position CoordTranslate::UeToOdr::FromLocation(const FVector &P) {
 
 FVector CoordTranslate::UeToOdr::Location(const FVector &P) {
 	return FVector(
-		 P.X * UuToMeters(),
-		-P.Y * UuToMeters(),
-		 P.Z * UuToMeters()
+		UuToMeters( P.X),
+		UuToMeters(-P.Y),
+		UuToMeters( P.Z)
 	);
 }
 
