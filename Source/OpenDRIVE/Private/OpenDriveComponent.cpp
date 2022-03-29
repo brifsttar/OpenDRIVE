@@ -56,10 +56,10 @@ void UOpenDriveComponent::SetTrackPosition(int TrackId, int LaneId, float S, flo
 
 bool UOpenDriveComponent::MoveAlongS(float S, int Strategy) {
 	roadmanager::Position p = OdrPosition();
-	roadmanager::Position::ErrorCode ret;
+	roadmanager::Position::ReturnCode ret;
 	ret = p.MoveAlongS(UuToMeters(S), 0., roadmanager::Junction::JunctionStrategyType(Strategy));
 	SetTrackPosition(p);
-	return ret == roadmanager::Position::ErrorCode::ERROR_NO_ERROR;
+	return ret == roadmanager::Position::ReturnCode::OK;
 }
 
 void UOpenDriveComponent::ResetPosition() {
