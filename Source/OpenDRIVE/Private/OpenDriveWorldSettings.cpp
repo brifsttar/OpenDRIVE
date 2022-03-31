@@ -3,12 +3,12 @@
 
 #include "OpenDriveWorldSettings.h"
 #include "Misc/UObjectToken.h"
-#include "Editor/EditorEngine.h"
-#include "Subsystems/ImportSubsystem.h"
 #include "Logging/MessageLog.h"
 #include "Roadmanager.hpp"
 #if WITH_EDITOR
 #include "Editor.h"
+#include "Editor/EditorEngine.h"
+#include "Subsystems/ImportSubsystem.h"
 #endif
 
 #if WITH_EDITOR
