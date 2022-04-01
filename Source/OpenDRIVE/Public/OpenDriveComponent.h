@@ -144,4 +144,15 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float SDistanceTo(const UOpenDriveComponent* Other) const;
+
+	/**
+	* Returns the delta to the other object
+	* @param Other Other object
+	* @param Ds Delta in S coordinate
+	* @param Dt Delta in T coordinate
+	* @param DLaneId Delta in lane ID
+	* @return Whether the delta was resolved
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	bool Delta(const UOpenDriveComponent* Other, float& Ds, float& Dt, int& DLaneId) const;
 };

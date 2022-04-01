@@ -122,3 +122,17 @@ float UOpenDriveComponent::SDistanceTo(const UOpenDriveComponent* Other) const {
 		return std::numeric_limits<double>::quiet_NaN();
 	}
 }
+
+bool UOpenDriveComponent::Delta(const UOpenDriveComponent* Other, float& Ds, float& Dt, int& DLaneId) const {
+	if (!Other) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("UOpenDriveComponent::Delta(): No other point"));
+		return false;
+	}
+	roadmanager::PositionDiff diff;
+	roadmanager::Position otherPos = Other->OdrPosition();
+	bool ret = OdrPosition().Delta(&otherPos, diff);
+	Ds = MetersToUu(diff.ds);
+	Dt = MetersToUu(diff.dt);
+	DLaneId = diff.dLaneId;
+	return ret;
+}
