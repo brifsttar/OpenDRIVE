@@ -31,9 +31,9 @@ UObject *UOpenDriveFactory::FactoryCreateFile(
 	if (!FFileHelper::LoadFileToString(OdrContent, *Filename)) return nullptr;
 	OdrAsset = NewObject<UOpenDriveAsset>(InParent, InClass, InName, Flags);
 	OdrAsset->XodrContent = OdrContent;
-	roadmanager::OpenDrive Odr;
-	Odr.LoadOpenDriveContent(TCHAR_TO_UTF8(*(OdrContent)));
-	OdrAsset->RoadCount = Odr.GetNumOfRoads();
+	//roadmanager::OpenDrive Odr;
+	//Odr.LoadOpenDriveContent(TCHAR_TO_UTF8(*(OdrContent)));
+	//OdrAsset->RoadCount = Odr.GetNumOfRoads();
 	OdrAsset->AssetImportData->UpdateFilenameOnly(Filename);
 	bOutOperationCanceled = false;
 

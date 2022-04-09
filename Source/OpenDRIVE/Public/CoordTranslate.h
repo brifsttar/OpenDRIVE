@@ -21,6 +21,6 @@ namespace CoordTranslate {
 		FVector               OPENDRIVE_API Rotation     (const FVector &P);
 	}
 
-	float OPENDRIVE_API UuToMeters();
-	float OPENDRIVE_API MetersToUu();
+	constexpr float OPENDRIVE_API MetersToUu(double Meters) { return Meters * 100.f; };
+	constexpr double OPENDRIVE_API UuToMeters(float Uu) { return Uu / 100.; };
 };

@@ -15,29 +15,13 @@ UOpenDriveComponent::UOpenDriveComponent()
 	// ...
 }
 
-
-// Called when the game starts
-void UOpenDriveComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-
-// Called every frame
-void UOpenDriveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UOpenDriveComponent::GetPosition() {
 	if (!GetOwner()) return;
 	roadmanager::Position p = OdrPosition();
 	RoadId_ = p.GetTrackId();
 	LaneId_ = p.GetLaneId();
-	S_ = p.GetS() * MetersToUu();
-	T_ = p.GetOffset() * MetersToUu();
+	S_ = MetersToUu(p.GetS());
+	T_ = MetersToUu(p.GetOffset());
 	H_ = FMath::RadiansToDegrees(p.GetHRelativeDrivingDirection());
 }
 
@@ -65,17 +49,17 @@ void UOpenDriveComponent::SetTrackPosition(const roadmanager::Position &p) {
 }
 
 void UOpenDriveComponent::SetTrackPosition(int TrackId, int LaneId, float S, float Offset, float H) {
-	roadmanager::Position p(TrackId, LaneId, S * UuToMeters(), Offset * UuToMeters());
+	roadmanager::Position p(TrackId, LaneId, UuToMeters(S), UuToMeters(Offset));
 	p.SetHeadingRelative(FMath::DegreesToRadians(H));
 	SetTrackPosition(p);
 }
 
 bool UOpenDriveComponent::MoveAlongS(float S, int Strategy) {
 	roadmanager::Position p = OdrPosition();
-	roadmanager::Position::ErrorCode ret;
-	ret = p.MoveAlongS(S * UuToMeters(), 0., roadmanager::Junction::JunctionStrategyType(Strategy));
+	roadmanager::Position::ReturnCode ret;
+	ret = p.MoveAlongS(UuToMeters(S), 0., roadmanager::Junction::JunctionStrategyType(Strategy));
 	SetTrackPosition(p);
-	return ret == roadmanager::Position::ErrorCode::ERROR_NO_ERROR;
+	return ret == roadmanager::Position::ReturnCode::OK;
 }
 
 void UOpenDriveComponent::ResetPosition() {
@@ -91,11 +75,11 @@ int UOpenDriveComponent::GetLaneId() const {
 }
 
 float UOpenDriveComponent::GetS() const {
-	return OdrPosition().GetS() * MetersToUu();
+	return MetersToUu(OdrPosition().GetS());
 }
 
 float UOpenDriveComponent::GetT() const {
-	return OdrPosition().GetOffset() * MetersToUu();
+	return MetersToUu(OdrPosition().GetOffset());
 }
 
 float UOpenDriveComponent::GetH() const {
@@ -108,7 +92,7 @@ int UOpenDriveComponent::GetJunctionId() const {
 }
 
 float UOpenDriveComponent::GetNextJunctionDistance() const {
-	return OdrPosition().GetNextJunction().distance * MetersToUu();
+	return MetersToUu(OdrPosition().GetNextJunction().distance);
 }
 
 int UOpenDriveComponent::GetNextJunctionId() const {
@@ -116,9 +100,8 @@ int UOpenDriveComponent::GetNextJunctionId() const {
 }
 
 bool UOpenDriveComponent::IsJunctionDistanceLessThan(float Dist, int JunctionId) const {
-	Dist *= UuToMeters();
 	roadmanager::Position::NextJunction next = OdrPosition().GetNextJunction();
-	bool isLess = next.distance < Dist;
+	bool isLess = next.distance < UuToMeters(Dist);
 	if (JunctionId == -1) {
 		return isLess;
 	} else {
@@ -134,8 +117,22 @@ float UOpenDriveComponent::SDistanceTo(const UOpenDriveComponent* Other) const {
 	roadmanager::PositionDiff diff;
 	roadmanager::Position otherPos = Other->OdrPosition();
 	if (OdrPosition().Delta(&otherPos, diff)) {
-		return diff.ds * MetersToUu();
+		return MetersToUu(diff.ds);
 	} else {
 		return std::numeric_limits<double>::quiet_NaN();
 	}
+}
+
+bool UOpenDriveComponent::Delta(const UOpenDriveComponent* Other, float& Ds, float& Dt, int& DLaneId) const {
+	if (!Other) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("UOpenDriveComponent::Delta(): No other point"));
+		return false;
+	}
+	roadmanager::PositionDiff diff;
+	roadmanager::Position otherPos = Other->OdrPosition();
+	bool ret = OdrPosition().Delta(&otherPos, diff);
+	Ds = MetersToUu(diff.ds);
+	Dt = MetersToUu(diff.dt);
+	DLaneId = diff.dLaneId;
+	return ret;
 }

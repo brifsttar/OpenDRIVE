@@ -7,7 +7,7 @@ public class OpenDRIVE : ModuleRules
 	public OpenDRIVE(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
+
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -27,5 +27,9 @@ public class OpenDRIVE : ModuleRules
 				"Engine",
 			}
 		);
+
+		if (Target.bBuildEditor) {
+			PrivateDependencyModuleNames.Add("UnrealEd");
+		}
 	}
 }

@@ -5,6 +5,7 @@
 #include "OpenDriveWorldSettings.h"
 #include "Misc/UObjectToken.h"
 #include "Misc/MapErrors.h"
+#include "Logging/MessageLog.h"
 #include "Roadmanager.hpp"
 
 DEFINE_LOG_CATEGORY(OpenDriveLog);

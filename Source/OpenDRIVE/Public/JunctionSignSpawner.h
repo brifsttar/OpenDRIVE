@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	AJunctionSignSpawner();
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UOpenDriveComponent* OpenDrive;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -34,7 +34,7 @@ public:
 	* S-coordinate offset (cm) from the junction
 	*/
 	UPROPERTY(EditAnywhere, Category = "Junction Spawner|Generation")
-	float SOffset = 0.f;
+	float SOffset = 100.f;
 
 	/**
 	* T-coordinate offset (cm) from the sidewalk center

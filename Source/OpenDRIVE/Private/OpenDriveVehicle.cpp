@@ -9,6 +9,18 @@ UOpenDriveVehicle::UOpenDriveVehicle() {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UOpenDriveVehicle::TickComponent(
+	float DeltaTime,
+	ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction
+) {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (PrevRoadId != GetRoadId()) {
+		PrevRoadId = GetRoadId();
+		OnNewRoad.Broadcast(PrevRoadId);
+	}
+}
+
 void UOpenDriveVehicle::PostLoad() {
 	Super::PostLoad();
 	if (!GetOwner()) return;
@@ -43,7 +55,7 @@ double UOpenDriveVehicle::LengthBack() const {
 
 double UOpenDriveVehicle::OdrSpeed() const {
 	if (_Car->GetMesh()->IsSimulatingPhysics()) {
-		return _MovComp->GetForwardSpeed() * CoordTranslate::UuToMeters();
+		return _CoordTranslate::UuToMeters(MovComp->GetForwardSpeed());
 	} else {
 		return _SpeedOverride;
 	}
@@ -82,7 +94,7 @@ double UOpenDriveVehicle::OdrWheelbase() const {
 		if (c->ConstraintBone1 == wBackName) wBackPos = c->Pos2.X;
 		if (c->ConstraintBone2 == wBackName) wBackPos = c->Pos2.X;
 	}
-	return std::abs(wFrontPos - wBackPos) * CoordTranslate::UuToMeters();
+	return CoordTranslate::UuToMeters(std::abs(wFrontPos - wBackPos));
 }
 
 float UOpenDriveVehicle::RoadDistanceTo(const UOpenDriveVehicle *Other) const {

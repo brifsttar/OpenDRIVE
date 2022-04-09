@@ -4,8 +4,8 @@
 #include "TrafficLightController.h"
 
 #include "RoadManager.hpp"
-//#include "OpenDriveComponent.h"
-#include "Components/BillboardComponent.h"
+#include "TrafficLight.h"
+//#include "Components/BillboardComponent.h"
 #include "EngineUtils.h"
 #include "CoordTranslate.h"
 
@@ -90,8 +90,9 @@ void ATrafficLightController::UpdateLights()
 
 		// Applying state
 		for (auto& tl : g.TrafficLights) {
-			ITrafficLightInterface::Execute_SetTrafficLightState(tl, state);
-			ITrafficLightInterface::Execute_SetPedestrianLightState(tl, pedState);
+			if (!IsValid(tl)) continue;
+			tl->SetTrafficLightState(state);
+			tl->SetPedestrianLightState(pedState);
 		}
 	}
 }
@@ -114,9 +115,16 @@ void ATrafficLightController::CreateDefaultGroups()
 	const float MAX_DH = 30.;
 
 	// Finding pairs
-	std::set<AActor*> tlset;
-	tlset.insert(JunctionSigns.begin(), JunctionSigns.end());
-	AActor* refTl = JunctionSigns[0];
+	std::set<ATrafficLight*> tlset;
+	ATrafficLight* refTl;
+	for (auto& sign : JunctionSigns) {
+		if (ATrafficLight* tl = Cast<ATrafficLight>(sign)) {
+			tlset.insert(tl);
+			refTl = tl;
+		} else {
+			//todo log
+		}
+	}
 	TrafficLightGroups[0].TrafficLights.Add(refTl);
 	tlset.erase(refTl);
 	FRotator refRot = refTl->GetActorTransform().GetRotation().Rotator();

@@ -29,6 +29,12 @@ protected:
 
 	void LoadOpenDrive();
 
+#if WITH_EDITOR
+	void OnObjectReimported(UObject* InObject);
+#endif
+
+	bool bRegisteredReimportCallback = false;
+
 public:
 
 	virtual void PostLoad() override;

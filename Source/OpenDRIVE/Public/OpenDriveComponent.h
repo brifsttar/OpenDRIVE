@@ -10,7 +10,6 @@
 using CoordTranslate::UuToMeters;
 using CoordTranslate::MetersToUu;
 
-
 UCLASS( ClassGroup=(OpenDRIVE), meta=(BlueprintSpawnableComponent, ShortTooltip = "Manipulate OpenDRIVE coordinate (e.g. road, S, T)") )
 class OPENDRIVE_API UOpenDriveComponent : public USceneComponent
 {
@@ -43,13 +42,7 @@ public:
 
 	void SetTrackPosition(const roadmanager::Position &p);
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	/**
 	* Computes the current OpenDRIVE position and updates the public position variables accordingly
@@ -151,4 +144,15 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float SDistanceTo(const UOpenDriveComponent* Other) const;
+
+	/**
+	* Returns the delta to the other object
+	* @param Other Other object
+	* @param Ds Delta in S coordinate
+	* @param Dt Delta in T coordinate
+	* @param DLaneId Delta in lane ID
+	* @return Whether the delta was resolved
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	bool Delta(const UOpenDriveComponent* Other, float& Ds, float& Dt, int& DLaneId) const;
 };

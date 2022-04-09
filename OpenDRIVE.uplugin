@@ -23,7 +23,7 @@
 		{
 			"Name": "OpenDRIVELoader",
 			"Type": "Runtime",
-			"LoadingPhase": "PreDefault"
+			"LoadingPhase": "PostConfigInit"
 		},
 		{
 			"Name": "OpenDRIVEEditor",

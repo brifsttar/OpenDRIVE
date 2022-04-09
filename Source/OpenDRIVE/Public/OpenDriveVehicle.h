@@ -7,6 +7,8 @@
 #include "OpenDriveVehicle.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNewRoad, int, Road);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OPENDRIVE_API UOpenDriveVehicle : public UOpenDriveComponent
 {
@@ -24,6 +26,7 @@ private:
 	mutable double _PrevSpeed = 0.;
 	mutable double _PrevTime = 0.;
 	mutable double _Acc = 0.;
+	int PrevRoadId = -1;
 	FBoxSphereBounds GetBounds() const;
 
 protected:
@@ -32,12 +35,17 @@ protected:
 	double LengthBack() const;
 
 public:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	// Legacy methods that I'll (re)move over time
 	double OdrSpeed() const;
 	double OdrAcceleration() const;
 	double OdrSteerAngle() const;
 	double OdrSteerAngleMax() const;
 	double OdrWheelbase() const;
+
+	UPROPERTY(BlueprintAssignable);
+	FOnNewRoad OnNewRoad;
 
 	// Overrides speed value for cluster slaves, since they don't have PhysX vehicle model
 	void SetSpeedOverride(float Speed) { _SpeedOverride = Speed; }
@@ -105,13 +113,13 @@ public:
 	* Returns the current speed (cm/s)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
-	float Speed() const { return OdrSpeed() * MetersToUu(); }
+	float Speed() const { return MetersToUu(OdrSpeed()); }
 
 	/**
 	* Returns the current acceleration (cm/s²)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
-	float Acceleration() const { return OdrAcceleration() * MetersToUu(); }
+	float Acceleration() const { return MetersToUu(OdrAcceleration()); }
 
 		
 };
