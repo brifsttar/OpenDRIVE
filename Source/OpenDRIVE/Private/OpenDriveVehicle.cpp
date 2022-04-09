@@ -55,7 +55,7 @@ double UOpenDriveVehicle::LengthBack() const {
 
 double UOpenDriveVehicle::OdrSpeed() const {
 	if (_Car->GetMesh()->IsSimulatingPhysics()) {
-		return _CoordTranslate::UuToMeters(MovComp->GetForwardSpeed());
+		return CoordTranslate::UuToMeters(_MovComp->GetForwardSpeed());
 	} else {
 		return _SpeedOverride;
 	}
