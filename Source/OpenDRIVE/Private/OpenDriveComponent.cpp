@@ -59,11 +59,11 @@ bool UOpenDriveComponent::MoveAlongS(float S, int Strategy) {
 	roadmanager::Position::ReturnCode ret;
 	ret = p.MoveAlongS(UuToMeters(S), 0., roadmanager::Junction::JunctionStrategyType(Strategy));
 	SetTrackPosition(p);
-	return ret == roadmanager::Position::ReturnCode::OK;
+	return ret >= roadmanager::Position::ReturnCode::OK;
 }
 
 void UOpenDriveComponent::ResetPosition() {
-	SetTrackPosition(roadmanager::Position());
+	_TrackPosCache = roadmanager::Position();
 }
 
 int UOpenDriveComponent::GetRoadId() const {
