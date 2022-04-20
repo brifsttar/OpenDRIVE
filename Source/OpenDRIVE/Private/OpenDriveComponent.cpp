@@ -63,7 +63,7 @@ bool UOpenDriveComponent::MoveAlongS(float S, int Strategy) {
 }
 
 void UOpenDriveComponent::ResetPosition() {
-	SetTrackPosition(roadmanager::Position());
+	_TrackPosCache = roadmanager::Position();
 }
 
 int UOpenDriveComponent::GetRoadId() const {
