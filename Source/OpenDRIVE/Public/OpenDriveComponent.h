@@ -15,7 +15,7 @@ class OPENDRIVE_API UOpenDriveComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-private:
+protected:
 	// Cache for position
 	mutable roadmanager::Position _TrackPosCache;
 	mutable FVector _XyzPosCache;
@@ -38,7 +38,7 @@ public:
 
 	UOpenDriveComponent();
 
-	roadmanager::Position OdrPosition() const;
+	virtual roadmanager::Position OdrPosition() const;
 
 	void SetTrackPosition(const roadmanager::Position &p);
 

@@ -15,7 +15,8 @@ void UOpenDriveVehicle::TickComponent(
 	FActorComponentTickFunction* ThisTickFunction
 ) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (PrevRoadId != GetRoadId()) {
+
+	if (OnNewRoad.IsBound() && PrevRoadId != GetRoadId()) {
 		PrevRoadId = GetRoadId();
 		OnNewRoad.Broadcast(PrevRoadId);
 	}

@@ -93,7 +93,7 @@ void AJunctionSignSpawner::SpawnJunctionSigns() {
 		// Spawn sign on the sidewalk with given offsets
 		roadmanager::Position tp(r->GetId(), laneId, s, UuToMeters(side * TOffset));
 		double h_offset = FMath::DegreesToRadians(HOffset);
-		if (SOffset != 0.) tp.MoveAlongS(UuToMeters(-SOffset));
+		if (SOffset != 0.) tp.MoveAlongS(UuToMeters(side * SOffset));
 		tp.SetHeadingRelativeRoadDirection(-h_offset);
 		FTransform t = CoordTranslate::OdrToUe::ToTransfrom(tp);
 		AActor *junctionSign = GetWorld()->SpawnActor<AActor>(JunctionSignClass, t);
