@@ -30,6 +30,7 @@ private:
 
 protected:
 	float _SpeedOverride = 0.f;
+	float _AccOverride = 0.f;
 	double LengthFront() const;
 	double LengthBack() const;
 
@@ -48,6 +49,7 @@ public:
 
 	// Overrides speed value for cluster slaves, since they don't have PhysX vehicle model
 	void SetSpeedOverride(float Speed) { _SpeedOverride = Speed; }
+	void SetAccOverride(float Acc) { _AccOverride = Acc; }
 
 	/**
 	* Returns the longitudinal distance (cm, also known as "pk" or "S" distance) to another vehicle
