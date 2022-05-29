@@ -63,6 +63,9 @@ double UOpenDriveVehicle::OdrSpeed() const {
 }
 
 double UOpenDriveVehicle::OdrAcceleration() const {
+	if (!_Car->GetMesh()->IsSimulatingPhysics()) {
+		return _AccOverride;
+	}
 	float t = _Car->GetGameTimeSinceCreation();
 	if (_PrevTime == 0.0) {
 		_PrevTime = t;
