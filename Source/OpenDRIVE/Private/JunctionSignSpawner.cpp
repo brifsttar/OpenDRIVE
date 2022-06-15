@@ -40,13 +40,12 @@ AJunctionSignSpawner::AJunctionSignSpawner()
 }
 
 void AJunctionSignSpawner::SpawnJunctionSigns() {
-	if (!JunctionSignClass) {
-		return;
-	}
+	if (!JunctionSignClass) return;
 
 	// Find all roads connected to the junction
 	std::set<roadmanager::Road*> trafficLightRoads;
 	roadmanager::Position p = OpenDrive->OdrPosition();
+	if (!p.GetRoad()) return;
 	int junctionId = p.GetRoad()->GetJunction();
 	roadmanager::Junction *j = p.GetOpenDrive()->GetJunctionById(junctionId);
 	if (!j)  return;
