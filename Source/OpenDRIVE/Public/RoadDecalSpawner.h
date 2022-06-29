@@ -13,8 +13,8 @@ public:
 	// Sets default values for this actor's properties
 	ARoadDecalSpawner();
 
-	//UPROPERTY(EditDefaultsOnly)
-	class UBillboardComponent* BillboardComponent;
+	UPROPERTY(EditDefaultsOnly)
+	class UBoxComponent* BoxComponent;
 
 	UPROPERTY()
 	TArray<class ADecalActor*> SpawnedDecals;

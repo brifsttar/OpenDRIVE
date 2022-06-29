@@ -1,24 +1,15 @@
 
 #include "RoadDecalSpawner.h"
 #include "Engine/DecalActor.h"
+#include "Components/BoxComponent.h"
 #include "CoordTranslate.h"
-#include "Components/BillboardComponent.h"
 #include "RoadManager.hpp"
 
 ARoadDecalSpawner::ARoadDecalSpawner() {
 	PrimaryActorTick.bCanEverTick = false;
 
-	struct FConstructorStatics {
-		ConstructorHelpers::FObjectFinder<UTexture2D> Texture0;
-		FConstructorStatics()
-			: Texture0(TEXT("Texture2D'/Engine/EditorResources/Waypoint'")) {
-		}
-	};
-	static FConstructorStatics ConstructorStatics;
-	BillboardComponent = CreateDefaultSubobject<UBillboardComponent>(TEXT("Billboard"));
-	SpriteTexture = ConstructorStatics.Texture0.Object;
-	BillboardComponent->Sprite = SpriteTexture;
-	RootComponent = BillboardComponent;
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	RootComponent = BoxComponent;
 }
 
 void ARoadDecalSpawner::BeginPlay() {
@@ -42,6 +33,8 @@ void ARoadDecalSpawner::SpawnDecals() {
 	float sRandMax = CoordTranslate::UuToMeters(SAverageSpacing);
 	float tOffset = CoordTranslate::UuToMeters(TMaxOffset);
 
+	FBox box = BoxComponent->CalcBounds(GetTransform()).GetBox();
+
 	for (int i = 0; i < roadCount; i++) {
 		road = odr->GetRoadByIdx(i);
 		roadLen = road->GetLength();
@@ -60,6 +53,7 @@ void ARoadDecalSpawner::SpawnDecals() {
 			if (!lane) continue;
 			if (!(lane->GetLaneType() & roadmanager::Lane::LaneType::LANE_TYPE_ANY_DRIVING)) continue;
 			FTransform tf = CoordTranslate::OdrToUe::ToTransfrom(p);
+			if (!box.IsInside(tf.GetLocation())) continue;
 			tf.SetScale3D(FVector(FMath::RandRange(ScaleRangeMin, ScaleRangeMax)));
 			decal = GetWorld()->SpawnActor<ADecalActor>(ADecalActor::StaticClass(), tf);
 #if WITH_EDITOR
