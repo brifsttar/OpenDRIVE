@@ -82,3 +82,11 @@ Known limitations:
 
 *  Sculpting can miss parts of the landscape in junctions, leaving spikes. Those can be manually removed with standard sculpting tools
 * Layer painting won't remove foliage from the previous layer. It seems to be an Unreal Engine bug, and the current workaround is to manually apply a single paint touch to each landscape grid unit, which will instantly remove all foliage on painted roads for that grid unit.
+
+### Road Decal Spawner
+
+![Road Decal Spawner](Resources/odr_decal_spawner.gif)
+
+This Blueprint can randomly spawn a selection of [Decal](https://docs.unrealengine.com/4.27/en-US/Resources/ContentExamples/Decals/) on the drivable lanes; ideal for placing asphalt defects, tar lines, oil splats, etc.
+
+No material are included with the plugin, but many can be found for free on [Quixel](https://quixel.com/megascans/home?category=decal&category=street).
