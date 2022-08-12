@@ -88,8 +88,10 @@ double UOpenDriveVehicle::OdrSteerAngleMax() const {
 }
 
 double UOpenDriveVehicle::OdrWheelbase() const {
-	FName wFrontName = _MovComp->WheelSetups[0].BoneName;
-	FName wBackName = _MovComp->WheelSetups[3].BoneName;
+	int frontIdx = 0;
+	int backIdx = _MovComp->WheelSetups.Num() > 2 ? 3 : 1;
+	FName wFrontName = _MovComp->WheelSetups[frontIdx].BoneName;
+	FName wBackName = _MovComp->WheelSetups[backIdx].BoneName;
 	float wFrontPos = NAN, wBackPos = NAN;
 	for (auto &c : _Car->GetMesh()->Constraints) {
 		//todo That probably doesn't work for all cars...
