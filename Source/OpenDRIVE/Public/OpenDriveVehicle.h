@@ -26,6 +26,7 @@ private:
 	mutable double _PrevSpeed = 0.;
 	mutable double _PrevTime = 0.;
 	mutable double _Acc = 0.;
+	mutable double _Wheelbase = 0.;
 	int PrevRoadId = -1;
 	FBoxSphereBounds GetBounds() const;
 
