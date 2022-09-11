@@ -6,7 +6,7 @@ This plugin allows you to manipulate your [OpenDRIVE](https://www.asam.net/stand
 
 `RoadManager` is included as a submodule to this repository, so make sure to initialize and update submodules. For example:
 ```
-git clone --recurse-submodules git@github.com:brifsttar/OpenDRIVE.git
+git clone --recurse-submodules https://github.com/brifsttar/OpenDRIVE.git
 ```
 
 ## How to use
