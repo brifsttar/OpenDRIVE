@@ -24,10 +24,6 @@ public:
 	UPROPERTY(/*VisibleAnywhere, BlueprintReadOnly, Category = "OpenDRIVE"*/)
 	FFilePath OpenDriveFile;
 
-#if WITH_EDITOR
-	virtual void CheckForErrors() override;
-#endif
-
 protected:
 	virtual void BeginPlay() override;
 
