@@ -9,6 +9,12 @@ This plugin allows you to manipulate your [OpenDRIVE](https://www.asam.net/stand
 git clone --recurse-submodules https://github.com/brifsttar/OpenDRIVE.git
 ```
 
+Currently, this plugin  supports **Windows only**. For Linux support, it is being discussed in [#8](https://github.com/brifsttar/OpenDRIVE/issues/8).
+
+The plugin has been tested with Unreal Engine versions from 4.26 to 5.0.
+
+*For [CARLA](https://github.com/carla-simulator/carla) users*: due to conflicting classes name, the plugin doesn't work as-is alongside CARLA. The simplest workaround is to delete this plugin's `ATrafficLightController` class to remove the conflict.
+
 ## How to use
 
 There are a few steps to follow before jumping into the features.
