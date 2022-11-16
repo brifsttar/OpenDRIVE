@@ -108,6 +108,10 @@ double UOpenDriveVehicle::OdrWheelbase() const {
 
 float UOpenDriveVehicle::RoadDistanceTo(const UOpenDriveVehicle *Other) const {
 	double ds = SDistanceTo(Other);
+	if (!Other) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("UOpenDriveVehicle::RoadDistanceTo(): No other vehicle"));
+		return NAN;
+	}
 	if (ds >= 0) {
 		// Other is in front of us
 		ds -= LengthFront() - Other->LengthBack();
@@ -162,6 +166,10 @@ float UOpenDriveVehicle::TimeToWithAcc(const UOpenDriveComponent *Other) const {
 }
 
 float UOpenDriveVehicle::TTC(const UOpenDriveVehicle *Other) const {
+	if (!Other) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("UOpenDriveVehicle::RoadDistanceTo(): No other vehicle"));
+		return NAN;
+	}
 	if (Speed() == Other->Speed()) {
 		return std::numeric_limits<double>::infinity();
 	}
@@ -175,6 +183,10 @@ float UOpenDriveVehicle::TTC(const UOpenDriveVehicle *Other) const {
 }
 
 float UOpenDriveVehicle::ETTC(const UOpenDriveVehicle *Other) const {
+	if (!Other) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("UOpenDriveVehicle::RoadDistanceTo(): No other vehicle"));
+		return NAN;
+	}
 	if (Acceleration() == Other->Acceleration()) {
 		return TTC(Other);
 	}

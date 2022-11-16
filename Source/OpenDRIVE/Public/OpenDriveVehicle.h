@@ -28,7 +28,6 @@ private:
 	mutable double _Acc = 0.;
 	mutable double _Wheelbase = 0.;
 	int PrevRoadId = -1;
-	FBoxSphereBounds GetBounds() const;
 
 protected:
 	float _SpeedOverride = 0.f;
@@ -45,6 +44,9 @@ public:
 	double OdrSteerAngle() const;
 	double OdrSteerAngleMax() const;
 	double OdrWheelbase() const;
+
+	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
+	FBoxSphereBounds GetBounds() const;
 
 	UPROPERTY(BlueprintAssignable);
 	FOnNewRoad OnNewRoad;

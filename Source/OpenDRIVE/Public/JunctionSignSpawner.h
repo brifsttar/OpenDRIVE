@@ -15,10 +15,10 @@ public:
 	// Sets default values for this actor's properties
 	AJunctionSignSpawner();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Junction Spawner|Generation")
 	class UOpenDriveComponent* OpenDrive;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Junction Spawner|Generation")
 	class UBillboardComponent* BillboardComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Junction Spawner|Generation")

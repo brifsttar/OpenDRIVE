@@ -16,7 +16,7 @@ public:
 	// Sets default values for this actor's properties
 	AOpenDriveTrajectory();
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "OpenDRIVE", meta = (AllowPrivateAccess = "true"))
 	USplineComponent* Spline;
 
 	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE"))
