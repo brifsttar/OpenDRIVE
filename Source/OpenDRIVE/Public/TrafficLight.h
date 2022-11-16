@@ -32,10 +32,10 @@ public:
 	// Sets default values for this actor's properties
 	ATrafficLight();
 
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(VisibleDefaultsOnly, Category = "TrafficLight")
 	class USceneComponent* Scene;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "TrafficLight", meta = (AllowPrivateAccess = "true"))
 	class UOpenDriveComponent* OpenDrive;
 
 	UPROPERTY(BlueprintAssignable);
@@ -45,10 +45,10 @@ public:
 	FOnPedestrianLightStateChanged OnPedestrianLightStateChanged;
 
 protected:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "TrafficLight")
 	EPedestrianLightState PedestrianState;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "TrafficLight")
 	ETrafficLightState LightState;
 
 public:

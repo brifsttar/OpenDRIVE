@@ -21,7 +21,7 @@ public:
 	// Sets default values for this actor's properties
 	UOpenDrive2Landscape();
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "OpenDRIVE2Landscape", meta = (AllowPrivateAccess = "true"))
 	USplineComponent* Spline;
 
 	/**

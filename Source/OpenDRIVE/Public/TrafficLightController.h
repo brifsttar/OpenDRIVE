@@ -13,32 +13,38 @@ struct FTrafficLightGroup {
 
 	// For some reason this doesn't work. It can be set via BP, but not in the editor window.
 	//UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<TScriptInterface<ITrafficLightInterface>> TrafficLights;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) TArray<class ATrafficLight*> TrafficLights;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "TrafficLightGroup")
+	TArray<class ATrafficLight*> TrafficLights;
 
 	/**
 	* Green light start time (s)
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) float GreenStart = 0.f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "TrafficLightGroup")
+	float GreenStart = 0.f;
 
 	/**
 	* Amber light start time (s)
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) float AmberStart = 0.f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "TrafficLightGroup")
+	float AmberStart = 0.f;
 
 	/**
 	* Red light start time (s)
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) float RedStart = 0.f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "TrafficLightGroup")
+	float RedStart = 0.f;
 
 	/**
 	* Pedestrian green light start time (s)
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) float PedestrianGreenStart = 0.f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "TrafficLightGroup")
+	float PedestrianGreenStart = 0.f;
 
 	/**
 	* Pedestrian red light start time (s)
 	*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere) float PedestrianRedStart = 0.f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "TrafficLightGroup")
+	float PedestrianRedStart = 0.f;
 };
 
 UCLASS()

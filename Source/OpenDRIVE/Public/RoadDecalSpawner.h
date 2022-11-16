@@ -13,7 +13,7 @@ public:
 	// Sets default values for this actor's properties
 	ARoadDecalSpawner();
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Road Decal Spawner")
 	class UBoxComponent* BoxComponent;
 
 	UPROPERTY()
