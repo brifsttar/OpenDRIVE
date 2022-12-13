@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "IAssetTypeActions.h"
 
 class FOpenDRIVEEditorModule : public IModuleInterface
 {
@@ -11,4 +12,7 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+private:
+	TSharedPtr<IAssetTypeActions> OpenDRIVEAssetTypeActions;
 };
