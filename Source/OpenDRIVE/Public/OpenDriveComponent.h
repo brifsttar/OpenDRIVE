@@ -21,19 +21,19 @@ protected:
 	mutable FVector _XyzPosCache;
 
 public:
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Category = "OpenDRIVE"))
 	int RoadId_;
 
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Category = "OpenDRIVE"))
 	int LaneId_;
 
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Category = "OpenDRIVE"))
 	float S_;
 
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Category = "OpenDRIVE"))
 	float T_;
 
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Category = "OpenDRIVE"))
 	float H_;
 
 	UOpenDriveComponent();
