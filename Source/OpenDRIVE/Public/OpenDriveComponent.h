@@ -113,6 +113,12 @@ public:
 	float GetH() const;
 
 	/**
+	* Returns the width of the lane at the current position
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	float GetLaneWidth() const;
+
+	/**
 	* Returns the current Junction ID, or -1 if N/A
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))

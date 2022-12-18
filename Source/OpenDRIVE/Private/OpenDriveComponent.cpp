@@ -86,6 +86,16 @@ float UOpenDriveComponent::GetH() const {
 	return FMath::RadiansToDegrees(OdrPosition().GetHRelativeDrivingDirection());
 }
 
+float UOpenDriveComponent::GetLaneWidth() const {
+	roadmanager::Position p = OdrPosition();
+	double s = p.GetS();
+	const roadmanager::Road* r = p.GetRoad();
+	if (r == nullptr) return NAN;
+	const roadmanager::LaneSection* ls = r->GetLaneSectionByS(s);
+	if (ls == nullptr) return NAN;
+	return MetersToUu(ls->GetWidth(s, p.GetLaneId()));
+}
+
 int UOpenDriveComponent::GetJunctionId() const {
 	roadmanager::Road* r = OdrPosition().GetRoad();
 	return r ? r->GetJunction() : -1;
