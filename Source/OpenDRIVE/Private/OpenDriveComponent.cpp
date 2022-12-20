@@ -95,10 +95,10 @@ bool UOpenDriveComponent::IsJunctionDistanceLessThan(float Dist, int JunctionId)
 
 float UOpenDriveComponent::SDistanceTo(const UOpenDriveComponent* Other) const {
 	if (!IsValid(Other)) return NAN;
-	return GetTrackPosition()->SDistanceTo(Other->_TrackPosition);
+	return GetTrackPosition()->SDistanceTo(Other->GetTrackPosition());
 }
 
 bool UOpenDriveComponent::Delta(const UOpenDriveComponent* Other, float& Ds, float& Dt, int& DLaneId) const {
 	if (!IsValid(Other)) return false;
-	return GetTrackPosition()->Delta(Other->_TrackPosition, Ds, Dt, DLaneId);
+	return GetTrackPosition()->Delta(Other->GetTrackPosition(), Ds, Dt, DLaneId);
 }
