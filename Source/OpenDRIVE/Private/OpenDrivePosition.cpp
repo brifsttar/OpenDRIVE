@@ -18,12 +18,19 @@ roadmanager::Position UOpenDrivePosition::OdrPosition() const {
 	return _TrackPos;
 }
 
-void UOpenDrivePosition::SetTransform(const FTransform& T) {
+void UOpenDrivePosition::SetTransform(const FTransform& T, int HintRoad) {
 	if (T.Equals(_InertialPosCache)) return;
 	_InertialPosCache = T;
 	FVector p = CoordTranslate::UeToOdr::Location(T.GetLocation());
 	FVector r = CoordTranslate::UeToOdr::Rotation(T.Rotator().Euler());
-	_TrackPos.SetInertiaPos(p.X, p.Y, p.Z, r.X, r.Y, r.Z);
+	_TrackPos.SetX(p.X);
+	_TrackPos.SetY(p.Y);
+	_TrackPos.SetZ(p.Z);
+	_TrackPos.XYZH2TrackPos(p.X, p.Y, p.Z, _TrackPos.GetH(), false, -1, false, HintRoad);
+	_TrackPos.SetHeading(r.X);
+	_TrackPos.SetPitch(r.Y);
+	_TrackPos.SetRoll(r.Z);
+	_TrackPos.EvaluateOrientation();
 }
 
 FTransform UOpenDrivePosition::GetTransform() const {

@@ -21,8 +21,6 @@ protected:
 
 	void InvalidateCache();
 
-	void SetTrackPosition(const roadmanager::Position& p);
-
 public:
 	UOpenDrivePosition();
 
@@ -31,16 +29,18 @@ public:
 	*/
 	virtual roadmanager::Position OdrPosition() const;
 
+	void SetTrackPosition(const roadmanager::Position& p);
+
 	/**
 	* Computes the current OpenDRIVE position based on the input transform
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE"))
-	void SetTransform(const FTransform &T);
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", AdvancedDisplay = "HintRoad"))
+	void SetTransform(const FTransform &T, int HintRoad = -1);
 
 	/**
 	* Get the transform based on the current OpenDRIVE position
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE"))
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	FTransform GetTransform() const;
 
 	/**
