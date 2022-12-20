@@ -17,7 +17,11 @@ class OPENDRIVE_API UOpenDrivePosition : public UObject {
 
 protected:
 	roadmanager::Position _TrackPos;
+
+	UPROPERTY()
 	FTransform _InertialPosCache;
+
+	UPROPERTY()
 	int _HintRoad = -1;
 
 	void InvalidateCache();

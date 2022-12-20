@@ -9,12 +9,11 @@ using CoordTranslate::UuToMeters;
 using CoordTranslate::MetersToUu;
 
 UCLASS( ClassGroup=(OpenDRIVE), meta=(BlueprintSpawnableComponent, ShortTooltip = "Manipulate OpenDRIVE coordinate (e.g. road, S, T)") )
-class OPENDRIVE_API UOpenDriveComponent : public USceneComponent
-{
+class OPENDRIVE_API UOpenDriveComponent : public USceneComponent {
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY()
+	UPROPERTY(Transient, Instanced)
 	class UOpenDrivePosition* _TrackPosition;
 
 	void MovePositionToActor() const;
