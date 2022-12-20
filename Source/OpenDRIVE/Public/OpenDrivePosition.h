@@ -1,45 +1,47 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SceneComponent.h"
+#include "UObject/NoExportTypes.h"
 #include "CoordTranslate.h"
-#include "OpenDriveComponent.generated.h"
+#include "OpenDrivePosition.generated.h"
 
 using CoordTranslate::UuToMeters;
 using CoordTranslate::MetersToUu;
 
-UCLASS( ClassGroup=(OpenDRIVE), meta=(BlueprintSpawnableComponent, ShortTooltip = "Manipulate OpenDRIVE coordinate (e.g. road, S, T)") )
-class OPENDRIVE_API UOpenDriveComponent : public USceneComponent
-{
+/**
+ * 
+ */
+UCLASS(BlueprintType, Blueprintable)
+class OPENDRIVE_API UOpenDrivePosition : public UObject {
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY()
-	class UOpenDrivePosition* _TrackPosition;
+	roadmanager::Position _TrackPos;
+	FTransform _InertialPosCache;
 
-	void MovePositionToActor() const;
-	void MoveActorToPosition();
-
-	class UOpenDrivePosition* GetTrackPosition() const;
+	void InvalidateCache();
 
 public:
-	UOpenDriveComponent();
+	UOpenDrivePosition();
 
+	/**
+	* Returns a copy of the wrapped position object
+	*/
 	virtual roadmanager::Position OdrPosition() const;
 
-	void SetTrackPosition(const roadmanager::Position &p);
+	void SetTrackPosition(const roadmanager::Position& p);
 
 	/**
-	* Computes the current OpenDRIVE position and updates the public position variables accordingly
+	* Computes the current OpenDRIVE position based on the input transform
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE", DeprecatedFunction))
-	void GetPosition();
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", AdvancedDisplay = "HintRoad"))
+	void SetTransform(const FTransform &T, int HintRoad = -1);
 
 	/**
-	* Sets the OpenDRIVE position based on the public position variables values
+	* Get the transform based on the current OpenDRIVE position
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE", DeprecatedFunction))
-	void SetPosition();
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	FTransform GetTransform() const;
 
 	/**
 	* Sets the OpenDRIVE position
@@ -91,11 +93,17 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetT() const;
 
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetT(float T);
+
 	/**
 	* Returns the current heading offset (°) from the lane orientation
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetH() const;
+
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetH(float H);
 
 	/**
 	* Returns the width of the lane at the current position
@@ -134,7 +142,7 @@ public:
 	* @param Other Other object
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
-	float SDistanceTo(const UOpenDriveComponent* Other) const;
+	float SDistanceTo(const UOpenDrivePosition* Other) const;
 
 	/**
 	* Returns the delta to the other object
@@ -145,5 +153,8 @@ public:
 	* @return Whether the delta was resolved
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
-	bool Delta(const UOpenDriveComponent* Other, float& Ds, float& Dt, int& DLaneId) const;
+	bool Delta(const UOpenDrivePosition* Other, float& Ds, float& Dt, int& DLaneId) const;
+
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void AlignWithLaneCenter();
 };
