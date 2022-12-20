@@ -18,6 +18,7 @@ class OPENDRIVE_API UOpenDrivePosition : public UObject {
 protected:
 	roadmanager::Position _TrackPos;
 	FTransform _InertialPosCache;
+	int _HintRoad = -1;
 
 	void InvalidateCache();
 
@@ -31,11 +32,14 @@ public:
 
 	void SetTrackPosition(const roadmanager::Position& p);
 
+	UFUNCTION(meta = (Category = "OpenDRIVE"))
+	void SetHintRoad(int HintRoad) { _HintRoad = HintRoad; }
+
 	/**
 	* Computes the current OpenDRIVE position based on the input transform
 	*/
-	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", AdvancedDisplay = "HintRoad"))
-	void SetTransform(const FTransform &T, int HintRoad = -1);
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetTransform(const FTransform &T);
 
 	/**
 	* Get the transform based on the current OpenDRIVE position

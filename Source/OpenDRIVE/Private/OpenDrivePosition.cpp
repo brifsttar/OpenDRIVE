@@ -18,7 +18,7 @@ roadmanager::Position UOpenDrivePosition::OdrPosition() const {
 	return _TrackPos;
 }
 
-void UOpenDrivePosition::SetTransform(const FTransform& T, int HintRoad) {
+void UOpenDrivePosition::SetTransform(const FTransform& T) {
 	if (T.Equals(_InertialPosCache)) return;
 	_InertialPosCache = T;
 	FVector p = CoordTranslate::UeToOdr::Location(T.GetLocation());
@@ -26,7 +26,7 @@ void UOpenDrivePosition::SetTransform(const FTransform& T, int HintRoad) {
 	_TrackPos.SetX(p.X);
 	_TrackPos.SetY(p.Y);
 	_TrackPos.SetZ(p.Z);
-	_TrackPos.XYZH2TrackPos(p.X, p.Y, p.Z, _TrackPos.GetH(), false, -1, false, HintRoad);
+	_TrackPos.XYZH2TrackPos(p.X, p.Y, p.Z, _TrackPos.GetH(), false, -1, false, _HintRoad);
 	_TrackPos.SetHeading(r.X);
 	_TrackPos.SetPitch(r.Y);
 	_TrackPos.SetRoll(r.Z);
