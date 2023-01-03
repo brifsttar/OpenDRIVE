@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,49 +9,35 @@ using CoordTranslate::UuToMeters;
 using CoordTranslate::MetersToUu;
 
 UCLASS( ClassGroup=(OpenDRIVE), meta=(BlueprintSpawnableComponent, ShortTooltip = "Manipulate OpenDRIVE coordinate (e.g. road, S, T)") )
-class OPENDRIVE_API UOpenDriveComponent : public USceneComponent
-{
+class OPENDRIVE_API UOpenDriveComponent : public USceneComponent {
 	GENERATED_BODY()
 
 protected:
-	// Cache for position
-	mutable roadmanager::Position _TrackPosCache;
-	mutable FVector _XyzPosCache;
+	UPROPERTY(Transient, Instanced)
+	class UOpenDrivePosition* _TrackPosition;
+
+	void MovePositionToActor() const;
+	void MoveActorToPosition();
+
+	class UOpenDrivePosition* GetTrackPosition() const;
 
 public:
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
-	int RoadId_;
-
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
-	int LaneId_;
-
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
-	float S_;
-
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
-	float T_;
-
-	UPROPERTY(EditAnywhere, meta = (Category = "OpenDRIVE"))
-	float H_;
-
 	UOpenDriveComponent();
 
 	virtual roadmanager::Position OdrPosition() const;
 
 	void SetTrackPosition(const roadmanager::Position &p);
 
-public:	
-
 	/**
 	* Computes the current OpenDRIVE position and updates the public position variables accordingly
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE"))
+	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE", DeprecatedFunction))
 	void GetPosition();
 
 	/**
 	* Sets the OpenDRIVE position based on the public position variables values
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE"))
+	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE", DeprecatedFunction))
 	void SetPosition();
 
 	/**
@@ -111,6 +95,12 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetH() const;
+
+	/**
+	* Returns the width of the lane at the current position
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	float GetLaneWidth() const;
 
 	/**
 	* Returns the current Junction ID, or -1 if N/A
