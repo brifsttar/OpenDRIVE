@@ -96,3 +96,11 @@ Known limitations:
 This Blueprint can randomly spawn a selection of [Decal](https://docs.unrealengine.com/4.27/en-US/Resources/ContentExamples/Decals/) on the drivable lanes; ideal for placing asphalt defects, tar lines, oil splats, etc.
 
 No material are included with the plugin, but many can be found for free on [Quixel](https://quixel.com/megascans/home?category=decal&category=street).
+
+### Duplicate Actor Along Road
+
+![Road Duplicate Actor](Resources/odr_repeat.gif)
+
+This Editor Utility Blueprint allows any actor to be duplicated along any road at a fixed step. The process runs until it encounters a junction, so it can actually span multiple roads.
+
+For this to work, actors are assumed to use the standard Unreal Engine alignment (X+ forward, Z+ up), except Decals, for which Y- forward and X- up are expected.
