@@ -15,7 +15,7 @@ FVector CoordTranslate::OdrToUe::ToLocation(const roadmanager::Position &P) {
 
 FRotator CoordTranslate::OdrToUe::ToRotation(const roadmanager::Position &P) {
 	//return Rotation(FVector(P.GetH(), P.GetP(), P.GetR()));
-	double h = P.Side() > 0 ? -P.GetH() : M_PI - P.GetH();
+	double h = P.DrivingSide() > 0 ? -P.GetH() : M_PI - P.GetH();
 	return FRotator(FQuat(FVector(0, 0, 1), h));
 }
 
