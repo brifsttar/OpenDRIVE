@@ -103,6 +103,18 @@ void UOpenDrive2Landscape::CreateRoadSplines(
 		ULandscapeSplinesComponent* LandscapeSpline = nullptr;
 		ILandscapeSplineInterface* SplineOwner = nullptr;
 
+		SplineOwner = Landscape;
+		LandscapeSpline = SplineOwner->GetSplinesComponent();
+		if (!LandscapeSpline) {
+			SplineOwner->CreateSplineComponent();
+			LandscapeSpline = SplineOwner->GetSplinesComponent();
+		}
+		if (!LandscapeSpline->IsRegistered()) {
+			LandscapeSpline->RegisterComponent();
+		} else {
+			LandscapeSpline->MarkRenderStateDirty();
+		}
+
 		roadmanager::OpenDrive* Odr = roadmanager::Position::GetOpenDrive();
 		roadmanager::Road* road = 0;
 		roadmanager::Position p;
@@ -141,19 +153,6 @@ void UOpenDrive2Landscape::CreateRoadSplines(
 
 				FRotator r = CoordTranslate::OdrToUe::ToRotation(p);
 
-				if (SplineOwner == nullptr) {
-					SplineOwner = /*Info->CreateSplineActor(sp)*/Landscape;
-					LandscapeSpline = SplineOwner->GetSplinesComponent();
-					if (!LandscapeSpline) {
-						SplineOwner->CreateSplineComponent();
-						LandscapeSpline = SplineOwner->GetSplinesComponent();
-					}
-					if (!LandscapeSpline->IsRegistered()) {
-						LandscapeSpline->RegisterComponent();
-					} else {
-						LandscapeSpline->MarkRenderStateDirty();
-					}
-				}
 				LandscapeSpline->Modify();
 				ULandscapeSplineControlPoint* NewControlPoint = NewObject<ULandscapeSplineControlPoint>(LandscapeSpline, NAME_None, RF_Transactional);
 				LandscapeSpline->GetControlPoints().Add(NewControlPoint);
@@ -196,7 +195,6 @@ void UOpenDrive2Landscape::CreateRoadSplines(
 
 				s += 5;
 			}
-			return;
 		}
 	}
 }
