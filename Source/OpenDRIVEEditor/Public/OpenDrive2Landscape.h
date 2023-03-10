@@ -31,8 +31,21 @@ public:
 	* @param PaintLayer Layer to paint on the landscape where roads are present
 	*/
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "Assets")
-	void SculptLandscape(float RoadZOffset = -10.f, float Falloff = 100.f, ULandscapeLayerInfoObject *PaintLayer = 0);
+	void SculptLandscape(
+		float RoadZOffset = -10.f,
+		float Falloff = 100.f,
+		ULandscapeLayerInfoObject *PaintLayer = 0,
+		FName LayerName = FName(TEXT("Layer"))
+	);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Assets")
-	void ApplySpline(ALandscapeProxy *Landscape, USplineComponent *SplineComponent, float WidthStart, float WidthEnd, float Falloff, ULandscapeLayerInfoObject *PaintLayer);
+	void ApplySpline(
+		ALandscapeProxy *Landscape,
+		USplineComponent *SplineComponent,
+		float WidthStart,
+		float WidthEnd,
+		float Falloff,
+		ULandscapeLayerInfoObject *PaintLayer,
+		FName LayerName
+	);
 };

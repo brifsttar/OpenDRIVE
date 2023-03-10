@@ -15,7 +15,12 @@ UOpenDrive2Landscape::UOpenDrive2Landscape() {
 	Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 }
 
-void UOpenDrive2Landscape::SculptLandscape(float RoadZOffset, float Falloff, ULandscapeLayerInfoObject *PaintLayer) {
+void UOpenDrive2Landscape::SculptLandscape(
+	float RoadZOffset,
+	float Falloff,
+	ULandscapeLayerInfoObject *PaintLayer,
+	FName LayerName
+) {
 	// Landscapes to sculpt
 	USelection *Selection = GEditor->GetSelectedActors();
 	TArray<ALandscapeProxy *> Landscapes;
@@ -59,7 +64,8 @@ void UOpenDrive2Landscape::SculptLandscape(float RoadZOffset, float Falloff, ULa
 			sp = CoordTranslate::OdrToUe::ToLocation(p);
 			// Slight Z down offset to avoid Z-fighting
 			sp.Z += RoadZOffset;
-			Spline->AddSplineWorldPoint(sp);
+			Spline->AddSplinePoint(sp, ESplineCoordinateSpace::World);
+
 			s += 5;
 		}
 
@@ -72,7 +78,7 @@ void UOpenDrive2Landscape::SculptLandscape(float RoadZOffset, float Falloff, ULa
 			// The following doesn't work (EditorApplySpline isn't accessible via C++)
 			// See https://answers.unrealengine.com/questions/228146/editorapplyspline-is-not-accessible-via-c.html
 			//ls->EditorApplySpline(Spline);
-			ApplySpline(ls, Spline, WidthStart, WidthEnd, Falloff, PaintLayer);
+			ApplySpline(ls, Spline, WidthStart, WidthEnd, Falloff, PaintLayer, LayerName);
 		}
 	}
 }
