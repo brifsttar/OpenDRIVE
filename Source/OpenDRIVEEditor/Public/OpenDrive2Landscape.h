@@ -38,6 +38,20 @@ public:
 		FName LayerName = FName(TEXT("Layer"))
 	);
 
+	/**
+	* Creates landscape splines for all OpenDRIVE roads
+	* @param RoadZOffset Additional Z-offset (cm) to apply to sculpted roads (to dig deeper than surface)
+	* @param Falloff Lateral distance (cm) to transition from road to existing landscape
+	* @param PaintLayer Layer to paint on the landscape where roads are present
+	*/
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = "Assets")
+	void CreateRoadSplines(
+		float RoadZOffset = -10.f,
+		float Falloff = 100.f,
+		ULandscapeLayerInfoObject *PaintLayer = 0,
+		FName LayerName = FName(TEXT("Layer"))
+	);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Assets")
 	void ApplySpline(
 		ALandscapeProxy *Landscape,
