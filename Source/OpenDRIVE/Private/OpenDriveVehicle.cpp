@@ -3,6 +3,7 @@
 
 #include "OpenDriveVehicle.h"
 #include "WheeledVehiclePawn.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 
 UOpenDriveVehicle::UOpenDriveVehicle() {
@@ -33,7 +34,7 @@ void UOpenDriveVehicle::PostLoad() {
 
 FBoxSphereBounds UOpenDriveVehicle::GetBounds() const {
 	return FBoxSphereBounds(
-		_Car->GetMesh()->SkeletalMesh->PhysicsAsset->CalcAABB(
+		_Car->GetMesh()->GetSkeletalMeshAsset()->GetPhysicsAsset()->CalcAABB(
 			_Car->GetMesh(),
 			FTransform::Identity
 		)
