@@ -15,6 +15,12 @@ The plugin has been tested with Unreal Engine versions from 4.26 to 5.0. For UE 
 
 *For [CARLA](https://github.com/carla-simulator/carla) users*: due to conflicting classes name, the plugin doesn't work as-is alongside CARLA. The simplest workaround is to delete this plugin's `ATrafficLightController` class to remove the conflict.
 
+## Disclaimer about coordinate systems
+
+OpenDRIVE uses a right-handed coordinate system, whereas Unreal Engine uses a left-handed coordinate system. To convert between those, the plugin assumes X and Z are common, and Y is flipped.
+
+This assumption can differ from the one made by various other tools provider. For instance, Mathworks' [RoadRunner](https://www.mathworks.com/products/roadrunner.html) instead maps OpenDRIVE's (X, Y) axes to Unreal Engine's (Y, X). In this case, it means there ends up being a 90° rotation mismatch along the Z axis between a mesh and an OpenDRIVE file both exported from RoadRunner. The easiest workaround for this is to rotate the imported scene's root actor -90° around the Z axis in Unreal Engine.
+
 ## How to use
 
 There are a few steps to follow before jumping into the features.
