@@ -11,4 +11,9 @@ public :
 	void Construct(const FArguments& InArgs);
 
 	class FOpenDRIVEEditorMode* GetEdMode() const;
+
+	FReply Reset();
+	bool IsLoaded() const;
+
+	FReply Generate();
 };
