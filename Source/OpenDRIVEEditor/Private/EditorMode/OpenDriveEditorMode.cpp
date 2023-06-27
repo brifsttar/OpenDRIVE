@@ -17,35 +17,27 @@ void FOpenDRIVEEditorMode::Enter()
 		Toolkit->Init(Owner->GetToolkitHost());
 	}
 
-	if (hasBeenLoaded == false)
-	{
-		LoadRoads();
-	}
-	else if(Roads != nullptr)
-	{
-		Roads->SetIsTemporarilyHiddenInEditor(false);
-	}
+	LoadRoads();
 }
 
 void FOpenDRIVEEditorMode::Exit()
 {
 	FToolkitManager::Get().CloseToolkit(Toolkit.ToSharedRef());
 	Toolkit.Reset();
-	
-	if (Roads != nullptr)
-	{
-		Roads->SetIsTemporarilyHiddenInEditor(true);
-	}
-
+	Reset();
 	FEdMode::Exit();
 }
 
 void FOpenDRIVEEditorMode::Reset()
 {
-	if (Roads != nullptr)
+	for (AOpenDriveRoadEd* road : Roads)
 	{
-		Roads->Destroy();
+		if (road != nullptr)
+		{
+			Roads.Remove(road);
+		}
 	}
+	hasBeenLoaded = false;
 }
 
 void FOpenDRIVEEditorMode::Generate()
@@ -55,12 +47,28 @@ void FOpenDRIVEEditorMode::Generate()
 		Reset();
 		LoadRoads();
 	}
+	else
+	{
+		LoadRoads();
+	}
 }
 
 void FOpenDRIVEEditorMode::LoadRoads()
 {
-	AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator);
-	newRoad->Initialize(50.f);
-	Roads = newRoad;
+	roadmanager::OpenDrive* Odr = roadmanager::Position::GetOpenDrive();
+	roadmanager::Road* road = 0;
+	size_t nrOfRoads = Odr->GetNumOfRoads();
+
+	for (int i = 0; i < (int)nrOfRoads; i++)
+	{
+		road = Odr->GetRoadByIdx(i);
+		if (!road) continue;
+
+		AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator);
+		newRoad->SetFolderPath("/EditorMode");
+		newRoad->SetActorLabel(FString("Roads ") + FString::FromInt(i));
+		newRoad->Initialize(road, 50.f);
+		Roads.Add(newRoad);
+	}
 	hasBeenLoaded = true;
 }

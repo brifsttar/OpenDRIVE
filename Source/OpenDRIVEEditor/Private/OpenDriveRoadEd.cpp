@@ -16,21 +16,11 @@ AOpenDriveRoadEd::AOpenDriveRoadEd()
 	baseMeshSize = LaneMesh->GetBoundingBox().GetSize().Y;
 }
 
-void AOpenDriveRoadEd::Initialize(float roadOffset_)
+void AOpenDriveRoadEd::Initialize(roadmanager::Road* road_, float roadOffset_)
 {
 	roadOffset = roadOffset_;
-	roadmanager::OpenDrive* Odr = roadmanager::Position::GetOpenDrive();
-	roadmanager::Road* road = 0;
-	size_t nrOfRoads = Odr->GetNumOfRoads();
 
-	for (int i = 0; i < (int)nrOfRoads; i++)
-	{
-		road = Odr->GetRoadByIdx(i);
-		if (!road) continue;
-
-		DrawLanes(road);
-	}
-
+	DrawLanes(road_);
 }
 
 void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
@@ -66,6 +56,7 @@ void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
 			LaneSpline->ClearSplinePoints();
 
 			//Start Point
+			
 			double t = 0.;
 			position.Init();
 			position.SetSnapLaneTypes(lane->GetLaneType());
@@ -76,7 +67,7 @@ void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
 
 			LaneSpline->AddSplineWorldPoint(sp);
 
-			YScale = (laneSection->GetWidth(laneLength, lane->GetId()) * 100) / baseMeshSize;
+			YScale = (laneSection->GetWidth(0., lane->GetId()) * 100) / baseMeshSize;
 			LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, YScale, 1.0f));
 
 			prevPosition = position;
@@ -95,7 +86,7 @@ void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
 				{
 					LaneSpline->AddSplineWorldPoint(sp);
 
-					YScale = (laneSection->GetWidth(laneLength, lane->GetId()) * 100) / baseMeshSize;
+					YScale = (laneSection->GetWidth(s, lane->GetId()) * 100) / baseMeshSize;
 					LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, YScale, 1.0f));
 
 					prevPosition = position;
@@ -103,6 +94,7 @@ void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
 			}
 
 			//Final point
+			
 			position.Init();
 			position.SetSnapLaneTypes(lane->GetLaneType());
 			position.SetLanePos(road->GetId(), lane->GetId(), laneLength, t);
@@ -114,6 +106,7 @@ void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
 
 			YScale = (laneSection->GetWidth(laneLength, lane->GetId()) * 100) / baseMeshSize;
 			LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, YScale, 1.0f));
+		
 
 			for (int k = 0; k < LaneSpline->GetNumberOfSplinePoints(); k++)
 			{
@@ -177,5 +170,6 @@ void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
 		}
 	}
 }
+
 
 

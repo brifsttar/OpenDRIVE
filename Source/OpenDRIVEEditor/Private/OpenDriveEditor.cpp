@@ -22,11 +22,13 @@ void FOpenDRIVEEditorModule::StartupModule() {
 		OpenDRIVEAssetTypeActions = MakeShareable(new FOpenDRIVEAssetActions);
 		AssetTools.RegisterAssetTypeActions(OpenDRIVEAssetTypeActions.ToSharedRef());
 
+		/*
 		FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
 		LevelEditorMenuExtensibilityManager = LevelEditorModule.GetMenuExtensibilityManager();
 		MenuExtender = MakeShareable(new FExtender);
 		MenuExtender->AddMenuBarExtension("Window", EExtensionHook::After, NULL, FMenuBarExtensionDelegate::CreateRaw(this, &FOpenDRIVEEditorModule::MakePulldownMenu));
 		LevelEditorMenuExtensibilityManager->AddExtender(MenuExtender);
+		*/
 	}
 
 	IOpenDRIVEModuleInterface::StartupModule();
@@ -45,7 +47,7 @@ void FOpenDRIVEEditorModule::ShutdownModule() {
 
 void FOpenDRIVEEditorModule::AddModuleListeners()
 {
-	ModuleListeners.Add(MakeShareable(new MenuTool));
+	//ModuleListeners.Add(MakeShareable(new MenuTool));
 	ModuleListeners.Add(MakeShareable(new OpenDRIVEEdModeTool));
 }
 

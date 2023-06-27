@@ -19,7 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	AOpenDriveRoadEd();
 
-	void Initialize(float roadOffset_);
+	void Initialize(roadmanager::Road* road_, float roadOffset_);
 
 	void DrawLanes(roadmanager::Road* road);
 
@@ -30,19 +30,10 @@ protected:
 
 private : 
 
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMesh> LaneMesh;
-
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterial> LaneMaterial;
-
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInstance> LeftMaterial;
-
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInstance> RightMaterial;
-
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInstance> SidewalkMaterial;
 
 	float roadOffset;

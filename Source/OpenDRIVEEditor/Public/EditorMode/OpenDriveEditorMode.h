@@ -23,6 +23,5 @@ protected :
 
 	void LoadRoads();
 	
-	AOpenDriveRoadEd* Roads;
-
+	TArray<AOpenDriveRoadEd*> Roads;
 };
