@@ -7,8 +7,6 @@
 #include "OpenDriveAsset.h"
 #include "OpenDriveScriptActor.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(OpenDriveLog, Log, All);
-
 /**
  * 
  */

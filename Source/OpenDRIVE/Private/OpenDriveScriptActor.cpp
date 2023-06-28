@@ -8,8 +8,6 @@
 #include "Logging/MessageLog.h"
 #include "Roadmanager.hpp"
 
-DEFINE_LOG_CATEGORY(OpenDriveLog);
-
 void AOpenDriveScriptActor::BeginPlay() {
 	Super::BeginPlay();
 	LoadOpenDrive();
