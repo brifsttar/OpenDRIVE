@@ -5,6 +5,9 @@
 
 void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 {
+	TextBlock = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("test")));
+
 	ChildSlot
 		[
 			SNew(SScrollBox)
@@ -45,6 +48,12 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 						.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate)
 					]
 				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.f, 5.f, 0.f, 0.f)
+				[
+					TextBlock.ToSharedRef()
+				]
 			]
 		];
 }
@@ -70,5 +79,10 @@ FReply SOpenDRIVEEditorModeWidget::Generate()
 {
 	GetEdMode()->Generate();
 	return FReply::Handled();
+}
+
+int SOpenDRIVEEditorModeWidget::GetNumberOfRoads() 
+{
+	return GetEdMode()->GetRoads().Num();
 }
 

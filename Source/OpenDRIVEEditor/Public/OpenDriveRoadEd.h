@@ -23,6 +23,8 @@ public:
 
 	void DrawLanes(roadmanager::Road* road);
 
+	inline TArray<USplineMeshComponent*> GetSplineMeshes() { return LanesMeshesArray; };
+
 protected:
 
 	UPROPERTY(EditAnywhere)

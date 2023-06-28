@@ -16,4 +16,9 @@ public :
 	bool IsLoaded() const;
 
 	FReply Generate();
+
+	int GetNumberOfRoads();
+
+	TSharedPtr<STextBlock> TextBlock;
+
 };

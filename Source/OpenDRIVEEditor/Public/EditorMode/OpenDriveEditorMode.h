@@ -8,20 +8,36 @@ class FOpenDRIVEEditorMode : public FEdMode
 public :
 	const static FEditorModeID EM_RoadMode;
 
+	FOpenDRIVEEditorMode();
+
 	virtual void Enter() override;
 	virtual void Exit() override;
 
-	inline bool GetHasBeenLoaded() const { return hasBeenLoaded; };
+	inline bool GetHasBeenLoaded() const { return bHasBeenLoaded; };
 
 	void Reset();
 
 	void Generate();
 
+	inline TArray<AOpenDriveRoadEd*> GetRoads() const { return Roads; };
+
+	~FOpenDRIVEEditorMode();
+
+	void OnMapOpenedCallback(const FString& MapName, bool bLoadAsTemplate);
+
 protected :
 
-	bool hasBeenLoaded = false;
+	bool bHasBeenLoaded = false;
 
 	void LoadRoads();
+
+	void SetRoadsVisibility(bool bIsVisible);
 	
 	TArray<AOpenDriveRoadEd*> Roads;
+
+private :
+
+	FDelegateHandle MapOpenedDelegateHandle;
+
+	bool bIsMapOpening;
 };

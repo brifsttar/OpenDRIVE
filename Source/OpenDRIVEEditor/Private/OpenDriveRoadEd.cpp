@@ -123,7 +123,7 @@ void AOpenDriveRoadEd::DrawLanes(roadmanager::Road* road)
 
 				switch (lane->GetLaneType())
 				{
-				case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING) :
+				case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
 
 					if (lane->GetId() > 0)
 					{
