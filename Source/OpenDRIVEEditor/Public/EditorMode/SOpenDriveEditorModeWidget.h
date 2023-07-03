@@ -17,8 +17,12 @@ public :
 
 	FReply Generate();
 
-	int GetNumberOfRoads();
+	/*Lane info display*/
+	TSharedPtr<STextBlock> RoadId;
+	TSharedPtr<STextBlock> JunctionId;
+	TSharedPtr<STextBlock> LaneId;
+	TSharedPtr<STextBlock> LaneType;
 
-	TSharedPtr<STextBlock> TextBlock;
-
+	FDelegateHandle OnLaneSelected;
+	void UpdateLaneInfo(AOpenDriveRoadEd* lane);
 };

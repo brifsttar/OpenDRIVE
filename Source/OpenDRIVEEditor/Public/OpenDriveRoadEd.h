@@ -19,16 +19,19 @@ public:
 	// Sets default values for this actor's properties
 	AOpenDriveRoadEd();
 
-	void Initialize(roadmanager::Road* road_, float roadOffset_);
+	void Initialize(int roadId_, int junctionId_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_);
 
 	void DrawLanes(roadmanager::Road* road);
 
-	inline TArray<USplineMeshComponent*> GetSplineMeshes() { return LanesMeshesArray; };
+	void DrawLane();
 
-protected:
+	inline int GetRoadId() { return RoadId; };
 
-	UPROPERTY(EditAnywhere)
-	TArray<USplineMeshComponent*> LanesMeshesArray;
+	inline int GetJunctionId() { return JunctionId; };
+
+	inline FString GetLaneType() { return LaneType; };
+
+	inline int GetLaneId() { return Lane->GetId(); };
 
 private : 
 
@@ -38,7 +41,14 @@ private :
 	TObjectPtr<UMaterialInstance> RightMaterial;
 	TObjectPtr<UMaterialInstance> SidewalkMaterial;
 
-	float roadOffset;
+	float roadOffset = 50.f;
 
 	float baseMeshSize;
+
+	int RoadId = 0; 
+	int JunctionId = 0;
+	FString LaneType = "Any";
+
+	roadmanager::LaneSection* LaneSection;
+	roadmanager::Lane* Lane;
 };

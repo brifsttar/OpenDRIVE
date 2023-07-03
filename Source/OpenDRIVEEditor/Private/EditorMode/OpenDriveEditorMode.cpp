@@ -13,6 +13,8 @@ FOpenDRIVEEditorMode::FOpenDRIVEEditorMode()
 
 	UE_LOG(LogClass, Warning, TEXT("Custom editor mode constructor called"));
 	MapOpenedDelegateHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FOpenDRIVEEditorMode::OnMapOpenedCallback);
+
+	OnActorSelectedHandle = USelection::SelectObjectEvent.AddRaw(this, &FOpenDRIVEEditorMode::OnActorSelected);
 }
 
 void FOpenDRIVEEditorMode::Enter()
@@ -80,6 +82,7 @@ void FOpenDRIVEEditorMode::Generate()
 FOpenDRIVEEditorMode::~FOpenDRIVEEditorMode()
 {
 	FEditorDelegates::OnMapOpened.Remove(MapOpenedDelegateHandle);
+	USelection::SelectObjectEvent.Remove(OnActorSelectedHandle);
 }
 
 void FOpenDRIVEEditorMode::OnMapOpenedCallback(const FString& MapName, bool bLoadAsTemplate)
@@ -91,6 +94,7 @@ void FOpenDRIVEEditorMode::OnMapOpenedCallback(const FString& MapName, bool bLoa
 
 void FOpenDRIVEEditorMode::LoadRoads()
 {
+	/*reset*/
 	if (Roads.IsEmpty() == false)
 	{
 		for (AOpenDriveRoadEd* roads : Roads)
@@ -101,10 +105,15 @@ void FOpenDRIVEEditorMode::LoadRoads()
 		Roads.Empty();
 	}
 
+	/*roadmanager params*/
 	roadmanager::OpenDrive* Odr = roadmanager::Position::GetOpenDrive();
 	roadmanager::Road* road = 0;
+	roadmanager::LaneSection* laneSection = 0;
+	roadmanager::Lane* lane = 0;
 	size_t nrOfRoads = Odr->GetNumOfRoads();
+	double laneLength = 0.;
 
+	/*Actor spawn params*/
 	FActorSpawnParameters spawnParam;
 	spawnParam.bHideFromSceneOutliner = true;
 	spawnParam.bTemporaryEditorActor = true;
@@ -113,10 +122,26 @@ void FOpenDRIVEEditorMode::LoadRoads()
 	{
 		road = Odr->GetRoadByIdx(i);
 		if (!road) continue;
+		
+		for (int j = 0; j < road->GetNumberOfLaneSections(); j++)
+		{
+			laneSection = road->GetLaneSectionByIdx(j);
 
-		AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
-		newRoad->Initialize(road, 50.f);
-		Roads.Add(newRoad);
+			if (!laneSection) continue;
+
+			laneLength = laneSection->GetLength();
+
+			for (int k = 0; k < laneSection->GetNumberOfLanes(); k++)
+			{
+				lane = laneSection->GetLaneByIdx(k);
+
+				if (!lane || lane->GetId() == 0) continue;
+
+				AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
+				newRoad->Initialize(road->GetId(), road->GetJunction(), laneSection, lane);
+				Roads.Add(newRoad);
+			}
+		}
 	}
 	bHasBeenLoaded = true;
 }
@@ -126,5 +151,16 @@ void FOpenDRIVEEditorMode::SetRoadsVisibility(bool bIsVisible)
 	for (AOpenDriveRoadEd* road : Roads)
 	{
 		road->SetIsTemporarilyHiddenInEditor(bIsVisible);
+	}
+}
+
+void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
+{
+	AOpenDriveRoadEd* selectedRoad = Cast<AOpenDriveRoadEd>(selectedObject);
+
+	if (IsValid(selectedRoad) == true)
+	{
+		UE_LOG(LogClass, Warning, TEXT("object selected"));
+		onLaneSelected.Broadcast(selectedRoad);
 	}
 }

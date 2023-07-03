@@ -3,9 +3,12 @@
 #include "EdMode.h"
 #include "../OpenDriveRoadEd.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveRoadEd* road)
+
 class FOpenDRIVEEditorMode : public FEdMode
 {
 public :
+
 	const static FEditorModeID EM_RoadMode;
 
 	FOpenDRIVEEditorMode();
@@ -25,6 +28,8 @@ public :
 
 	void OnMapOpenedCallback(const FString& MapName, bool bLoadAsTemplate);
 
+	FOnLaneSelected onLaneSelected;
+
 protected :
 
 	bool bHasBeenLoaded = false;
@@ -40,4 +45,8 @@ private :
 	FDelegateHandle MapOpenedDelegateHandle;
 
 	bool bIsMapOpening;
+
+	FDelegateHandle OnActorSelectedHandle;
+
+	void OnActorSelected(UObject* _selectedObject);
 };

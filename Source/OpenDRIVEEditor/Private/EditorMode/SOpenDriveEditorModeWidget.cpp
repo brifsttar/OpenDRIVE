@@ -5,8 +5,17 @@
 
 void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 {
-	TextBlock = SNew(STextBlock)
-		.Text(FText::FromString(TEXT("test")));
+	RoadId = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("RoadId : ")));
+	
+	JunctionId = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("JunctionId : ")));
+
+	LaneType = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("Lane type : ")));
+
+	LaneId = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("LaneId : ")));
 
 	ChildSlot
 		[
@@ -16,13 +25,6 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 			.Padding(5.f)
 			[
 				SNew(SVerticalBox)
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				.Padding(0.f,5.f,0.f,0.f)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString(TEXT("OpenDRIVE Editor Mode")))
-				]
 				+ SVerticalBox::Slot()
 				.AutoHeight()
 				.Padding(0.f,5.f,0.f,0.f)
@@ -50,14 +52,33 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 				]
 				+ SVerticalBox::Slot()
 				.AutoHeight()
+				.Padding(0.f, 20.f, 0.f, 0.f)
+				[
+					RoadId.ToSharedRef()
+				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
 				.Padding(0.f, 5.f, 0.f, 0.f)
 				[
-					TextBlock.ToSharedRef()
+					LaneId.ToSharedRef()
+				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.f, 5.f, 0.f, 0.f)
+				[
+					JunctionId.ToSharedRef()
+				]
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.f, 5.f, 0.f, 0.f)
+				[
+					LaneType.ToSharedRef()
 				]
 			]
 		];
-}
 
+	OnLaneSelected = GetEdMode()->onLaneSelected.AddRaw(this, &SOpenDRIVEEditorModeWidget::UpdateLaneInfo);
+}
 
 FOpenDRIVEEditorMode* SOpenDRIVEEditorModeWidget::GetEdMode() const
 {
@@ -66,6 +87,7 @@ FOpenDRIVEEditorMode* SOpenDRIVEEditorModeWidget::GetEdMode() const
 
 FReply SOpenDRIVEEditorModeWidget::Reset()
 {
+	GetEdMode()->onLaneSelected.Remove(OnLaneSelected);
 	GetEdMode()->Reset();
 	return FReply::Handled();
 }
@@ -81,8 +103,20 @@ FReply SOpenDRIVEEditorModeWidget::Generate()
 	return FReply::Handled();
 }
 
-int SOpenDRIVEEditorModeWidget::GetNumberOfRoads() 
+void SOpenDRIVEEditorModeWidget::UpdateLaneInfo(AOpenDriveRoadEd* lane)
 {
-	return GetEdMode()->GetRoads().Num();
-}
+	FString roadIDString = "Road Id : " + FString::FromInt(lane->GetRoadId());
+	FText roadIdText = FText::FromString(roadIDString);
+	RoadId.Get()->SetText(roadIdText);
+	
+	FString junctionIdString = "Junction Id : " + FString::FromInt(lane->GetJunctionId());
+	FText junctionIdText = FText::FromString(junctionIdString);
+	JunctionId.Get()->SetText(junctionIdText);
 
+	FString laneTypeString = "Lane type : " + lane->GetLaneType();
+	LaneType.Get()->SetText(FText::FromString(laneTypeString));
+
+	FString laneIDString = "Lane Id : " + FString::FromInt(lane->GetLaneId());
+	FText laneIDText = FText::FromString(laneIDString);
+	LaneId.Get()->SetText(laneIDText);
+}
