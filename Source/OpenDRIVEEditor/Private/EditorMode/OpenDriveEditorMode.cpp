@@ -138,6 +138,7 @@ void FOpenDRIVEEditorMode::LoadRoads()
 				if (!lane || lane->GetId() == 0) continue;
 
 				AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
+				newRoad->SetActorHiddenInGame(true);
 				newRoad->Initialize(road->GetId(), road->GetJunction(), laneSection, lane);
 				Roads.Add(newRoad);
 			}
