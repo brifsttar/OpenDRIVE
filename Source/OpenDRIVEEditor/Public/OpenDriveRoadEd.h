@@ -36,10 +36,6 @@ public:
 private : 
 
 	TObjectPtr<UStaticMesh> LaneMesh;
-	TObjectPtr<UMaterial> LaneMaterial;
-	TObjectPtr<UMaterialInstance> LeftMaterial;
-	TObjectPtr<UMaterialInstance> RightMaterial;
-	TObjectPtr<UMaterialInstance> SidewalkMaterial;
 
 	float roadOffset = 50.f;
 

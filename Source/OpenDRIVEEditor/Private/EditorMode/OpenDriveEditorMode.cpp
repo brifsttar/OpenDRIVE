@@ -162,5 +162,17 @@ void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
 	{
 		UE_LOG(LogClass, Warning, TEXT("object selected"));
 		onLaneSelected.Broadcast(selectedRoad);
+		
+		TSharedPtr<FOpenDRIVEEditorModeToolkit> openDRIVEEdToolkit = StaticCastSharedPtr<FOpenDRIVEEditorModeToolkit>(Toolkit);
+
+		if (openDRIVEEdToolkit.IsValid())
+		{
+			TSharedPtr<SOpenDRIVEEditorModeWidget> openDRIVEEdWidget = StaticCastSharedPtr<SOpenDRIVEEditorModeWidget>(openDRIVEEdToolkit->GetInlineContent());
+
+			if (openDRIVEEdWidget.IsValid())
+			{
+				openDRIVEEdWidget->UpdateLaneInfo(selectedRoad);
+			}
+		}
 	}
 }

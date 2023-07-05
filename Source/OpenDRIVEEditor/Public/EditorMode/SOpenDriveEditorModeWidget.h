@@ -23,6 +23,5 @@ public :
 	TSharedPtr<STextBlock> LaneId;
 	TSharedPtr<STextBlock> LaneType;
 
-	FDelegateHandle OnLaneSelected;
 	void UpdateLaneInfo(AOpenDriveRoadEd* lane);
 };

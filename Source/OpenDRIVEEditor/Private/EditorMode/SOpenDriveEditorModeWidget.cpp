@@ -76,8 +76,6 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 				]
 			]
 		];
-
-	OnLaneSelected = GetEdMode()->onLaneSelected.AddRaw(this, &SOpenDRIVEEditorModeWidget::UpdateLaneInfo);
 }
 
 FOpenDRIVEEditorMode* SOpenDRIVEEditorModeWidget::GetEdMode() const
@@ -87,7 +85,6 @@ FOpenDRIVEEditorMode* SOpenDRIVEEditorModeWidget::GetEdMode() const
 
 FReply SOpenDRIVEEditorModeWidget::Reset()
 {
-	GetEdMode()->onLaneSelected.Remove(OnLaneSelected);
 	GetEdMode()->Reset();
 	return FReply::Handled();
 }
@@ -105,18 +102,11 @@ FReply SOpenDRIVEEditorModeWidget::Generate()
 
 void SOpenDRIVEEditorModeWidget::UpdateLaneInfo(AOpenDriveRoadEd* lane)
 {
-	FString roadIDString = "Road Id : " + FString::FromInt(lane->GetRoadId());
-	FText roadIdText = FText::FromString(roadIDString);
-	RoadId.Get()->SetText(roadIdText);
-	
-	FString junctionIdString = "Junction Id : " + FString::FromInt(lane->GetJunctionId());
-	FText junctionIdText = FText::FromString(junctionIdString);
-	JunctionId.Get()->SetText(junctionIdText);
+	RoadId.Get()->SetText(FText::FromString("Road Id : " + FString::FromInt(lane->GetRoadId())));
 
-	FString laneTypeString = "Lane type : " + lane->GetLaneType();
-	LaneType.Get()->SetText(FText::FromString(laneTypeString));
+	JunctionId.Get()->SetText(FText::FromString("Junction Id : " + FString::FromInt(lane->GetJunctionId())));
 
-	FString laneIDString = "Lane Id : " + FString::FromInt(lane->GetLaneId());
-	FText laneIDText = FText::FromString(laneIDString);
-	LaneId.Get()->SetText(laneIDText);
+	LaneType.Get()->SetText(FText::FromString("Lane type : " + lane->GetLaneType()));
+
+	LaneId.Get()->SetText(FText::FromString("Lane Id : " + FString::FromInt(lane->GetLaneId())));
 }
