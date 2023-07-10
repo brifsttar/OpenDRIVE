@@ -1,124 +1,143 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "OpenDriveRoadEd.h"
 
 // Sets default values
 AOpenDriveRoadEd::AOpenDriveRoadEd()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = false; 
 	
-	LaneMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/LaneSplineEdMesh"));
+	_laneMeshPtr = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/LaneSplineEdMesh"));
 
-	baseMeshSize = LaneMesh->GetBoundingBox().GetSize().Y;
+	_baseMeshSize = _laneMeshPtr->GetBoundingBox().GetSize().Y; // The mesh's width. Used to set our lanes widths correctly.
 }
 
-void AOpenDriveRoadEd::Initialize(int roadId_, int junctionId_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_)
+void AOpenDriveRoadEd::Initialize(int roadId_, int junctionId_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_)
 {
-	RoadId = roadId_;
-	JunctionId = junctionId_;
-	LaneSection = laneSection_;
-	Lane = lane_;
+	_roadId = roadId_;
+	_junctionId = junctionId_;
+	_laneSection = laneSection_;
+	_lane = lane_;
 
-	switch (Lane->GetLaneType())
+	_roadOffset = offset_;
+
+	switch (_lane->GetLaneType())
 	{
 	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
-		LaneType = "Driving road";
+		_laneType = "Driving road";
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
-		LaneType = "Sidewalk lane";
+		_laneType = "Sidewalk lane";
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
-		LaneType = "Parking slot(s)";
+		_laneType = "Parking slot(s)";
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_BORDER):
-		LaneType = "Border";
+		_laneType = "Border";
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_RAIL):
-		LaneType = "Rail";
+		_laneType = "Rail";
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_TRAM):
-		LaneType = "Tram";
+		_laneType = "Tram";
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
-		LaneType = "Shoulder";
+		_laneType = "Shoulder";
 		break;
 	default:
-		LaneType = "Any";
+		_laneType = "Any";
 		break;
 	}
 
-	DrawLane();
+	DrawLane(false);
 }
 
-void AOpenDriveRoadEd::DrawLane()
+void AOpenDriveRoadEd::DrawLane(bool perfMode_)
 {
-	/*roadmanager positions*/
+	// Roadmanager positions
 	roadmanager::Position position;
 	roadmanager::Position prevPosition;
 
-	/*spline point vector, lane scale, lane length*/
+	// Spline point vector, lane scale, lane length
 	FVector sp;
 	float Yscale = 1.0f;
-	double laneLength = LaneSection->GetLength();
+	double laneLength = _laneSection->GetLength();
 
+	// Spline component creation
 	USplineComponent* LaneSpline = NewObject<USplineComponent>(this);
 	LaneSpline->SetupAttachment(RootComponent);
 	LaneSpline->RegisterComponent();
 	LaneSpline->ClearSplinePoints();
 
-	/*start point*/
+	// Start point
 	position.Init();
-	position.SetSnapLaneTypes(Lane->GetLaneType());
-	position.SetLanePos(RoadId, Lane->GetId(), 0., 0.);
+	position.SetSnapLaneTypes(_lane->GetLaneType());
+	position.SetLanePos(_roadId, _lane->GetId(), 0., 0.);
 	position.SetHeadingRelativeRoadDirection(0.);
 	sp = CoordTranslate::OdrToUe::ToLocation(position);
-	sp.Z = roadOffset;
+	sp.Z = _roadOffset;
 	LaneSpline->AddSplineWorldPoint(sp);
-	Yscale = (LaneSection->GetWidth(0., Lane->GetId()) * 100) / baseMeshSize;
+	Yscale = (_laneSection->GetWidth(0., _lane->GetId()) * 100) / _baseMeshSize;
 	LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
 	prevPosition = position;
 
-	/*had a lane spline point every 5 meters, 
-	only if there's and angle big enough between the current point and the previous one*/
-	for (int s = 5; s < laneLength; s += 5)
+	// Had a lane spline point every 5 meters
+	if (perfMode_ == true)
 	{
-		position.Init();
-		position.SetSnapLaneTypes(Lane->GetLaneType());
-		position.SetLanePos(RoadId, Lane->GetId(), s, 0.);
-		position.SetHeadingRelativeRoadDirection(0.);
-
-		if (FMath::Abs(prevPosition.GetH() - position.GetH()) > FMath::DegreesToRadians(0.))
+		for (int s = 5; s < laneLength; s += 5)
 		{
-			sp = CoordTranslate::OdrToUe::ToLocation(position);
-			sp.Z = roadOffset;
-			LaneSpline->AddSplineWorldPoint(sp);
-			Yscale = (LaneSection->GetWidth(s, Lane->GetId()) * 100) / baseMeshSize;
-			LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
+			position.Init();
+			position.SetSnapLaneTypes(_lane->GetLaneType());
+			position.SetLanePos(_roadId, _lane->GetId(), s, 0.);
+			position.SetHeadingRelativeRoadDirection(0.);
 
-			prevPosition = position;
+			if (FMath::Abs(prevPosition.GetH() - position.GetH()) > FMath::DegreesToRadians(0.))
+			{
+				sp = CoordTranslate::OdrToUe::ToLocation(position);
+				sp.Z = _roadOffset;
+				LaneSpline->AddSplineWorldPoint(sp);
+				Yscale = (_laneSection->GetWidth(s, _lane->GetId()) * 100) / _baseMeshSize;
+				LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
+
+				prevPosition = position;
+			}
+		}
+	}
+	else
+	{
+		for (int s = 5; s < laneLength; s += 5)
+		{
+			position.Init();
+			position.SetSnapLaneTypes(_lane->GetLaneType());
+			position.SetLanePos(_roadId, _lane->GetId(), s, 0.);
+			position.SetHeadingRelativeRoadDirection(0.);
+
+			sp = CoordTranslate::OdrToUe::ToLocation(position);
+			sp.Z = _roadOffset;
+			LaneSpline->AddSplineWorldPoint(sp);
+			Yscale = (_laneSection->GetWidth(s, _lane->GetId()) * 100) / _baseMeshSize;
+			LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
 		}
 	}
 
-	/*final point*/
+	// Final point
 	position.Init();
-	position.SetSnapLaneTypes(Lane->GetLaneType());
-	position.SetLanePos(RoadId, Lane->GetId(), laneLength, 0.);
+	position.SetSnapLaneTypes(_lane->GetLaneType());
+	position.SetLanePos(_roadId, _lane->GetId(), laneLength, 0.);
 	position.SetHeadingRelativeRoadDirection(0.);
 	sp = CoordTranslate::OdrToUe::ToLocation(position);
-	sp.Z += roadOffset;
+	sp.Z += _roadOffset;
 	LaneSpline->AddSplineWorldPoint(sp);
-	Yscale = (LaneSection->GetWidth(laneLength, Lane->GetId()) * 100) / baseMeshSize;
+	Yscale = (_laneSection->GetWidth(laneLength, _lane->GetId()) * 100) / _baseMeshSize;
 	LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
 
-	/*spline meshes creation*/
+	// Note : it seems like spline are doing weird when there's some height, but works pretty well overall
 
+	// Material loading
 	UMaterialInstance* meshMaterial = nullptr;
-
-	switch (Lane->GetLaneType())
+	switch (_lane->GetLaneType())
 	{
 	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
 
-		if (Lane->GetId() > 0)
+		if (_lane->GetId() > 0)
 		{
 			meshMaterial = LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/MI_LeftRoad"));
 		}
@@ -134,40 +153,41 @@ void AOpenDriveRoadEd::DrawLane()
 		break;
 	}
 
+	// Spline meshes creation 
 	for (int i = 0; i < LaneSpline->GetNumberOfSplinePoints() - 1; i++)
 	{
 		USplineMeshComponent* newSplineMesh = NewObject<USplineMeshComponent>(this);
 		newSplineMesh->SetupAttachment(RootComponent);
 		newSplineMesh->SetMobility(EComponentMobility::Movable);
-		newSplineMesh->SetStaticMesh(LaneMesh);
-
+		newSplineMesh->SetStaticMesh(_laneMeshPtr);
 		if (meshMaterial != nullptr)
 		{
 			newSplineMesh->SetMaterial(0, meshMaterial);
 		}
-		
 		newSplineMesh->SetForwardAxis(ESplineMeshAxis::X);
 
+		// Start and end points (position and tangent)
 		const FVector StartPoint = LaneSpline->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::Local);
 		const FVector StartTangent = LaneSpline->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::Local);
 		const FVector EndPoint = LaneSpline->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::Local);
 		const FVector EndTangent = LaneSpline->GetTangentAtSplinePoint(i + 1, ESplineCoordinateSpace::Local);
-
 		newSplineMesh->SetStartAndEnd(StartPoint, StartTangent, EndPoint, EndTangent, false);
 
+		// Start and end scale 
 		const FVector StartScale = LaneSpline->GetScaleAtSplinePoint(i);
 		const FVector EndScale = LaneSpline->GetScaleAtSplinePoint(i + 1);
-
 		newSplineMesh->SetStartScale(FVector2D(StartScale.Y, StartScale.Z), false);
 		newSplineMesh->SetEndScale(FVector2D(EndScale.Y, EndScale.Z), false);
 
+		// Turn off all collision
 		newSplineMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+		// Update spline mesh render and register it so it can be visible in editor viewport
 		newSplineMesh->UpdateRenderStateAndCollision();
-
 		newSplineMesh->RegisterComponent();
 	}
 
+	// To regain some performance, we can destroy the spline. Now that we have generated the meshes, spline points are no longer needed.
 	LaneSpline->DestroyComponent();
 }
 

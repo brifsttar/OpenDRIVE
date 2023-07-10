@@ -12,7 +12,7 @@ public :
 		SAssignNew(OpenDriveEditorModeWidget, SOpenDRIVEEditorModeWidget);
 	}
 
-	/** IToolkit interface */
+	// IToolkit interface 
 	virtual FName GetToolkitFName() const override { return FName("OpenDRIVEEditorMode"); }
 	virtual FText GetBaseToolkitName() const override { return NSLOCTEXT("BuilderModeToolkit", "DisplayName", "Builder"); }
 	virtual class FEdMode* GetEditorMode() const override { return GLevelEditorModeTools().GetActiveMode(FOpenDRIVEEditorMode::EM_RoadMode); }

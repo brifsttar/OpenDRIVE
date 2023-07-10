@@ -5,76 +5,91 @@
 
 void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 {
-	RoadId = SNew(STextBlock)
+	RoadIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("RoadId : ")));
 	
-	JunctionId = SNew(STextBlock)
+	JunctionIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("JunctionId : ")));
 
-	LaneType = SNew(STextBlock)
+	LaneTypeTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("Lane type : ")));
 
-	LaneId = SNew(STextBlock)
+	LaneIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("LaneId : ")));
 
 	ChildSlot
 		[
-			SNew(SScrollBox)
-			+ SScrollBox::Slot()
-			.VAlign(VAlign_Top)
-			.Padding(5.f)
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0.f,5.f,0.f,0.f)
 			[
-				SNew(SVerticalBox)
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				.Padding(0.f,5.f,0.f,0.f)
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.Padding(2,0,0,0)
+				.VAlign(VAlign_Center)
 				[
-					SNew(SHorizontalBox)
-					+ SHorizontalBox::Slot()
-					.AutoWidth()
-					.Padding(2,0,0,0)
-					.VAlign(VAlign_Center)
-					[
-						SNew(SButton)
-						.Text(FText::FromString("Reset"))
-						.OnClicked(this, &SOpenDRIVEEditorModeWidget::Reset)
-						.IsEnabled(this, &SOpenDRIVEEditorModeWidget::IsLoaded)
-					]
-					+ SHorizontalBox::Slot()
-					.AutoWidth()
-					.Padding(0, 0, 2, 0)
-					.VAlign(VAlign_Center)
-					[
-						SNew(SButton)
-						.Text(FText::FromString("Generate"))
-						.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate)
-					]
+					SNew(SButton)
+					.HAlign(HAlign_Left)
+					.Text(FText::FromString("Reset"))
+					.OnClicked(this, &SOpenDRIVEEditorModeWidget::Reset)
+					.IsEnabled(this, &SOpenDRIVEEditorModeWidget::IsLoaded)
 				]
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				.Padding(0.f, 20.f, 0.f, 0.f)
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.Padding(10, 0, 2, 0)
+				.VAlign(VAlign_Center)
 				[
-					RoadId.ToSharedRef()
-				]
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				.Padding(0.f, 5.f, 0.f, 0.f)
-				[
-					LaneId.ToSharedRef()
-				]
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				.Padding(0.f, 5.f, 0.f, 0.f)
-				[
-					JunctionId.ToSharedRef()
-				]
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				.Padding(0.f, 5.f, 0.f, 0.f)
-				[
-					LaneType.ToSharedRef()
+					SNew(SButton)
+					.HAlign(HAlign_Right)
+					.Text(FText::FromString("Generate"))
+					.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate)
+					.IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfSimulating)
 				]
 			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0.f, 10.f, 0.f, 0.f)
+			[
+				SNew(SEditableTextBox)
+				.Justification(ETextJustify::Center)
+				.HintText(FText::FromString(TEXT("Road Offset")))
+				.OnTextChanged(this, &SOpenDRIVEEditorModeWidget::SetOffset)
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0.f, 30.f, 0.f, 0.f)
+			[
+				SNew(SBorder)
+				[
+					SNew(SVerticalBox)
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.Padding(5.f, 10.f, 0.f, 0.f)
+					[
+						RoadIdTextPtr.ToSharedRef()
+					]
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.Padding(5.f, 5.f, 0.f, 0.f)
+					[
+						LaneIdTextPtr.ToSharedRef()
+					]
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.Padding(5.f, 5.f, 0.f, 0.f)
+					[
+						JunctionIdTextPtr.ToSharedRef()
+					]
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.Padding(5.f, 5.f, 0.f, 10.f)
+					[
+						LaneTypeTextPtr.ToSharedRef()
+					]	
+				]
+			]	
 		];
 }
 
@@ -91,7 +106,12 @@ FReply SOpenDRIVEEditorModeWidget::Reset()
 
 bool SOpenDRIVEEditorModeWidget::IsLoaded() const
 {
-	return GetEdMode()->GetHasBeenLoaded();
+	return (GetEdMode()->GetHasBeenLoaded() && CheckIfSimulating());
+}
+
+bool SOpenDRIVEEditorModeWidget::CheckIfSimulating() const
+{
+	return !(GEditor->IsSimulateInEditorInProgress());
 }
 
 FReply SOpenDRIVEEditorModeWidget::Generate()
@@ -100,13 +120,23 @@ FReply SOpenDRIVEEditorModeWidget::Generate()
 	return FReply::Handled();
 }
 
-void SOpenDRIVEEditorModeWidget::UpdateLaneInfo(AOpenDriveRoadEd* lane)
+void SOpenDRIVEEditorModeWidget::UpdateLaneInfo(AOpenDriveRoadEd* lane_)
 {
-	RoadId.Get()->SetText(FText::FromString("Road Id : " + FString::FromInt(lane->GetRoadId())));
+	RoadIdTextPtr.Get()->SetText(FText::FromString("Road Id : " + FString::FromInt(lane_->GetRoadId())));
 
-	JunctionId.Get()->SetText(FText::FromString("Junction Id : " + FString::FromInt(lane->GetJunctionId())));
+	JunctionIdTextPtr.Get()->SetText(FText::FromString("Junction Id : " + FString::FromInt(lane_->GetJunctionId())));
 
-	LaneType.Get()->SetText(FText::FromString("Lane type : " + lane->GetLaneType()));
+	LaneTypeTextPtr.Get()->SetText(FText::FromString("Lane type : " + lane_->GetLaneType()));
 
-	LaneId.Get()->SetText(FText::FromString("Lane Id : " + FString::FromInt(lane->GetLaneId())));
+	LaneIdTextPtr.Get()->SetText(FText::FromString("Lane Id : " + FString::FromInt(lane_->GetLaneId())));
 }
+
+void SOpenDRIVEEditorModeWidget::SetOffset(const FText &newOffset_)
+{
+	FString string = newOffset_.ToString();
+
+	float offset = string.IsNumeric() ? FCString::Atof(*string) : 10.f;
+
+	GetEdMode()->SetRoadOffset(offset);
+}
+

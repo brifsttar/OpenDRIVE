@@ -13,7 +13,6 @@ FOpenDRIVEEditorMode::FOpenDRIVEEditorMode()
 
 	UE_LOG(LogClass, Warning, TEXT("Custom editor mode constructor called"));
 	MapOpenedDelegateHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FOpenDRIVEEditorMode::OnMapOpenedCallback);
-
 	OnActorSelectedHandle = USelection::SelectObjectEvent.AddRaw(this, &FOpenDRIVEEditorMode::OnActorSelected);
 }
 
@@ -37,7 +36,7 @@ void FOpenDRIVEEditorMode::Enter()
 	}
 	else
 	{
-		SetRoadsVisibility(false);
+		SetRoadsVisibilityInEditor(false);
 	}
 }
 
@@ -46,9 +45,12 @@ void FOpenDRIVEEditorMode::Exit()
 	FToolkitManager::Get().CloseToolkit(Toolkit.ToSharedRef());
 	Toolkit.Reset();
 	
+	// When we load a new map, it will call the function Exit(). 
+	// The issue here to not hide the actors bellow. 
+	// (because they doesn't exist in the new opened level, so it will just crash when it will try to set their visibility
 	if (bIsMapOpening == false)
 	{
-		SetRoadsVisibility(true);
+		SetRoadsVisibilityInEditor(true);
 	}
 
 	FEdMode::Exit();
@@ -56,7 +58,7 @@ void FOpenDRIVEEditorMode::Exit()
 
 void FOpenDRIVEEditorMode::Reset()
 {
-	for (AOpenDriveRoadEd* road : Roads)
+	for (AOpenDriveRoadEd* road : FRoadsArray)
 	{
 		if (IsValid(road))
 		{
@@ -94,18 +96,17 @@ void FOpenDRIVEEditorMode::OnMapOpenedCallback(const FString& MapName, bool bLoa
 
 void FOpenDRIVEEditorMode::LoadRoads()
 {
-	/*reset*/
-	if (Roads.IsEmpty() == false)
+	// reset old roads pointers after a change of level
+	if (FRoadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveRoadEd* roads : Roads)
+		for (AOpenDriveRoadEd* roads : FRoadsArray)
 		{
-			Roads.Remove(roads);
+			FRoadsArray.Remove(roads);
 		}
-
-		Roads.Empty();
+		FRoadsArray.Empty();
 	}
 
-	/*roadmanager params*/
+	// roadmanager params
 	roadmanager::OpenDrive* Odr = roadmanager::Position::GetOpenDrive();
 	roadmanager::Road* road = 0;
 	roadmanager::LaneSection* laneSection = 0;
@@ -113,7 +114,7 @@ void FOpenDRIVEEditorMode::LoadRoads()
 	size_t nrOfRoads = Odr->GetNumOfRoads();
 	double laneLength = 0.;
 
-	/*Actor spawn params*/
+	// Actor spawn params
 	FActorSpawnParameters spawnParam;
 	spawnParam.bHideFromSceneOutliner = true;
 	spawnParam.bTemporaryEditorActor = true;
@@ -130,7 +131,7 @@ void FOpenDRIVEEditorMode::LoadRoads()
 			if (!laneSection) continue;
 
 			laneLength = laneSection->GetLength();
-
+		
 			for (int k = 0; k < laneSection->GetNumberOfLanes(); k++)
 			{
 				lane = laneSection->GetLaneByIdx(k);
@@ -139,17 +140,17 @@ void FOpenDRIVEEditorMode::LoadRoads()
 
 				AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
 				newRoad->SetActorHiddenInGame(true);
-				newRoad->Initialize(road->GetId(), road->GetJunction(), laneSection, lane);
-				Roads.Add(newRoad);
+				newRoad->Initialize(road->GetId(), road->GetJunction(), laneSection, lane, _roadOffset);
+				FRoadsArray.Add(newRoad);
 			}
 		}
 	}
 	bHasBeenLoaded = true;
 }
 
-void FOpenDRIVEEditorMode::SetRoadsVisibility(bool bIsVisible)
+void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 {
-	for (AOpenDriveRoadEd* road : Roads)
+	for (AOpenDriveRoadEd* road : FRoadsArray)
 	{
 		road->SetIsTemporarilyHiddenInEditor(bIsVisible);
 	}
@@ -161,9 +162,8 @@ void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
 
 	if (IsValid(selectedRoad) == true)
 	{
-		UE_LOG(LogClass, Warning, TEXT("object selected"));
-		onLaneSelected.Broadcast(selectedRoad);
-		
+		UE_LOG(LogClass, Warning, TEXT("road selected"));
+
 		TSharedPtr<FOpenDRIVEEditorModeToolkit> openDRIVEEdToolkit = StaticCastSharedPtr<FOpenDRIVEEditorModeToolkit>(Toolkit);
 
 		if (openDRIVEEdToolkit.IsValid())

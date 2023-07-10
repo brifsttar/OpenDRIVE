@@ -13,40 +13,73 @@ public :
 
 	FOpenDRIVEEditorMode();
 
+	// FEdMode base classes
 	virtual void Enter() override;
 	virtual void Exit() override;
 
+	/**
+	 * Gets if roads are drawn or not. 
+	 * @return True if loaded, False if not
+	 */
 	inline bool GetHasBeenLoaded() const { return bHasBeenLoaded; };
 
+	/**
+	 * Deletes drawn roads.
+	 */
 	void Reset();
 
+	/**
+	 * Generates roads.
+	 * It will call Reset() if there's already a generation done.
+	 */
 	void Generate();
 
-	inline TArray<AOpenDriveRoadEd*> GetRoads() const { return Roads; };
+	/**
+	 * @return The drawn roads array
+	 */
+	inline TArray<AOpenDriveRoadEd*> GetRoads() const { return FRoadsArray; };
 
 	~FOpenDRIVEEditorMode();
 
-	void OnMapOpenedCallback(const FString& MapName, bool bLoadAsTemplate);
+	/**
+	 * Sets the road offset 
+	 * @param newOffset_ The new offset
+	 */
+	inline void SetRoadOffset(float newOffset_) { _roadOffset = newOffset_;};
 
-	FOnLaneSelected onLaneSelected;
+	/**
+	 * @return The road offset
+	 */
+	inline float GetRoadOffset() { return _roadOffset; };
 
 protected :
 
-	bool bHasBeenLoaded = false;
-
+	/**
+	 * Loads roads 
+	 */
 	void LoadRoads();
 
-	void SetRoadsVisibility(bool bIsVisible);
-	
-	TArray<AOpenDriveRoadEd*> Roads;
+	/**
+	 * Sets the roads visibility in editor only
+	 * @param bIsVisible True for visible, False for hidden
+	 */
+	void SetRoadsVisibilityInEditor(bool bIsVisible);
+
+	TArray<AOpenDriveRoadEd*> FRoadsArray;
 
 private :
 
-	FDelegateHandle MapOpenedDelegateHandle;
+	float _roadOffset = 1.0f;
 
+	bool bHasBeenLoaded = false;
+
+	// Delegate used to detect when we load an existing map from the content browser 
+	// Note : doesn't seem to work if you create a new level without saving it.
+	FDelegateHandle MapOpenedDelegateHandle;
+	void OnMapOpenedCallback(const FString& mapName, bool bLoadAsTemplate);
 	bool bIsMapOpening;
 
+	// When an actor is selected. Used to send and display useful road info in the editor mode widget.
 	FDelegateHandle OnActorSelectedHandle;
-
 	void OnActorSelected(UObject* _selectedObject);
 };
