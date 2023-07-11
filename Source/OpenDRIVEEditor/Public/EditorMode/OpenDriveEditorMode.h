@@ -1,6 +1,7 @@
 #pragma once 
 #include "EditorModes.h"
 #include "EdMode.h"
+#include "../../../OpenDRIVE/Public/OpenDriveAsset.h"
 #include "../OpenDriveRoadEd.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveRoadEd* road)
@@ -52,6 +53,12 @@ public :
 	 */
 	inline float GetRoadOffset() { return _roadOffset; };
 
+	/**
+	 * Sets the OpenDRIVEAsset
+	 * @param newAsset_ The OpenDRIVEAsset
+	 */
+	void SetOpenDRIVEAsset(UOpenDriveAsset* newAsset_);
+
 protected :
 
 	/**
@@ -67,9 +74,12 @@ protected :
 
 	TArray<AOpenDriveRoadEd*> FRoadsArray;
 
+	UPROPERTY(AdvancedDisplay)
+	UOpenDriveAsset* OpenDRIVEAsset;
+
 private :
 
-	float _roadOffset = 1.0f;
+	float _roadOffset = 20.0f;
 
 	bool bHasBeenLoaded = false;
 
@@ -77,7 +87,7 @@ private :
 	// Note : doesn't seem to work if you create a new level without saving it.
 	FDelegateHandle MapOpenedDelegateHandle;
 	void OnMapOpenedCallback(const FString& mapName, bool bLoadAsTemplate);
-	bool bIsMapOpening;
+	bool bIsMapOpening = false;
 
 	// When an actor is selected. Used to send and display useful road info in the editor mode widget.
 	FDelegateHandle OnActorSelectedHandle;

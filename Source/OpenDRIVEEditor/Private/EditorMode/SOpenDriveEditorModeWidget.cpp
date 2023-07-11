@@ -5,6 +5,8 @@
 
 void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 {
+	AssetThumbnailPoolPtr = MakeShareable(new FAssetThumbnailPool(24));
+
 	RoadIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("RoadId : ")));
 	
@@ -17,6 +19,46 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 	LaneIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("LaneId : ")));
 
+	OpenDRIVEAssetProBoxPtr = SNew(SObjectPropertyEntryBox)
+		.DisplayBrowse(true)
+		.EnableContentPicker(true)
+		.DisplayThumbnail(true)
+		.ThumbnailPool(AssetThumbnailPoolPtr)
+		.AllowedClass(UOpenDriveAsset::StaticClass())
+		.AllowClear(true)
+		.OnObjectChanged(FOnSetObject::CreateSP(this, &SOpenDRIVEEditorModeWidget::OnObjectChanged))
+		.ObjectPath(this, &SOpenDRIVEEditorModeWidget::GetAssetDataPath);
+
+	TSharedRef<SBorder> border =
+		SNew(SBorder)
+		[
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(5.f, 10.f, 0.f, 0.f)
+			[
+				RoadIdTextPtr.ToSharedRef()
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(5.f, 5.f, 0.f, 0.f)
+			[
+				LaneIdTextPtr.ToSharedRef()
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(5.f, 5.f, 0.f, 0.f)
+			[
+				JunctionIdTextPtr.ToSharedRef()
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(5.f, 5.f, 0.f, 10.f)
+			[
+				LaneTypeTextPtr.ToSharedRef()
+			]
+		];
+
 	ChildSlot
 		[
 			SNew(SVerticalBox)
@@ -27,11 +69,11 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 				SNew(SHorizontalBox)
 				+ SHorizontalBox::Slot()
 				.AutoWidth()
+		        .HAlign(HAlign_Left)
 				.Padding(2,0,0,0)
 				.VAlign(VAlign_Center)
 				[
 					SNew(SButton)
-					.HAlign(HAlign_Left)
 					.Text(FText::FromString("Reset"))
 					.OnClicked(this, &SOpenDRIVEEditorModeWidget::Reset)
 					.IsEnabled(this, &SOpenDRIVEEditorModeWidget::IsLoaded)
@@ -61,35 +103,30 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 			.AutoHeight()
 			.Padding(0.f, 30.f, 0.f, 0.f)
 			[
-				SNew(SBorder)
+				border
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0.f, 30.f, 0.f, 0.f)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.HAlign(HAlign_Left)
+				.Padding(2, 0, 0, 0)
 				[
-					SNew(SVerticalBox)
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.Padding(5.f, 10.f, 0.f, 0.f)
-					[
-						RoadIdTextPtr.ToSharedRef()
-					]
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.Padding(5.f, 5.f, 0.f, 0.f)
-					[
-						LaneIdTextPtr.ToSharedRef()
-					]
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.Padding(5.f, 5.f, 0.f, 0.f)
-					[
-						JunctionIdTextPtr.ToSharedRef()
-					]
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.Padding(5.f, 5.f, 0.f, 10.f)
-					[
-						LaneTypeTextPtr.ToSharedRef()
-					]	
+					SNew(STextBlock)
+					.Text(FText::FromString(TEXT("OpenDRIVE Asset")))
 				]
-			]	
+			+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.HAlign(HAlign_Right)
+				.Padding(20, 0, 0, 0)
+				.VAlign(VAlign_Center)
+				[
+					OpenDRIVEAssetProBoxPtr.ToSharedRef()
+				]
+			]
 		];
 }
 
@@ -138,5 +175,16 @@ void SOpenDRIVEEditorModeWidget::SetOffset(const FText &newOffset_)
 	float offset = string.IsNumeric() ? FCString::Atof(*string) : 10.f;
 
 	GetEdMode()->SetRoadOffset(offset);
+}
+
+void SOpenDRIVEEditorModeWidget::OnObjectChanged(const FAssetData& assetData_)
+{
+	UOpenDriveAsset* openDRIVEAsset = Cast<UOpenDriveAsset>(assetData_.GetAsset());
+
+	if (IsValid(openDRIVEAsset))
+	{
+		_assetData = assetData_;
+		GetEdMode()->SetOpenDRIVEAsset(openDRIVEAsset);
+	}
 }
 

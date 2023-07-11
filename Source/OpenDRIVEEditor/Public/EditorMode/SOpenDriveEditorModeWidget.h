@@ -1,4 +1,6 @@
 #pragma once 
+#include "../../../OpenDRIVE/Public/OpenDriveAsset.h"
+#include "PropertyCustomizationHelpers.h"
 #include "Framework/Application/SlateApplication.h"
 
 class SOpenDRIVEEditorModeWidget : public SCompoundWidget
@@ -32,12 +34,6 @@ public :
 	 */
 	bool CheckIfSimulating() const;
 
-	//Lane informations text blocks
-	TSharedPtr<STextBlock> RoadIdTextPtr;
-	TSharedPtr<STextBlock> JunctionIdTextPtr;
-	TSharedPtr<STextBlock> LaneIdTextPtr;
-	TSharedPtr<STextBlock> LaneTypeTextPtr;
-
 	/**
 	 * Displays the last selected lane's informations
 	 * @param lane The lane
@@ -49,4 +45,28 @@ public :
 	 * @param newOffset The new offset
 	 */
 	void SetOffset(const FText &newOffset);
+
+	/**
+	 * Called when an openDRIVE asset is selected, and sends it to the editor mode.
+	 * @param assetData_ The new object's data 
+	 */
+	void OnObjectChanged(const FAssetData& assetData_);
+
+	inline void SetAssetData(const FAssetData& assetData_) { _assetData = assetData_; };
+
+private : 
+	//Lane informations text blocks
+	TSharedPtr<STextBlock> RoadIdTextPtr;
+	TSharedPtr<STextBlock> JunctionIdTextPtr;
+	TSharedPtr<STextBlock> LaneIdTextPtr;
+	TSharedPtr<STextBlock> LaneTypeTextPtr;
+
+	TSharedPtr<SObjectPropertyEntryBox> OpenDRIVEAssetProBoxPtr;
+	FAssetData _assetData;
+	TSharedPtr<FAssetThumbnailPool> AssetThumbnailPoolPtr;
+
+	/**
+	 * @return The current asset data path.
+	 */
+	inline FString GetAssetDataPath() const { return _assetData.IsValid() ? _assetData.ObjectPath.ToString() : ""; };
 };

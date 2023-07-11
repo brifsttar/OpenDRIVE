@@ -82,7 +82,7 @@ void AOpenDriveRoadEd::DrawLane(bool perfMode_)
 	// Had a lane spline point every 5 meters
 	if (perfMode_ == true)
 	{
-		for (int s = 5; s < laneLength; s += 5)
+		for (int s = 1; s < laneLength; s += 1)
 		{
 			position.Init();
 			position.SetSnapLaneTypes(_lane->GetLaneType());
@@ -129,7 +129,10 @@ void AOpenDriveRoadEd::DrawLane(bool perfMode_)
 	Yscale = (_laneSection->GetWidth(laneLength, _lane->GetId()) * 100) / _baseMeshSize;
 	LaneSpline->SetScaleAtSplinePoint(LaneSpline->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
 
-	// Note : it seems like spline are doing weird when there's some height, but works pretty well overall
+	for (int i = 0; i < LaneSpline->GetNumberOfSplinePoints(); i++)
+	{
+		LaneSpline->SetSplinePointType(i, ESplinePointType::Linear);
+	}
 
 	// Material loading
 	UMaterialInstance* meshMaterial = nullptr;
