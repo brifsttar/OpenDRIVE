@@ -8,6 +8,17 @@
 using CoordTranslate::UuToMeters;
 using CoordTranslate::MetersToUu;
 
+UENUM(BlueprintType)
+enum LaneType
+{
+	Any,
+	DrivingRoad,
+	SidewalkLane,
+	ParkingSlot,
+	Border,
+	Shoulder
+};
+
 /**
  * 
  */
@@ -165,4 +176,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	void AlignWithLaneCenter();
+
+	/**
+	 * @return The lane type 
+	 */
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	LaneType GetLaneType();
 };

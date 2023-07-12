@@ -145,3 +145,40 @@ bool UOpenDrivePosition::Delta(const UOpenDrivePosition* Other, float& Ds, float
 void UOpenDrivePosition::AlignWithLaneCenter() {
 	SetTrackPosition(GetRoadId(), GetLaneId(), GetS(), 0.f, 0.f);
 }
+
+LaneType UOpenDrivePosition::GetLaneType()
+{
+	roadmanager::LaneSection* laneSec = _TrackPos.GetRoad()->GetLaneSectionByS(GetS());
+	roadmanager::Lane* lane = laneSec->GetLaneById(GetLaneId());
+
+	LaneType laneType;
+
+	switch (lane->GetLaneType())
+	{
+	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
+		laneType = DrivingRoad;
+		break;
+
+	case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
+		laneType = ParkingSlot;
+		break;
+
+	case(roadmanager::Lane::LaneType::LANE_TYPE_BORDER):
+		laneType = Border;
+		break;
+
+	case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
+		laneType = Shoulder;
+		break;
+
+	case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
+		laneType = SidewalkLane;
+		break;
+
+	default:
+		laneType = Any;
+		break;
+	}
+
+	return laneType;
+}
