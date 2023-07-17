@@ -10,7 +10,20 @@ public :
 	SLATE_BEGIN_ARGS(SOpenDRIVEEditorModeWidget) {}
 	SLATE_END_ARGS();
 
+	/**
+	 * Constructs the window
+	 */
 	void Construct(const FArguments& InArgs);
+	
+	/**
+	 * Constructs the lane info box
+	 */
+	TSharedRef<SBorder> ConstructLaneInfoBox(const FArguments& InArgs);
+
+	/**
+	 *  Constructs the generate and reset buttons
+	 */
+	TSharedRef<SHorizontalBox> ConstructButtons(const FArguments& InArgs);
 
 	/**
 	 * Returns the Editor mode 
@@ -52,6 +65,10 @@ public :
 	 */
 	void OnObjectChanged(const FAssetData& assetData_);
 
+	/**
+	* Sets the corresponding FAssetData to the selected object in the PropertyEntryBox
+	* @param assetData_ the FAssetData 
+	*/
 	inline void SetAssetData(const FAssetData& assetData_) { _assetData = assetData_; };
 
 private : 
@@ -61,6 +78,7 @@ private :
 	TSharedPtr<STextBlock> LaneIdTextPtr;
 	TSharedPtr<STextBlock> LaneTypeTextPtr;
 
+	//openDRIVE asset box property
 	TSharedPtr<SObjectPropertyEntryBox> OpenDRIVEAssetProBoxPtr;
 	FAssetData _assetData;
 	TSharedPtr<FAssetThumbnailPool> AssetThumbnailPoolPtr;

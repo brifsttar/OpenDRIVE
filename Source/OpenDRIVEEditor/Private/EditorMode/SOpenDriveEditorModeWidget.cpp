@@ -7,18 +7,6 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 {
 	AssetThumbnailPoolPtr = MakeShareable(new FAssetThumbnailPool(24));
 
-	RoadIdTextPtr = SNew(STextBlock)
-		.Text(FText::FromString(TEXT("RoadId : ")));
-	
-	JunctionIdTextPtr = SNew(STextBlock)
-		.Text(FText::FromString(TEXT("JunctionId : ")));
-
-	LaneTypeTextPtr = SNew(STextBlock)
-		.Text(FText::FromString(TEXT("Lane type : ")));
-
-	LaneIdTextPtr = SNew(STextBlock)
-		.Text(FText::FromString(TEXT("LaneId : ")));
-
 	OpenDRIVEAssetProBoxPtr = SNew(SObjectPropertyEntryBox)
 		.DisplayBrowse(true)
 		.EnableContentPicker(true)
@@ -28,6 +16,66 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 		.AllowClear(true)
 		.OnObjectChanged(FOnSetObject::CreateSP(this, &SOpenDRIVEEditorModeWidget::OnObjectChanged))
 		.ObjectPath(this, &SOpenDRIVEEditorModeWidget::GetAssetDataPath);
+
+	ChildSlot
+		[
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0.f,5.f,0.f,0.f)
+			[
+				ConstructButtons(InArgs)
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(20.f, 10.f, 20.f, 0.f)
+			[
+				SNew(SEditableTextBox)
+				.Justification(ETextJustify::Center)
+				.HintText(FText::FromString(TEXT("Road Offset")))
+				.OnTextChanged(this, &SOpenDRIVEEditorModeWidget::SetOffset)
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0.f, 30.f, 0.f, 0.f)
+			[
+				ConstructLaneInfoBox(InArgs)
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0.f, 30.f, 0.f, 0.f)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.FillWidth(0.5f)
+				.Padding(20, 10, 0, 0)
+				[
+					SNew(STextBlock)
+					.Text(FText::FromString(TEXT("OpenDRIVE Asset")))
+				]
+				+ SHorizontalBox::Slot()
+				.FillWidth(0.5f)
+				.Padding(10, 0, 20, 0)
+				[
+					OpenDRIVEAssetProBoxPtr.ToSharedRef()
+				]
+			]
+		];
+}
+
+TSharedRef<SBorder> SOpenDRIVEEditorModeWidget::ConstructLaneInfoBox(const FArguments& InArgs)
+{
+	RoadIdTextPtr = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("RoadId : ")));
+
+	JunctionIdTextPtr = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("JunctionId : ")));
+
+	LaneTypeTextPtr = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("Lane type : ")));
+
+	LaneIdTextPtr = SNew(STextBlock)
+		.Text(FText::FromString(TEXT("LaneId : ")));
 
 	TSharedRef<SBorder> border =
 		SNew(SBorder)
@@ -59,75 +107,33 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 			]
 		];
 
-	ChildSlot
+	return border;
+}
+
+TSharedRef<SHorizontalBox> SOpenDRIVEEditorModeWidget::ConstructButtons(const FArguments& InArgs)
+{
+	TSharedPtr<SButton> resetButton = SNew(SButton).Text(FText::FromString("Reset"))
+		.OnClicked(this, &SOpenDRIVEEditorModeWidget::Reset).IsEnabled(this, &SOpenDRIVEEditorModeWidget::IsLoaded);
+
+	StaticCast<STextBlock&>(resetButton.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
+
+	TSharedPtr<SButton> generateButton = SNew(SButton).Text(FText::FromString("Generate"))
+		.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate).IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfSimulating);
+
+	StaticCast<STextBlock&>(generateButton.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
+
+	TSharedRef<SHorizontalBox> horBox = 
+		SNew(SHorizontalBox)
+		+ SHorizontalBox::Slot().Padding(20, 0, 0, 0).FillWidth(0.5f)
 		[
-			SNew(SVerticalBox)
-			+ SVerticalBox::Slot()
-			.AutoHeight()
-			.Padding(0.f,5.f,0.f,0.f)
-			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-		        .HAlign(HAlign_Left)
-				.Padding(2,0,0,0)
-				.VAlign(VAlign_Center)
-				[
-					SNew(SButton)
-					.Text(FText::FromString("Reset"))
-					.OnClicked(this, &SOpenDRIVEEditorModeWidget::Reset)
-					.IsEnabled(this, &SOpenDRIVEEditorModeWidget::IsLoaded)
-				]
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.Padding(10, 0, 2, 0)
-				.VAlign(VAlign_Center)
-				[
-					SNew(SButton)
-					.HAlign(HAlign_Right)
-					.Text(FText::FromString("Generate"))
-					.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate)
-					.IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfSimulating)
-				]
-			]
-			+ SVerticalBox::Slot()
-			.AutoHeight()
-			.Padding(0.f, 10.f, 0.f, 0.f)
-			[
-				SNew(SEditableTextBox)
-				.Justification(ETextJustify::Center)
-				.HintText(FText::FromString(TEXT("Road Offset")))
-				.OnTextChanged(this, &SOpenDRIVEEditorModeWidget::SetOffset)
-			]
-			+ SVerticalBox::Slot()
-			.AutoHeight()
-			.Padding(0.f, 30.f, 0.f, 0.f)
-			[
-				border
-			]
-			+ SVerticalBox::Slot()
-			.AutoHeight()
-			.Padding(0.f, 30.f, 0.f, 0.f)
-			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.HAlign(HAlign_Left)
-				.Padding(2, 0, 0, 0)
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString(TEXT("OpenDRIVE Asset")))
-				]
-			+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.HAlign(HAlign_Right)
-				.Padding(20, 0, 0, 0)
-				.VAlign(VAlign_Center)
-				[
-					OpenDRIVEAssetProBoxPtr.ToSharedRef()
-				]
-			]
+			resetButton.ToSharedRef()
+		]
+		+ SHorizontalBox::Slot().Padding(10, 0, 20, 0).FillWidth(0.5f)
+		[
+			generateButton.ToSharedRef()
 		];
+
+	return horBox;
 }
 
 FOpenDRIVEEditorMode* SOpenDRIVEEditorModeWidget::GetEdMode() const
