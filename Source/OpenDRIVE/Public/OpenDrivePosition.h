@@ -182,4 +182,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	LaneType GetLaneType();
+
+	/**
+	 * @return The roadmanager's Position 
+	 */
+	inline roadmanager::Position GetTrackPosition() { return _TrackPos; };
+
 };

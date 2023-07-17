@@ -28,25 +28,6 @@ void FOpenDRIVEEditorMode::Enter()
 	{
 		Toolkit = MakeShareable(new FOpenDRIVEEditorModeToolkit);
 		Toolkit->Init(Owner->GetToolkitHost());
-
-		// If if we already selected an OpenDRIVE asset, send it to the widget to update its render 
-		// (so it doesn't show "none" instead of the actual selected asset)
-		if (IsValid(OpenDRIVEAsset))
-		{
-			FAssetData openDriveAssetData(OpenDRIVEAsset);
-
-			TSharedPtr<FOpenDRIVEEditorModeToolkit> openDRIVEEdToolkit = StaticCastSharedPtr<FOpenDRIVEEditorModeToolkit>(Toolkit);
-
-			if (openDRIVEEdToolkit.IsValid())
-			{
-				TSharedPtr<SOpenDRIVEEditorModeWidget> openDRIVEEdWidget = StaticCastSharedPtr<SOpenDRIVEEditorModeWidget>(openDRIVEEdToolkit->GetInlineContent());
-
-				if (openDRIVEEdWidget.IsValid())
-				{
-					openDRIVEEdWidget->SetAssetData(openDriveAssetData);
-				}
-			}
-		}
 	}
 
 	if (bHasBeenLoaded == false)
