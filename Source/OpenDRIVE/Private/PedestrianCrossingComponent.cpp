@@ -5,22 +5,21 @@ UPedestrianCrossingComponent::UPedestrianCrossingComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	OpenDRIVEPosition = NewObject<UOpenDrivePosition>();
 }
 
-FVector UPedestrianCrossingComponent::GetOppositeSidewalkPosition()
+void UPedestrianCrossingComponent::GetOppositeSidewalkPosition(UOpenDrivePosition* Odc, FSidewalksInfo& sidewalkInfo)
 {
-	OpenDRIVEPosition->SetTransform(GetOwner()->GetActorTransform());
+	Odc->SetTransform(GetOwner()->GetActorTransform());
 
-	roadmanager::Position startPos = OpenDRIVEPosition->GetTrackPosition();
-	roadmanager::LaneSection* laneSection = startPos.GetRoad()->GetLaneSectionByS(OpenDRIVEPosition->GetS());
+	roadmanager::Position startPos = Odc->GetTrackPosition();
+	roadmanager::LaneSection* laneSection = startPos.GetRoad()->GetLaneSectionByS(Odc->GetS());
 
 	roadmanager::Lane* lane;
 	roadmanager::Position targetPos;
 
-	int roadId = OpenDRIVEPosition->GetRoadId();
-	int currentLaneId = OpenDRIVEPosition->GetLaneId();
+	int roadId = Odc->GetRoadId();
+	int currentLaneId = Odc->GetLaneId();
+	sidewalkInfo.laneId1 = currentLaneId;
 
 	laneSection->GetNumberOfLanes();
 
@@ -36,7 +35,8 @@ FVector UPedestrianCrossingComponent::GetOppositeSidewalkPosition()
 
 			if (lane == nullptr)
 			{
-				return FVector::ZeroVector;
+				sidewalkInfo.position = FVector::ZeroVector;
+				return;
 			}
 			else if (lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK)
 			{
@@ -45,7 +45,9 @@ FVector UPedestrianCrossingComponent::GetOppositeSidewalkPosition()
 				targetPos.Init();
 				targetPos.SetSnapLaneTypes(lane->GetLaneType());
 				targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
-				return CoordTranslate::OdrToUe::ToLocation(targetPos);
+				sidewalkInfo.laneId2 = lane->GetId();
+				sidewalkInfo.position = CoordTranslate::OdrToUe::ToLocation(targetPos);
+				return;
 			}
 		}
 	}
@@ -61,7 +63,8 @@ FVector UPedestrianCrossingComponent::GetOppositeSidewalkPosition()
 
 			if (lane == nullptr)
 			{
-				return FVector::ZeroVector;
+				sidewalkInfo.position = FVector::ZeroVector;
+				return;
 			}
 			else if (lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK)
 			{
@@ -70,21 +73,26 @@ FVector UPedestrianCrossingComponent::GetOppositeSidewalkPosition()
 				targetPos.Init();
 				targetPos.SetSnapLaneTypes(lane->GetLaneType());
 				targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
-				return CoordTranslate::OdrToUe::ToLocation(targetPos);
+				sidewalkInfo.laneId2 = lane->GetId();
+				sidewalkInfo.position = CoordTranslate::OdrToUe::ToLocation(targetPos);
+				return;
 			}
 		}
 	}
 
-	return FVector::ZeroVector;
+	sidewalkInfo.position = FVector::ZeroVector;
+	return;
 }
 
-void UPedestrianCrossingComponent::CreateTrajectory(USplineComponent* spline)
+void UPedestrianCrossingComponent::CreateTrajectoryToOppositeSidewalk(UOpenDrivePosition* Odc, FSidewalksInfo& sidewalkInfo, USplineComponent* spline)
 {
 	spline->ClearSplinePoints();
 
 	spline->AddSplineWorldPoint(GetOwner()->GetActorLocation());
 
-	spline->AddSplineWorldPoint(GetOppositeSidewalkPosition());
+	GetOppositeSidewalkPosition(Odc, sidewalkInfo);
+
+	spline->AddSplineWorldPoint(sidewalkInfo.position);
 }
 
 void UPedestrianCrossingComponent::AlterateTrajectory(USplineComponent* spline, TrajectoryType trajectoryType)
@@ -111,9 +119,9 @@ void UPedestrianCrossingComponent::AlterateTrajectory(USplineComponent* spline, 
 
 	case(TrajectoryType::Drunk):
 
-		middlePoint = FVector(middlePoint.X - FMath::FRandRange(-100., 100.), middlePoint.Y - FMath::FRandRange(-100., 100.), middlePoint.Z);
-		point1 = FVector(point1.X - FMath::FRandRange(-100., 100.), point1.Y - FMath::FRandRange(-100., 100.), point1.Z);
-		point2 = FVector(point2.X - FMath::FRandRange(-100., 100.), point2.Y - FMath::FRandRange(-100., 100.), point2.Z);
+		middlePoint = FVector(middlePoint.X + FMath::FRandRange(-200., 200.), middlePoint.Y + FMath::FRandRange(-200., 200.), middlePoint.Z);
+		point1 = FVector(point1.X + FMath::FRandRange(-200., 200.), point1.Y + FMath::FRandRange(-200., 200.), point1.Z);
+		point2 = FVector(point2.X + FMath::FRandRange(-200., 200.), point2.Y + FMath::FRandRange(-200., 200.), point2.Z);
 
 		spline->AddSplineWorldPoint(point1);
 		spline->AddSplineWorldPoint(middlePoint);
