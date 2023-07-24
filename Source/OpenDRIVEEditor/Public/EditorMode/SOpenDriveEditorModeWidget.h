@@ -71,6 +71,12 @@ public :
 	*/
 	inline void SetAssetData(const FAssetData& assetData_) { _assetData = assetData_; };
 
+	/**
+	* Called when arrows' visibility chekbox state is changed 
+	* @param state the new checkbox state
+	*/
+	void OnCheckStateChanged(ECheckBoxState state);
+
 private : 
 	//Lane informations text blocks
 	TSharedPtr<STextBlock> RoadIdTextPtr;

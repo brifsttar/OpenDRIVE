@@ -101,13 +101,9 @@ void FOpenDRIVEEditorMode::SetOpenDRIVEAsset(UOpenDriveAsset* newAsset_)
 
 void FOpenDRIVEEditorMode::LoadRoads()
 {
-	// reset old roads pointers after a change of level
+	// empty the array if needed
 	if (FRoadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveRoadEd* roads : FRoadsArray)
-		{
-			FRoadsArray.Remove(roads);
-		}
 		FRoadsArray.Empty();
 	}
 
@@ -161,6 +157,14 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 	}
 }
 
+void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
+{
+	for (AOpenDriveRoadEd* road : FRoadsArray)
+	{
+		road->SetArrowVisibility(bIsVisible);
+	}
+}
+
 void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
 {
 	AOpenDriveRoadEd* selectedRoad = Cast<AOpenDriveRoadEd>(selectedObject);
@@ -168,7 +172,7 @@ void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
 	if (IsValid(selectedRoad) == true)
 	{
 		UE_LOG(LogClass, Warning, TEXT("road selected"));
-
+	
 		TSharedPtr<FOpenDRIVEEditorModeToolkit> openDRIVEEdToolkit = StaticCastSharedPtr<FOpenDRIVEEditorModeToolkit>(Toolkit);
 
 		if (openDRIVEEdToolkit.IsValid())

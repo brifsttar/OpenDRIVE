@@ -59,6 +59,12 @@ public :
 	 */
 	void SetOpenDRIVEAsset(UOpenDriveAsset* newAsset_);
 
+	/**
+	* Sets roads' arrows visibility
+	* @param bIsVisible True for visible false for hidden
+	*/
+	void SetRoadsArrowsVisibilityInEditor(bool bIsVisible);
+
 protected :
 
 	/**

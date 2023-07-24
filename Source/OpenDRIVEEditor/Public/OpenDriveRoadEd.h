@@ -59,14 +59,23 @@ public:
 	*/
 	inline int GetLaneId() { return _lane->GetId(); };
 
+	/**
+	* Sets arrows visibility
+	* @param _isVisible new visibility
+	*/
+	void SetArrowVisibility(bool _isVisible);
+
 private : 
 
 	TObjectPtr<UStaticMesh> _laneMeshPtr;
+	TObjectPtr<UStaticMesh> _laneArrowMeshPtr;
 	float _baseMeshSize;
 	float _roadOffset = 10.f;
+	TArray<UStaticMeshComponent*> _arrowMeshes;
 
 	int _roadId = 0; 
 	int _junctionId = 0;
+	int _roadDirection = 0;
 	FString _laneType = "Any";
 
 	roadmanager::LaneSection* _laneSection;

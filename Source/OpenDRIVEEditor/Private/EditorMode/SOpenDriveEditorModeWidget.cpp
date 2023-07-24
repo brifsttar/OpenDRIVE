@@ -28,6 +28,25 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 			]
 			+ SVerticalBox::Slot()
 			.AutoHeight()
+			.Padding(0.f,10.f,0.f,0.f)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.FillWidth(0.5f)
+				[
+					SNew(STextBlock)
+					.Text(FText::FromString(TEXT("Show arrow")))
+				]
+					+ SHorizontalBox::Slot()
+					.FillWidth(0.5f)
+					.Padding(10, 0, 0, 0)
+				[
+					SNew(SCheckBox)
+					.OnCheckStateChanged(this, &SOpenDRIVEEditorModeWidget::OnCheckStateChanged)
+				]
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
 			.Padding(20.f, 10.f, 20.f, 0.f)
 			[
 				SNew(SEditableTextBox)
@@ -191,6 +210,25 @@ void SOpenDRIVEEditorModeWidget::OnObjectChanged(const FAssetData& assetData_)
 	{
 		_assetData = assetData_;
 		GetEdMode()->SetOpenDRIVEAsset(openDRIVEAsset);
+	}
+}
+
+void SOpenDRIVEEditorModeWidget::OnCheckStateChanged(ECheckBoxState state)
+{
+	switch (state)
+	{
+	case(ECheckBoxState::Checked):
+		GetEdMode()->SetRoadsArrowsVisibilityInEditor(true);
+		break;
+	case(ECheckBoxState::Unchecked):
+		GetEdMode()->SetRoadsArrowsVisibilityInEditor(false);
+		break;
+	case(ECheckBoxState::Undetermined):
+		GetEdMode()->SetRoadsArrowsVisibilityInEditor(false);
+		break;
+	default:
+		GetEdMode()->SetRoadsArrowsVisibilityInEditor(false);
+		break;
 	}
 }
 
