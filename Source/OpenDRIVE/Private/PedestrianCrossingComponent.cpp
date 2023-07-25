@@ -95,41 +95,6 @@ void UPedestrianCrossingComponent::CreateTrajectoryToOppositeSidewalk(UOpenDrive
 	spline->AddSplineWorldPoint(sidewalkInfo.position);
 }
 
-void UPedestrianCrossingComponent::AlterateTrajectory(USplineComponent* spline, TrajectoryType trajectoryType)
-{
-	if (spline->GetNumberOfSplinePoints() > 2) return;
-
-	FVector start = spline->GetWorldLocationAtSplinePoint(0);
-	FVector end = spline->GetWorldLocationAtSplinePoint(spline->GetNumberOfSplinePoints() - 1);
-
-	spline->RemoveSplinePoint(spline->GetNumberOfSplinePoints() - 1);
-
-	FVector middlePoint((start.X + end.X) / 2, (start.Y + end.Y) / 2, (start.Z + end.Z) / 2);
-	FVector point1((start.X + middlePoint.X) / 2, (start.Y + middlePoint.Y) / 2, (start.Z + middlePoint.Z) / 2);
-	FVector point2((end.X + middlePoint.X) / 2, (end.Y + middlePoint.Y) / 2, (end.Z + middlePoint.Z) / 2);
-
-	switch (trajectoryType)
-	{
-	case(TrajectoryType::Clumsy):
-
-		middlePoint = FVector(middlePoint.X - FMath::FRandRange(-100., 100.), middlePoint.Y - FMath::FRandRange(-100., 100.), middlePoint.Z);
-		spline->AddSplineWorldPoint(middlePoint);
-		spline->AddSplineWorldPoint(end);
-		break;
-
-	case(TrajectoryType::Drunk):
-
-		middlePoint = FVector(middlePoint.X + FMath::FRandRange(-200., 200.), middlePoint.Y + FMath::FRandRange(-200., 200.), middlePoint.Z);
-		point1 = FVector(point1.X + FMath::FRandRange(-200., 200.), point1.Y + FMath::FRandRange(-200., 200.), point1.Z);
-		point2 = FVector(point2.X + FMath::FRandRange(-200., 200.), point2.Y + FMath::FRandRange(-200., 200.), point2.Z);
-
-		spline->AddSplineWorldPoint(point1);
-		spline->AddSplineWorldPoint(middlePoint);
-		spline->AddSplineWorldPoint(point2);
-		spline->AddSplineWorldPoint(end);
-		break;
-	}
-}
 
 	
 

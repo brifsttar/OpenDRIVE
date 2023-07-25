@@ -6,13 +6,6 @@
 #include "Components/SplineComponent.h"
 #include "PedestrianCrossingComponent.generated.h"
 
-UENUM(BlueprintType)
-enum TrajectoryType
-{
-	Drunk,
-	Clumsy,
-};
-
 USTRUCT(BlueprintType)
 struct FSidewalksInfo
 {
@@ -55,12 +48,4 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, CallInEditor)
 	void CreateTrajectoryToOppositeSidewalk(UOpenDrivePosition* Odc, FSidewalksInfo& sidewalkInfo, USplineComponent* spline);
-
-	/**
-	 * Alterates a the created trajectory
-	 * @param spline The spline to modify 
-	 * @param trajectoryType The trajectory type 
-	 */
-	UFUNCTION(BlueprintCallable, CallInEditor)
-	void AlterateTrajectory(USplineComponent* spline, TrajectoryType trajectoryType);
 };
