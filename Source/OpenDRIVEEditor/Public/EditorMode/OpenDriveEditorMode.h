@@ -92,7 +92,7 @@ private :
 	// Delegate used to detect when we load an existing map from the content browser 
 	// Note : doesn't seem to work if you create a new level without saving it.
 	FDelegateHandle MapOpenedDelegateHandle;
-	void OnMapOpenedCallback(const FString& mapName, bool bLoadAsTemplate);
+	void OnMapOpenedCallback(uint32 type);
 	bool bIsMapOpening = false;
 
 	// When an actor is selected. Used to send and display useful road info in the editor mode widget.

@@ -71,7 +71,7 @@ void AOpenDriveRoadEd::DrawLane(bool perfMode_)
 	// Start point
 	position.Init();
 	position.SetSnapLaneTypes(_lane->GetLaneType());
-	position.SetLanePos(_roadId, _lane->GetId(), 0., 0.);
+	position.SetLanePos(_roadId, _lane->GetId(), _laneSection->GetS(), 0.);
 	position.SetHeadingRelativeRoadDirection(0.);
 	sp = CoordTranslate::OdrToUe::ToLocation(position);
 	sp.Z += _roadOffset;
@@ -84,7 +84,7 @@ void AOpenDriveRoadEd::DrawLane(bool perfMode_)
 	// Had a lane spline point every 5 meters
 	if (perfMode_ == true)
 	{
-		for (int s = 5; s < laneLength; s += 5)
+		for (int s = _laneSection->GetS() + 5.; s < _laneSection->GetS() + laneLength; s += 5)
 		{
 			position.Init();
 			position.SetSnapLaneTypes(_lane->GetLaneType());
@@ -104,7 +104,7 @@ void AOpenDriveRoadEd::DrawLane(bool perfMode_)
 	}
 	else
 	{
-		for (int s = 5; s < laneLength; s += 5)
+		for (int s = _laneSection->GetS() + 5.; s < _laneSection->GetS() + laneLength; s += 5)
 		{
 			position.Init();
 			position.SetSnapLaneTypes(_lane->GetLaneType());
@@ -122,7 +122,7 @@ void AOpenDriveRoadEd::DrawLane(bool perfMode_)
 	// Final point
 	position.Init();
 	position.SetSnapLaneTypes(_lane->GetLaneType());
-	position.SetLanePos(_roadId, _lane->GetId(), laneLength, 0.);
+	position.SetLanePos(_roadId, _lane->GetId(), _laneSection->GetS() + laneLength, 0.);
 	position.SetHeadingRelativeRoadDirection(0.);
 	sp = CoordTranslate::OdrToUe::ToLocation(position);
 	sp.Z += _roadOffset;

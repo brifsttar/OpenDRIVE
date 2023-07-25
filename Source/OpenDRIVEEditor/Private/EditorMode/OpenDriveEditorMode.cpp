@@ -12,7 +12,7 @@ FOpenDRIVEEditorMode::FOpenDRIVEEditorMode()
 	FEdMode::FEdMode();
 
 	UE_LOG(LogClass, Warning, TEXT("Custom editor mode constructor called"));
-	MapOpenedDelegateHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FOpenDRIVEEditorMode::OnMapOpenedCallback);
+	MapOpenedDelegateHandle = FEditorDelegates::MapChange.AddRaw(this, &FOpenDRIVEEditorMode::OnMapOpenedCallback);
 	OnActorSelectedHandle = USelection::SelectObjectEvent.AddRaw(this, &FOpenDRIVEEditorMode::OnActorSelected);
 }
 
@@ -87,11 +87,15 @@ FOpenDRIVEEditorMode::~FOpenDRIVEEditorMode()
 	USelection::SelectObjectEvent.Remove(OnActorSelectedHandle);
 }
 
-void FOpenDRIVEEditorMode::OnMapOpenedCallback(const FString& MapName, bool bLoadAsTemplate)
+void FOpenDRIVEEditorMode::OnMapOpenedCallback(uint32 type)
 {
-	UE_LOG(LogClass, Warning, TEXT("a new map has been opened"));
-	bIsMapOpening = true;
-	bHasBeenLoaded = false;
+	if (type == MapChangeEventFlags::NewMap)
+	{
+		UE_LOG(LogClass, Warning, TEXT("a new map has been opened"));
+
+		bIsMapOpening = true;
+		bHasBeenLoaded = false;
+	}
 }
 
 void FOpenDRIVEEditorMode::SetOpenDRIVEAsset(UOpenDriveAsset* newAsset_)
