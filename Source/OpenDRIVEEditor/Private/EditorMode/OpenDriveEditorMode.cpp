@@ -58,27 +58,23 @@ void FOpenDRIVEEditorMode::Exit()
 
 void FOpenDRIVEEditorMode::Reset()
 {
-	for (AOpenDriveRoadEd* road : FRoadsArray)
+	if (FRoadsArray.IsEmpty() == false)
 	{
-		if (IsValid(road))
+		for (AOpenDriveRoadEd* road : FRoadsArray)
 		{
-			road->Destroy();
+			if (IsValid(road))
+			{
+				road->Destroy();
+			}
 		}
+		FRoadsArray.Empty();
+		bHasBeenLoaded = false;
 	}
-	bHasBeenLoaded = false;
 }
 
 void FOpenDRIVEEditorMode::Generate()
 {
-	if (bHasBeenLoaded == true)
-	{
-		Reset();
-		LoadRoads();
-	}
-	else
-	{
-		LoadRoads();
-	}
+	LoadRoads();
 }
 
 FOpenDRIVEEditorMode::~FOpenDRIVEEditorMode()
@@ -108,7 +104,7 @@ void FOpenDRIVEEditorMode::LoadRoads()
 	// empty the array if needed
 	if (FRoadsArray.IsEmpty() == false)
 	{
-		FRoadsArray.Empty();
+		Reset();
 	}
 
 	// roadmanager params
@@ -116,9 +112,10 @@ void FOpenDRIVEEditorMode::LoadRoads()
 	roadmanager::Road* road = 0;
 	roadmanager::LaneSection* laneSection = 0;
 	roadmanager::Lane* lane = 0;
+	roadmanager::RoadLink* predecessorLink;
+	roadmanager::RoadLink* successorLink;
 	size_t nrOfRoads = Odr->GetNumOfRoads();
-	double laneLength = 0.;
-
+	
 	// Actor spawn params
 	FActorSpawnParameters spawnParam;
 	spawnParam.bHideFromSceneOutliner = true;
@@ -128,15 +125,18 @@ void FOpenDRIVEEditorMode::LoadRoads()
 	{
 		road = Odr->GetRoadByIdx(i);
 		if (!road) continue;
-		
+
+		predecessorLink = road->GetLink(roadmanager::LinkType::PREDECESSOR);
+		successorLink = road->GetLink(roadmanager::LinkType::SUCCESSOR);
+		int predId = predecessorLink != nullptr ? predecessorLink->GetElementId() : 0;
+		int succId = successorLink != nullptr ? successorLink->GetElementId() : 0;
+
 		for (int j = 0; j < road->GetNumberOfLaneSections(); j++)
 		{
 			laneSection = road->GetLaneSectionByIdx(j);
 
 			if (!laneSection) continue;
 
-			laneLength = laneSection->GetLength();
-		
 			for (int k = 0; k < laneSection->GetNumberOfLanes(); k++)
 			{
 				lane = laneSection->GetLaneByIdx(k);
@@ -145,7 +145,7 @@ void FOpenDRIVEEditorMode::LoadRoads()
 
 				AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
 				newRoad->SetActorHiddenInGame(true);
-				newRoad->Initialize(road->GetId(), road->GetJunction(), laneSection, lane, _roadOffset);
+				newRoad->Initialize(road->GetId(), road->GetJunction(), succId, predId, laneSection, lane, _roadOffset, _step);
 				FRoadsArray.Add(newRoad);
 			}
 		}
@@ -155,17 +155,24 @@ void FOpenDRIVEEditorMode::LoadRoads()
 
 void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 {
-	for (AOpenDriveRoadEd* road : FRoadsArray)
+	if (FRoadsArray.IsEmpty() == false)
 	{
-		road->SetIsTemporarilyHiddenInEditor(bIsVisible);
+		for (AOpenDriveRoadEd* road : FRoadsArray)
+		{
+			road->SetIsTemporarilyHiddenInEditor(bIsVisible);
+		}
 	}
 }
 
+
 void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
 {
-	for (AOpenDriveRoadEd* road : FRoadsArray)
+	if (FRoadsArray.IsEmpty() == false)
 	{
-		road->SetArrowVisibility(bIsVisible);
+		for (AOpenDriveRoadEd* road : FRoadsArray)
+		{
+			road->SetArrowVisibility(bIsVisible);
+		}
 	}
 }
 

@@ -54,7 +54,7 @@ void OpenDRIVEEdModeTool::RegisterEditorMode()
 	FEditorModeRegistry::Get().RegisterMode<FOpenDRIVEEditorMode>(
 		FOpenDRIVEEditorMode::EM_RoadMode,
 		FText::FromString("OpenDRIVE Editor"),
-		FSlateIcon(StyleSet->GetStyleSetName(), "OpenDRIVEEditorMode", "OpenDRIVEEditorMode.Small"), true, 500
+		FSlateIcon(StyleSet->GetStyleSetName(), "OpenDRIVEEditorMode", "OpenDRIVEEditorMode.Small"), true, 1
 	);
 }
 

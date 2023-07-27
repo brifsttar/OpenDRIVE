@@ -54,6 +54,17 @@ public :
 	inline float GetRoadOffset() { return _roadOffset; };
 
 	/**
+	* Sets the step for the roads' lanes drawing
+	* @param The new step 
+	*/
+	inline void SetStep(float newStep_) { _step = newStep_; };
+
+	/**
+	* @return The step
+	*/
+	inline float GetStep() { return _step; };
+
+	/**
 	 * Sets the OpenDRIVEAsset
 	 * @param newAsset_ The OpenDRIVEAsset
 	 */
@@ -86,7 +97,7 @@ protected :
 private :
 
 	float _roadOffset = 20.0f;
-
+	float _step = 5.f;
 	bool bHasBeenLoaded = false;
 
 	// Delegate used to detect when we load an existing map from the content browser 

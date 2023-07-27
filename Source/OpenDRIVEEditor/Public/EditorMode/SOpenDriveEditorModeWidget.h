@@ -26,6 +26,11 @@ public :
 	TSharedRef<SHorizontalBox> ConstructButtons(const FArguments& InArgs);
 
 	/**
+	* 
+	*/
+	TSharedRef<SBorder> ConstructRoadGenerationParameters(const FArguments& InArgs);
+
+	/**
 	 * Returns the Editor mode 
 	 * @return The OpenDRIVE Editor Mode
 	 */
@@ -77,20 +82,42 @@ public :
 	*/
 	void OnCheckStateChanged(ECheckBoxState state);
 
+	/**
+	* Called when the offset value is changed with the slider 
+	* @param value The new value 
+	*/
+	void OnOffsetValueChanged(float value);
+
+	/**
+	* Called when the step value is changed with the slider 
+	* @param value The new value
+	*/
+	void OnStepValueChanged(float value);
+
 private : 
+
+	//Text font
+	TSharedPtr<FSlateFontInfo> _fontInfoPtr;
+
+	//Slider bars's texts 
+	TSharedPtr<STextBlock> _stepTextPtr;
+	TSharedPtr<STextBlock> _offsetTextPtr;
+
 	//Lane informations text blocks
-	TSharedPtr<STextBlock> RoadIdTextPtr;
-	TSharedPtr<STextBlock> JunctionIdTextPtr;
-	TSharedPtr<STextBlock> LaneIdTextPtr;
-	TSharedPtr<STextBlock> LaneTypeTextPtr;
+	TSharedPtr<STextBlock> _roadIdTextPtr;
+	TSharedPtr<STextBlock> _junctionIdTextPtr;
+	TSharedPtr<STextBlock> _laneIdTextPtr;
+	TSharedPtr<STextBlock> _laneTypeTextPtr;
+	TSharedPtr<STextBlock> _successorIdTextPtr;
+	TSharedPtr<STextBlock> _predecessorIdTextPtr;
 
 	//openDRIVE asset box property
-	TSharedPtr<SObjectPropertyEntryBox> OpenDRIVEAssetProBoxPtr;
+	TSharedPtr<SObjectPropertyEntryBox> _openDRIVEAssetProBoxPtr;
 	FAssetData _assetData;
-	TSharedPtr<FAssetThumbnailPool> AssetThumbnailPoolPtr;
-
+	TSharedPtr<FAssetThumbnailPool> _assetThumbnailPoolPtr;
+	
 	/**
 	 * @return The current asset data path.
 	 */
-	inline FString GetAssetDataPath() const { return _assetData.IsValid() ? _assetData.ObjectPath.ToString() : ""; };
+	inline FString GetAssetDataPath() const { return _assetData.IsValid() ? _assetData.GetObjectPathString() : ""; };
 };
