@@ -29,8 +29,6 @@ public:
 		return FModuleManager::Get().IsModuleLoaded("OpenDriveEditor");
 	}
 
-	/** Menu extension **/
-	void AddMenuExtension(const FMenuExtensionDelegate& extensionDelegate, FName extensionHook, const TSharedPtr<FUICommandList>& CommandList = NULL, EExtensionHook::Position position = EExtensionHook::Before);
 	TSharedRef<FWorkspaceItem> GetMenuRoot() { return MenuRoot; };
 
 protected:
@@ -39,9 +37,6 @@ protected:
 	TSharedPtr<FExtender> MenuExtender;
 
 	static TSharedRef<FWorkspaceItem> MenuRoot;
-
-	void MakePulldownMenu(FMenuBarBuilder& menuBuilder);
-	void FillPulldownMenu(FMenuBuilder& menuBuilder);
 
 private:
 

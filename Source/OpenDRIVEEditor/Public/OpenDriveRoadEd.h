@@ -111,10 +111,11 @@ public:
 
 private : 
 
+	TArray<UStaticMeshComponent*> FArrowMeshes;
+
 	TObjectPtr<UStaticMesh> _laneMeshPtr;
 	TObjectPtr<UStaticMesh> _laneArrowMeshPtr;
 	float _baseMeshSize;
-	TArray<UStaticMeshComponent*> _arrowMeshes;
 
 	int _roadId = 0; 
 	int _junctionId = 0;

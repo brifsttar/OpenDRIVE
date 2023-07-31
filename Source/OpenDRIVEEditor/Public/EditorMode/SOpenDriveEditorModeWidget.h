@@ -16,7 +16,7 @@ public :
 	void Construct(const FArguments& InArgs);
 	
 	/**
-	 * Constructs the lane info box
+	 * Constructs the lane info box (road id, ...)
 	 */
 	TSharedRef<SBorder> ConstructLaneInfoBox(const FArguments& InArgs);
 
@@ -26,7 +26,7 @@ public :
 	TSharedRef<SHorizontalBox> ConstructButtons(const FArguments& InArgs);
 
 	/**
-	* 
+	* Constructs the road generation parameters box (offset / step)
 	*/
 	TSharedRef<SBorder> ConstructRoadGenerationParameters(const FArguments& InArgs);
 
@@ -36,8 +36,14 @@ public :
 	 */
 	class FOpenDRIVEEditorMode* GetEdMode() const;
 
-	//Link between the buttons and the editor mode functions
+	/**
+	* Link the Generate() function in the OpenDRIVEEditorMode.cpp file
+	*/
 	FReply Generate();
+
+	/**
+	* Link the Reset() function in the OpenDRIVEEditorMode.cpp file
+	*/
 	FReply Reset();
 
 	/**

@@ -9,20 +9,20 @@ const FEditorModeID FOpenDRIVEEditorMode::EM_RoadMode(TEXT("EM_RoadMode"));
 
 FOpenDRIVEEditorMode::FOpenDRIVEEditorMode()
 {
-	FEdMode::FEdMode();
-
 	UE_LOG(LogClass, Warning, TEXT("Custom editor mode constructor called"));
+
+	FEdMode::FEdMode();
 	MapOpenedDelegateHandle = FEditorDelegates::MapChange.AddRaw(this, &FOpenDRIVEEditorMode::OnMapOpenedCallback);
 	OnActorSelectedHandle = USelection::SelectObjectEvent.AddRaw(this, &FOpenDRIVEEditorMode::OnActorSelected);
 }
 
 void FOpenDRIVEEditorMode::Enter()
 {
+	UE_LOG(LogClass, Warning, TEXT("Enter"));
+
 	FEdMode::Enter();
 
 	bIsMapOpening = false;
-
-	UE_LOG(LogClass, Warning, TEXT("Enter"));
 
 	if (!Toolkit.IsValid())
 	{
@@ -32,7 +32,7 @@ void FOpenDRIVEEditorMode::Enter()
 
 	if (bHasBeenLoaded == false)
 	{
-		LoadRoads();
+		LoadRoadsNetwork();
 	}
 	else
 	{
@@ -45,10 +45,7 @@ void FOpenDRIVEEditorMode::Exit()
 	FToolkitManager::Get().CloseToolkit(Toolkit.ToSharedRef());
 	Toolkit.Reset();
 	
-	// When we load a new map, it will call the function Exit(). 
-	// The issue here to not hide the actors bellow. 
-	// (because they doesn't exist in the new opened level, so it will just crash when it will try to set their visibility
-	if (bIsMapOpening == false)
+	if (bIsMapOpening == false) //prevents the function's call in case of level change 
 	{
 		SetRoadsVisibilityInEditor(true);
 	}
@@ -74,7 +71,7 @@ void FOpenDRIVEEditorMode::Reset()
 
 void FOpenDRIVEEditorMode::Generate()
 {
-	LoadRoads();
+	LoadRoadsNetwork();
 }
 
 FOpenDRIVEEditorMode::~FOpenDRIVEEditorMode()
@@ -94,12 +91,7 @@ void FOpenDRIVEEditorMode::OnMapOpenedCallback(uint32 type)
 	}
 }
 
-void FOpenDRIVEEditorMode::SetOpenDRIVEAsset(UOpenDriveAsset* newAsset_)
-{
-	OpenDRIVEAsset = newAsset_;
-}
-
-void FOpenDRIVEEditorMode::LoadRoads()
+void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 {
 	// empty the array if needed
 	if (FRoadsArray.IsEmpty() == false)
@@ -163,7 +155,6 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 		}
 	}
 }
-
 
 void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
 {

@@ -31,6 +31,9 @@ void AOpenDriveRoadEd::SetLaneType()
 	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
 		_laneType = "Driving road";
 		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
+		_laneType = "Bike path";
+		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
 		_laneType = "Sidewalk lane";
 		break;
@@ -48,6 +51,9 @@ void AOpenDriveRoadEd::SetLaneType()
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
 		_laneType = "Shoulder";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
+		_laneType = "Restricted lane";
 		break;
 	default:
 		_laneType = "Any";
@@ -91,7 +97,7 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	}
 
 	//arrow meshes 
-	if (_lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_DRIVING)
+	if (_lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_DRIVING || _lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED)
 	{
 		if (_junctionId == -1)
 		{
@@ -112,9 +118,19 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	else
 	{
 		//set driving lane's spline's color in junction
-		if (_lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_DRIVING)
+		switch (_lane->GetLaneType())
 		{
+		case (roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
 			LaneSpline->EditorUnselectedSplineSegmentColor = _lane->GetId() > 0 ? FLinearColor::Red : FLinearColor::Green;
+			break;
+
+		case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
+			LaneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(1, 0.5, 0);
+			break;
+
+		case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
+			LaneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(0, 0, 1);
+			break;
 		}
 	}
 }
@@ -168,7 +184,7 @@ void AOpenDriveRoadEd::SetArrowMeshes(USplineComponent* laneSpline_, bool _isJun
 
 		newStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		newStaticMesh->RegisterComponent();
-		_arrowMeshes.Add(newStaticMesh);
+		FArrowMeshes.Add(newStaticMesh);
 	}
 }
 
@@ -197,6 +213,15 @@ void AOpenDriveRoadEd::SetColoredLaneMeshes(USplineComponent* laneSpline_)
 		
 		case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
 			newSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_Parking")));
+			break;
+			
+		case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
+			newSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_Biking")));
+			break;
+
+		case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
+			newSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_RestrictedRoad")));
+			break;
 
 		default:
 			newSplineMesh->SetMaterial(0, LoadObject<UMaterial>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/M_LaneSplineEd")));
@@ -234,7 +259,7 @@ void AOpenDriveRoadEd::SetArrowVisibility(bool _isVisible)
 {
 	if (_junctionId == -1)
 	{
-		for (UStaticMeshComponent* arrow : _arrowMeshes)
+		for (UStaticMeshComponent* arrow : FArrowMeshes)
 		{
 			arrow->SetVisibility(_isVisible);
 		}

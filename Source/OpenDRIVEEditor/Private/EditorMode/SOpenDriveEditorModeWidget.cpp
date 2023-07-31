@@ -316,7 +316,6 @@ void SOpenDRIVEEditorModeWidget::OnObjectChanged(const FAssetData& assetData_)
 	if (IsValid(openDRIVEAsset))
 	{
 		_assetData = assetData_;
-		GetEdMode()->SetOpenDRIVEAsset(openDRIVEAsset);
 	}
 }
 

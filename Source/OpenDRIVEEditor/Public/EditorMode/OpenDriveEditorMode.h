@@ -14,13 +14,21 @@ public :
 
 	FOpenDRIVEEditorMode();
 
-	// FEdMode base classes
+	~FOpenDRIVEEditorMode();
+
+	/**
+	* Called everytime the editor mode is entered
+	*/
 	virtual void Enter() override;
+
+	/**
+	* Called everytime the editor mode is closed 
+	*/
 	virtual void Exit() override;
 
 	/**
-	 * Gets if roads are drawn or not. 
-	 * @return True if loaded, False if not
+	 * Gets if the roads are drawn or not. 
+	 * @return true if loaded, false if not
 	 */
 	inline bool GetHasBeenLoaded() const { return bHasBeenLoaded; };
 
@@ -34,13 +42,6 @@ public :
 	 * It will call Reset() if there's already a generation done.
 	 */
 	void Generate();
-
-	/**
-	 * @return The drawn roads array
-	 */
-	inline TArray<AOpenDriveRoadEd*> GetRoads() const { return FRoadsArray; };
-
-	~FOpenDRIVEEditorMode();
 
 	/**
 	 * Sets the road offset 
@@ -65,34 +66,25 @@ public :
 	inline float GetStep() { return _step; };
 
 	/**
-	 * Sets the OpenDRIVEAsset
-	 * @param newAsset_ The OpenDRIVEAsset
-	 */
-	void SetOpenDRIVEAsset(UOpenDriveAsset* newAsset_);
-
-	/**
 	* Sets roads' arrows visibility
 	* @param bIsVisible True for visible false for hidden
 	*/
 	void SetRoadsArrowsVisibilityInEditor(bool bIsVisible);
+
+	/**
+	* Sets the roads visibility in editor only
+	* @param bIsVisible True for visible, False for hidden
+	*/
+	void SetRoadsVisibilityInEditor(bool bIsVisible);
 
 protected :
 
 	/**
 	 * Loads roads 
 	 */
-	void LoadRoads();
-
-	/**
-	 * Sets the roads visibility in editor only
-	 * @param bIsVisible True for visible, False for hidden
-	 */
-	void SetRoadsVisibilityInEditor(bool bIsVisible);
+	void LoadRoadsNetwork();
 
 	TArray<AOpenDriveRoadEd*> FRoadsArray;
-
-	UPROPERTY(AdvancedDisplay)
-	UOpenDriveAsset* OpenDRIVEAsset;
 
 private :
 
@@ -100,13 +92,18 @@ private :
 	float _step = 5.f;
 	bool bHasBeenLoaded = false;
 
-	// Delegate used to detect when we load an existing map from the content browser 
-	// Note : doesn't seem to work if you create a new level without saving it.
 	FDelegateHandle MapOpenedDelegateHandle;
+	/**
+	* Called when a new level is opened (or created)
+	* @param type MapChangeEventFlags namespace flag
+	*/
 	void OnMapOpenedCallback(uint32 type);
 	bool bIsMapOpening = false;
 
-	// When an actor is selected. Used to send and display useful road info in the editor mode widget.
 	FDelegateHandle OnActorSelectedHandle;
+	/**
+	* Called when an actor is selected in editor 
+	* @param selectedObject The selected object 
+	*/
 	void OnActorSelected(UObject* _selectedObject);
 };
