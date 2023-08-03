@@ -4,25 +4,22 @@
 #include "Components/ActorComponent.h"
 #include "OpenDrivePosition.h"
 #include "Components/SplineComponent.h"
+#include "OpenDriveCrosswalk.h"
 #include "PedestrianCrossingComponent.generated.h"
 
-USTRUCT(BlueprintType)
-struct FSidewalksInfo
+
+UENUM(BlueprintType)
+	enum class ECrossingPathType : uint8
 {
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(BlueprintReadWrite)
-	FVector position;
-
-	UPROPERTY(BlueprintReadWrite)
-	int laneId1;
-
-	UPROPERTY(BlueprintReadWrite)
-	int laneId2;
+	SIMPLE UMETA(DisplayName = "Simple"),
+	SIDEWALK UMETA(DisplayName = "Sidewalk"),
+	STRAIGHT UMETA(DisplayName = "Straight")
 };
 
+
+/**
+* Add this component on a pedestrian to allow him to cross roads by himself
+*/
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OPENDRIVE_API UPedestrianCrossingComponent : public UActorComponent
 {
@@ -35,17 +32,32 @@ public:
 	UPedestrianCrossingComponent();
 
 	/**
-	 * Finds the sidewalk on the road's opposite side. 
-	 * @param Odc The OpenDRIVEPosition
-	 */
-	UFUNCTION(BlueprintCallable, CallInEditor)
-	void GetOppositeSidewalkPosition(UOpenDrivePosition* Odc, FSidewalksInfo& sidewalkInfo);
+	* @param Odp The OpenDRIVEPosition
+	* @param startSOffset the S offset on the starting lane 
+	* @param endSOffset the S offset on the target lane
+	* @param bSimple the player go straight to the target or not
+	* @return positions The path to follow
+	*/
+	UFUNCTION(BlueprintCallable)
+	void CreatePathToOppositeSidewalk(UOpenDrivePosition* Odp, float endSOffset, ECrossingPathType pathType,TArray<FVector>& positions);
 
 	/**
-	 * Creates a simple linear trajectory between the starting point and the opposite sidewalk.
-	 * @param Odc The OpenDRIVEPosition
-	 * @param spline The actor's spline component to modify
-	 */
-	UFUNCTION(BlueprintCallable, CallInEditor)
-	void CreateTrajectoryToOppositeSidewalk(UOpenDrivePosition* Odc, FSidewalksInfo& sidewalkInfo, USplineComponent* spline);
+	* Add a new spline component following the given positions
+	* @param positions the path to follow 
+	* @param pathType the pathType 
+	*/
+	UFUNCTION(BlueprintCallable)
+	void AddNewPathSpline(TArray<FVector> positions);
+
+protected : 
+
+	/**
+	* Finds the nearest crosswalk to cross road 
+	* @param roadID the roadId
+	* @param currentLaneId the current laneId (where the pedestrian is)
+	* @param targetlaneId the targeted laneId (where the pedestrian wants to go)
+	* @param SearchAreaRadius the search area radius (in meter)
+	* @return the crosswalkPath the path to follow 
+	*/
+	void FindNearCrosswalk(int roadID, int currentlaneId, int targetlaneId, float SearchAreaRadius, TArray<FVector>& crosswalkPath);
 };

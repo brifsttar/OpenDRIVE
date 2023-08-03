@@ -4,7 +4,6 @@
 AOpenDriveRoadEd::AOpenDriveRoadEd()
 {
 	PrimaryActorTick.bCanEverTick = false; 
-	
 	_laneMeshPtr = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/EditorLandscapeResources/SplineEditorMesh"));
 	_laneArrowMeshPtr = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/BetterArrow"));
 
@@ -69,15 +68,15 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	double s = _laneSection->GetS();
 
 	// Spline component creation
-	USplineComponent* LaneSpline = NewObject<USplineComponent>(this);
-	LaneSpline->SetupAttachment(RootComponent);
-	LaneSpline->RegisterComponent();
-	LaneSpline->ClearSplinePoints();
+	USplineComponent* laneSpline = NewObject<USplineComponent>(this);
+	laneSpline->SetupAttachment(RootComponent);
+	laneSpline->RegisterComponent();
+	laneSpline->ClearSplinePoints();
 
 	// Start point
 	position.Init();
 	position.SetSnapLaneTypes(_lane->GetLaneType());
-	SetLanePoint(LaneSpline, position, s, offset);
+	SetLanePoint(laneSpline, position, s, offset);
 
 	//Driving direction
 	_roadDirection = position.GetDrivingDirectionRelativeRoad();
@@ -86,14 +85,14 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	s += step;
 	for (s ; s < _laneSection->GetS() + laneLength; s += step)
 	{
-		SetLanePoint(LaneSpline, position, s, offset);
+		SetLanePoint(laneSpline, position, s, offset);
 	}
 
 	// Final point
-	SetLanePoint(LaneSpline, position, _laneSection->GetS() + laneLength, offset);
+	SetLanePoint(laneSpline, position, _laneSection->GetS() + laneLength, offset);
 	if (laneLength > step)
 	{
-		CheckLastTwoPointsDistance(LaneSpline, step);
+		CheckLastTwoPointsDistance(laneSpline, step);
 	}
 
 	//arrow meshes 
@@ -101,11 +100,11 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	{
 		if (_junctionId == -1)
 		{
-			SetArrowMeshes(LaneSpline, false);
+			SetArrowMeshes(laneSpline, false);
 		}
 		else
 		{
-			SetArrowMeshes(LaneSpline, true);
+			SetArrowMeshes(laneSpline, true);
 		}
 	}
 
@@ -113,7 +112,7 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	if (_junctionId == -1)
 	{
 		// Spline meshes creation 
-		SetColoredLaneMeshes(LaneSpline);
+		SetColoredLaneMeshes(laneSpline);
 	}
 	else
 	{
@@ -121,15 +120,15 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 		switch (_lane->GetLaneType())
 		{
 		case (roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
-			LaneSpline->EditorUnselectedSplineSegmentColor = _lane->GetId() > 0 ? FLinearColor::Red : FLinearColor::Green;
+			laneSpline->EditorUnselectedSplineSegmentColor = _lane->GetId() > 0 ? FLinearColor::Red : FLinearColor::Green;
 			break;
 
 		case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
-			LaneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(1, 0.5, 0);
+			laneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(1, 0.5, 0);
 			break;
 
 		case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
-			LaneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(0, 0, 1);
+			laneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(0, 0, 1);
 			break;
 		}
 	}

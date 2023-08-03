@@ -7,92 +7,127 @@ UPedestrianCrossingComponent::UPedestrianCrossingComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPedestrianCrossingComponent::GetOppositeSidewalkPosition(UOpenDrivePosition* Odc, FSidewalksInfo& sidewalkInfo)
+void UPedestrianCrossingComponent::CreatePathToOppositeSidewalk(UOpenDrivePosition* Odp, float endSOffset, ECrossingPathType pathType, TArray<FVector>& positions)
 {
-	Odc->SetTransform(GetOwner()->GetActorTransform());
+	Odp->SetTransform(GetOwner()->GetActorTransform());
 
-	roadmanager::Position startPos = Odc->GetTrackPosition();
-	roadmanager::LaneSection* laneSection = startPos.GetRoad()->GetLaneSectionByS(Odc->GetS());
+	roadmanager::Position startPos = Odp->GetTrackPosition();
+	positions.Add(CoordTranslate::OdrToUe::ToLocation(startPos));
 
+	roadmanager::LaneSection* laneSection = startPos.GetRoad()->GetLaneSectionByS(Odp->GetS());
 	roadmanager::Lane* lane;
 	roadmanager::Position targetPos;
 
-	int roadId = Odc->GetRoadId();
-	int currentLaneId = Odc->GetLaneId();
-	sidewalkInfo.laneId1 = currentLaneId;
+	int roadId = Odp->GetRoadId();
+	int currentLaneId = Odp->GetLaneId();
+	int oppositeLaneId = currentLaneId;
 
-	laneSection->GetNumberOfLanes();
-
+	int direction = 1;
 	if (currentLaneId > 0)
 	{
-		UE_LOG(LogClass, Warning, TEXT("going to right"));
-
-		bool bStop = false;
-		while (bStop == false)
-		{
-			currentLaneId--;
-			lane = laneSection->GetLaneById(currentLaneId);
-
-			if (lane == nullptr)
-			{
-				sidewalkInfo.position = FVector::ZeroVector;
-				return;
-			}
-			else if (lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK)
-			{
-				UE_LOG(LogClass, Warning, TEXT("found sidewalk"));
-
-				targetPos.Init();
-				targetPos.SetSnapLaneTypes(lane->GetLaneType());
-				targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
-				sidewalkInfo.laneId2 = lane->GetId();
-				sidewalkInfo.position = CoordTranslate::OdrToUe::ToLocation(targetPos);
-				return;
-			}
-		}
+		direction = -1;
 	}
-	else if (currentLaneId < 0)
+
+	bool bStop = false;
+	while (bStop == false)
 	{
-		UE_LOG(LogClass, Warning, TEXT("going to left"));
+		oppositeLaneId += direction;
+		lane = laneSection->GetLaneById(oppositeLaneId);
 
-		bool bStop = false;
-		while (bStop == false)
+		if (lane == nullptr)
 		{
-			currentLaneId++;
-			lane = laneSection->GetLaneById(currentLaneId);
-
-			if (lane == nullptr)
+			break;
+		}
+		else if (lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK)
+		{
+			switch (pathType)
 			{
-				sidewalkInfo.position = FVector::ZeroVector;
-				return;
-			}
-			else if (lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK)
-			{
-				UE_LOG(LogClass, Warning, TEXT("found sidewalk"));
-
+			case(ECrossingPathType::SIMPLE):
 				targetPos.Init();
 				targetPos.SetSnapLaneTypes(lane->GetLaneType());
 				targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
-				sidewalkInfo.laneId2 = lane->GetId();
-				sidewalkInfo.position = CoordTranslate::OdrToUe::ToLocation(targetPos);
-				return;
+				positions.Add(CoordTranslate::OdrToUe::ToLocation(targetPos));
+				targetPos.MoveAlongS(endSOffset);
+				positions.Add(CoordTranslate::OdrToUe::ToLocation(targetPos));
+				break;
+
+			case(ECrossingPathType::STRAIGHT):
+				targetPos.Init();
+				targetPos.SetSnapLaneTypes(lane->GetLaneType());
+				targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
+				targetPos.MoveAlongS(endSOffset);
+				positions.Add(CoordTranslate::OdrToUe::ToLocation(targetPos));
+				break;
+
+			case(ECrossingPathType::SIDEWALK):
+				FindNearCrosswalk(roadId, currentLaneId, oppositeLaneId,5000.f, positions);
+				targetPos.Init();
+				targetPos.SetSnapLaneTypes(lane->GetLaneType());
+				targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
+				targetPos.MoveAlongS(endSOffset);
+				positions.Add(CoordTranslate::OdrToUe::ToLocation(targetPos));
+				break;
 			}
+			break;
 		}
 	}
-
-	sidewalkInfo.position = FVector::ZeroVector;
-	return;
 }
 
-void UPedestrianCrossingComponent::CreateTrajectoryToOppositeSidewalk(UOpenDrivePosition* Odc, FSidewalksInfo& sidewalkInfo, USplineComponent* spline)
+void UPedestrianCrossingComponent::FindNearCrosswalk(int roadID, int currentlaneId, int targetlaneId, float SearchAreaRadius, TArray<FVector>& crosswalkPath)
 {
-	spline->ClearSplinePoints();
+	FCollisionShape sphere = FCollisionShape::MakeSphere(SearchAreaRadius * 100);
 
-	spline->AddSplineWorldPoint(GetOwner()->GetActorLocation());
+	TArray<FHitResult> Out;
 
-	GetOppositeSidewalkPosition(Odc, sidewalkInfo);
+	FVector location = GetOwner()->GetActorLocation();
 
-	spline->AddSplineWorldPoint(sidewalkInfo.position);
+	bool bhit = GetWorld()->SweepMultiByChannel(Out, location, location, FQuat::Identity, ECC_WorldDynamic, sphere);
+
+	if (bhit == true)
+	{
+		for (FHitResult& hit : Out)
+		{
+			AOpenDriveCrosswalk* crosswalk = Cast<AOpenDriveCrosswalk>(hit.GetActor());
+
+			if (crosswalk != nullptr)
+			{
+				if (crosswalk->GetRoadId() == roadID)
+				{
+					FVector* p = crosswalk->GetPositionOnSidewalkId(currentlaneId);
+					if (p != nullptr)
+					{
+						crosswalkPath.Add(*p);
+					}
+					p = crosswalk->GetPositionOnSidewalkId(targetlaneId);
+					if (p != nullptr)
+					{
+						crosswalkPath.Add(*p);
+					}
+				}
+			}
+		}
+	}
+}
+
+void UPedestrianCrossingComponent::AddNewPathSpline(TArray<FVector> positions)
+{
+	USplineComponent* newSpline = NewObject<USplineComponent>(this);
+	newSpline->SetupAttachment(GetOwner()->GetRootComponent());
+	newSpline->RegisterComponent();
+	GetOwner()->AddInstanceComponent(newSpline);
+
+	newSpline->EditorUnselectedSplineSegmentColor = FLinearColor::MakeRandomColor();
+	newSpline->ClearSplinePoints();
+
+	for (const FVector p : positions)
+	{
+		newSpline->AddSplineWorldPoint(p);
+	}
+
+	for (int i = 0; i < newSpline->GetNumberOfSplinePoints(); i++)
+	{
+		newSpline->SetSplinePointType(i, ESplinePointType::Linear);
+	}
 }
 
 

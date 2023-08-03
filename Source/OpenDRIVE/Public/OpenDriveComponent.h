@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "CoordTranslate.h"
+#include "OpenDrivePosition.h"
 #include "OpenDriveComponent.generated.h"
 
 using CoordTranslate::UuToMeters;
