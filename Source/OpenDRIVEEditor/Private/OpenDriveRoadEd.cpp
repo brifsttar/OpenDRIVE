@@ -5,8 +5,6 @@ AOpenDriveRoadEd::AOpenDriveRoadEd()
 {
 	PrimaryActorTick.bCanEverTick = false; 
 	_laneMeshPtr = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/EditorLandscapeResources/SplineEditorMesh"));
-	_laneArrowMeshPtr = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/BetterArrow"));
-
 	_baseMeshSize = _laneMeshPtr->GetBoundingBox().GetSize().Y; // The mesh's width. Used to set our lanes widths correctly.
 }
 
@@ -96,18 +94,32 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	}
 
 	//arrow meshes 
-	if (_lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_DRIVING || _lane->GetLaneType() == roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED)
+	TObjectPtr<UStaticMesh> mesh;
+	switch (_lane->GetLaneType())
+	{
+	case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
+		mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/Warning"));
+		break;
+
+	case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
+		mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/Bike"));
+		break;
+
+	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
+		mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/BetterArrow"));
+		break;
+	}
+	if (mesh != nullptr)
 	{
 		if (_junctionId == -1)
 		{
-			SetArrowMeshes(laneSpline, false);
+			SetArrowMeshes(laneSpline, mesh, false);
 		}
 		else
 		{
-			SetArrowMeshes(laneSpline, true);
+			SetArrowMeshes(laneSpline, mesh, true);
 		}
 	}
-
 	//if its not a junction, we draw the spline meshes, else we just keep the spline line 
 	if (_junctionId == -1)
 	{
@@ -159,20 +171,20 @@ void AOpenDriveRoadEd::CheckLastTwoPointsDistance(USplineComponent* laneSpline_,
 	}
 }
 
-void AOpenDriveRoadEd::SetArrowMeshes(USplineComponent* laneSpline_, bool _isJunction)
+void AOpenDriveRoadEd::SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<UStaticMesh> mesh, bool isJunction)
 {
 	for (int i = 1; i < laneSpline_->GetNumberOfSplinePoints() - 1; i += 2)
 	{
 		UStaticMeshComponent* newStaticMesh = NewObject<UStaticMeshComponent>(this);
 		newStaticMesh->SetupAttachment(RootComponent);
 		newStaticMesh->SetMobility(EComponentMobility::Movable);
-		newStaticMesh->SetStaticMesh(_laneArrowMeshPtr);
-		newStaticMesh->SetWorldLocation(laneSpline_->GetWorldLocationAtSplinePoint(i) + FVector(0.f,0.f,50.0f));
+		newStaticMesh->SetStaticMesh(mesh);
+		newStaticMesh->SetWorldLocation(laneSpline_->GetWorldLocationAtSplinePoint(i) + FVector(0.f,0.f,5.0f));
 		FRotator rotation = laneSpline_->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::World);
 		rotation.Yaw += _roadDirection == -1 ? FMath::RadiansToDegrees(PI) : 0.f;
 		newStaticMesh->SetWorldRotation(rotation);
 
-		if (_isJunction == true)
+		if (isJunction == true)
 		{
 			newStaticMesh->SetWorldScale3D(newStaticMesh->GetComponentScale() / 2);
 		}

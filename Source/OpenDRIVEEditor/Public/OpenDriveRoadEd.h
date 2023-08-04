@@ -95,7 +95,7 @@ public:
 	* Sets the arrow meshes along the lane's spline
 	* @param laneSpline_ The lane's spline 
 	*/
-	void SetArrowMeshes(USplineComponent* laneSpline_, bool _isJunction);
+	void SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<UStaticMesh> mesh,bool isJunction);
 
 	/**
 	* Sets the colored spline meshes along the lane's spline
@@ -114,7 +114,6 @@ private :
 	TArray<UStaticMeshComponent*> FArrowMeshes;
 
 	TObjectPtr<UStaticMesh> _laneMeshPtr;
-	TObjectPtr<UStaticMesh> _laneArrowMeshPtr;
 	float _baseMeshSize;
 
 	int _roadId = 0; 
