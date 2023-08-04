@@ -105,6 +105,9 @@ private :
 	//Text font
 	TSharedPtr<FSlateFontInfo> _fontInfoPtr;
 
+	//Tickbox 
+	TSharedPtr<SCheckBox> _showArrowsCheckBox;
+
 	//Slider bars's texts 
 	TSharedPtr<STextBlock> _stepTextPtr;
 	TSharedPtr<STextBlock> _offsetTextPtr;

@@ -69,32 +69,32 @@ TSharedRef<SBorder> SOpenDRIVEEditorModeWidget::ConstructLaneInfoBox(const FArgu
 	_roadIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("RoadId : ")))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("The selected road's Id")));
+		.ToolTipText(FText::FromString(TEXT("The selected road's Id.")));
 
 	_junctionIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("JunctionId : ")))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("The selected road's junction's Id")));
+		.ToolTipText(FText::FromString(TEXT("The selected road's junction's Id.")));
 
 	_laneTypeTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("Lane type : ")))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("The selected lane's type")));
+		.ToolTipText(FText::FromString(TEXT("The selected lane's type.")));
 
 	_laneIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("LaneId : ")))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("The selected lane's Id")));
+		.ToolTipText(FText::FromString(TEXT("The selected lane's Id.")));
 
 	_successorIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("Successor Id : ")))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("The road's successorId")));
+		.ToolTipText(FText::FromString(TEXT("The road's successorId.")));
 
 	_predecessorIdTextPtr = SNew(STextBlock)
 		.Text(FText::FromString(TEXT("Predecessor Id : ")))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("The road's predecessorId")));
+		.ToolTipText(FText::FromString(TEXT("The road's predecessorId.")));
 
 	TSharedRef<SBorder> border =
 		SNew(SBorder)
@@ -164,13 +164,13 @@ TSharedRef<SHorizontalBox> SOpenDRIVEEditorModeWidget::ConstructButtons(const FA
 {
 	TSharedPtr<SButton> resetButton = SNew(SButton).Text(FText::FromString("Reset"))
 		.OnClicked(this, &SOpenDRIVEEditorModeWidget::Reset).IsEnabled(this, &SOpenDRIVEEditorModeWidget::IsLoaded)
-		.ToolTipText(FText::FromString(TEXT("Resets currently drawn roads")));
+		.ToolTipText(FText::FromString(TEXT("Resets currently drawn roads.")));
 
 	StaticCast<STextBlock&>(resetButton.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
 
 	TSharedPtr<SButton> generateButton = SNew(SButton).Text(FText::FromString("Generate"))
 		.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate).IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfSimulating)
-		.ToolTipText(FText::FromString(TEXT("Draws roads (will reset currently drawn roads)")));
+		.ToolTipText(FText::FromString(TEXT("Draws roads (will reset currently drawn roads).")));
 
 	StaticCast<STextBlock&>(generateButton.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
 
@@ -193,19 +193,22 @@ TSharedRef<SBorder> SOpenDRIVEEditorModeWidget::ConstructRoadGenerationParameter
 	_offsetTextPtr = SNew(STextBlock).Justification(ETextJustify::Center)
 		.Text(FText::FromString("ZOffset : " + FString::FormatAsNumber(GetEdMode()->GetRoadOffset())))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("Roads' ZOffset")));
+		.ToolTipText(FText::FromString(TEXT("Roads' ZOffset : by defaults, the road's network will be drawn at Z=20.\nSo if you already have static meshes to represent your roads, higher that value to avoid texture flickering.")));
 
 	_stepTextPtr = SNew(STextBlock).Justification(ETextJustify::Center)
 		.Text(FText::FromString("Step : " + FString::FormatAsNumber(GetEdMode()->GetStep())))
 		.Font(*_fontInfoPtr)
-		.ToolTipText(FText::FromString(TEXT("Lower this value for a more precise draw (and less performances !)")));
+		.ToolTipText(FText::FromString(TEXT("Lower this value for a more precise draw (and less performances !).")));
 
-	TSharedRef<SSlider> OffsetSlider = SNew(SSlider).MinValue(0.f).MaxValue(500.f)
+	TSharedRef<SSlider> OffsetSlider = SNew(SSlider).MinValue(0.f).MaxValue(80.f)
 		.Value(GetEdMode()->GetRoadOffset())
 		.OnValueChanged(this, &SOpenDRIVEEditorModeWidget::OnOffsetValueChanged);
 	TSharedRef<SSlider> StepSlider = SNew(SSlider).MinValue(1.f).MaxValue(10.f)
 		.Value(GetEdMode()->GetStep())
 		.OnValueChanged(this, &SOpenDRIVEEditorModeWidget::OnStepValueChanged);
+
+	_showArrowsCheckBox = SNew(SCheckBox)
+		.OnCheckStateChanged(this, &SOpenDRIVEEditorModeWidget::OnCheckStateChanged);
 
 	TSharedRef<SBorder> border = SNew(SBorder)
 		[
@@ -218,15 +221,14 @@ TSharedRef<SBorder> SOpenDRIVEEditorModeWidget::ConstructRoadGenerationParameter
 				.Text(FText::FromString(TEXT("Show arrows")))
 				.Font(*_fontInfoPtr)
 				.Justification(ETextJustify::Center)
-				.ToolTipText(FText::FromString(TEXT("Tick the checkbox to see the road direction")))
+				.ToolTipText(FText::FromString(TEXT("Tick the checkbox to see the roads' directions.")))
 			]
 			+ SVerticalBox::Slot()
 			.AutoHeight()
-			.Padding(5.f, 5.f, 0.f,0.f)
+			.Padding(5.f, 5.f, 0.f, 0.f)
 			.HAlign(HAlign_Center)
 			[
-				SNew(SCheckBox)
-				.OnCheckStateChanged(this, &SOpenDRIVEEditorModeWidget::OnCheckStateChanged)
+				_showArrowsCheckBox.ToSharedRef()
 			]
 			+ SVerticalBox::Slot()
 			.AutoHeight()
@@ -266,6 +268,7 @@ FOpenDRIVEEditorMode* SOpenDRIVEEditorModeWidget::GetEdMode() const
 FReply SOpenDRIVEEditorModeWidget::Reset()
 {
 	GetEdMode()->Reset();
+	_showArrowsCheckBox.Get()->SetIsChecked(ECheckBoxState::Unchecked);
 	return FReply::Handled();
 }
 
