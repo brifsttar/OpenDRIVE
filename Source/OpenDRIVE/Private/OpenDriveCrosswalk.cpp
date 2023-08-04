@@ -16,6 +16,7 @@ AOpenDriveCrosswalk::AOpenDriveCrosswalk()
 void AOpenDriveCrosswalk::SetCrosswalkBorderPositions()
 {
 	TSides.Empty();
+	SetActorRotation(FRotator::ZeroRotator);
 
 	UOpenDrivePosition* openDrivePosition = _openDriveComponent->GetTrackPosition();
 	openDrivePosition->SetTransform(GetActorTransform());
@@ -27,7 +28,7 @@ void AOpenDriveCrosswalk::SetCrosswalkBorderPositions()
 	position.SetLanePos(_roadId, 0, position.GetS(), 0.);
 	position.SetHeadingRelativeRoadDirection(0.);
 	SetActorTransform(CoordTranslate::OdrToUe::ToTransfrom(position));
-	AddActorLocalRotation(FQuat::MakeFromEuler(FVector(0.f, -90.f, 0.f)));
+	AddActorLocalRotation(FQuat::MakeFromEuler(FVector(90.f, -90.f, 0.f)));
 
 	roadmanager::LaneSection* laneSection = position.GetRoad()->GetLaneSectionByS(openDrivePosition->GetS());
 	roadmanager::Lane* lane;
@@ -80,7 +81,7 @@ void AOpenDriveCrosswalk::SetCrosswalkBorderPositions()
 		}
 	}
 
-	UDecal->DecalSize.Y = FVector::Distance(_side1, _side2) / 2;
+	UDecal->DecalSize.Z = (FVector::Distance(_side1, _side2) / 3);
 }
 
 

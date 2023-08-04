@@ -47,7 +47,7 @@ public:
 	* @param pathType the pathType 
 	*/
 	UFUNCTION(BlueprintCallable)
-	void AddNewPathSpline(TArray<FVector> positions);
+	USplineComponent* AddNewPathSpline(TArray<FVector> positions);
 
 protected : 
 

@@ -109,10 +109,9 @@ void UPedestrianCrossingComponent::FindNearCrosswalk(int roadID, int currentlane
 	}
 }
 
-void UPedestrianCrossingComponent::AddNewPathSpline(TArray<FVector> positions)
+USplineComponent* UPedestrianCrossingComponent::AddNewPathSpline(TArray<FVector> positions)
 {
 	USplineComponent* newSpline = NewObject<USplineComponent>(this);
-	newSpline->SetupAttachment(GetOwner()->GetRootComponent());
 	newSpline->RegisterComponent();
 	GetOwner()->AddInstanceComponent(newSpline);
 
@@ -128,6 +127,8 @@ void UPedestrianCrossingComponent::AddNewPathSpline(TArray<FVector> positions)
 	{
 		newSpline->SetSplinePointType(i, ESplinePointType::Linear);
 	}
+
+	return newSpline;
 }
 
 
