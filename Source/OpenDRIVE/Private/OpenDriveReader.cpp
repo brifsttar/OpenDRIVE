@@ -5,7 +5,9 @@
 
 AOpenDriveReader::AOpenDriveReader() {
 	PrimaryActorTick.bCanEverTick = false;
+#if WITH_EDITOR
 	bRunConstructionScriptOnDrag = true;
+#endif
 
 	struct FConstructorStatics {
 		ConstructorHelpers::FObjectFinder<UTexture2D> Texture0;
