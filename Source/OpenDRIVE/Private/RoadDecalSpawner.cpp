@@ -3,6 +3,7 @@
 #include "Engine/DecalActor.h"
 #include "Components/BoxComponent.h"
 #include "CoordTranslate.h"
+#include "Components/DecalComponent.h"
 #include "RoadManager.hpp"
 
 ARoadDecalSpawner::ARoadDecalSpawner() {
@@ -54,7 +55,6 @@ void ARoadDecalSpawner::SpawnDecals() {
 			if (!(lane->GetLaneType() & roadmanager::Lane::LaneType::LANE_TYPE_ANY_DRIVING)) continue;
 			FTransform tf = CoordTranslate::OdrToUe::ToTransfrom(p);
 			if (!box.IsInside(tf.GetLocation())) continue;
-			tf.SetScale3D(FVector(FMath::RandRange(ScaleRangeMin, ScaleRangeMax)));
 			decal = GetWorld()->SpawnActor<ADecalActor>(ADecalActor::StaticClass(), tf);
 #if WITH_EDITOR
 			// Renaming/moving
@@ -64,6 +64,11 @@ void ARoadDecalSpawner::SpawnDecals() {
 			decal->SetActorLabel(label);
 #endif
 			SpawnedDecals.Add(decal);
+			float scaleRatio = FMath::RandRange(ScaleRangeMin, ScaleRangeMax);
+			FVector& decalSize = decal->GetDecal()->DecalSize;
+			decalSize.X = 20;
+			decalSize.Y *= scaleRatio;
+			decalSize.Z *= scaleRatio;
 			if (matCount != 0) {
 				int matIdx = FMath::RandHelper(matCount);
 				decal->SetDecalMaterial(Materials[matIdx]);
