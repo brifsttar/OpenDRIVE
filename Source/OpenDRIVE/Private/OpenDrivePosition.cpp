@@ -74,6 +74,8 @@ float UOpenDrivePosition::GetT() const {
 void UOpenDrivePosition::SetT(float T) {
 	roadmanager::Position p = OdrPosition();
 	p.SetOffset(UuToMeters(T));
+	// Ugly trick to force refresh of internal T value
+	p.MoveAlongS(0.);
 	SetTrackPosition(p);
 }
 
