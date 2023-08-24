@@ -39,7 +39,7 @@ FTransform UOpenDrivePosition::GetTransform() const {
 
 void UOpenDrivePosition::SetTrackPosition(int TrackId, int LaneId, float S, float Offset, float H) {
 	roadmanager::Position p(TrackId, LaneId, UuToMeters(S), UuToMeters(Offset));
-	p.SetHeadingRelative(FMath::DegreesToRadians(H));
+	p.SetHeading(FMath::DegreesToRadians(H) + p.GetDrivingDirection());
 	SetTrackPosition(p);
 }
 
@@ -83,7 +83,7 @@ float UOpenDrivePosition::GetH() const {
 
 void UOpenDrivePosition::SetH(float H) {
 	roadmanager::Position p = OdrPosition();
-	p.SetHeadingRelative(FMath::DegreesToRadians(H));
+	p.SetHeading(FMath::DegreesToRadians(H) + p.GetDrivingDirection());
 	SetTrackPosition(p);
 }
 
