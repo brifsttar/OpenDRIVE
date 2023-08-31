@@ -80,7 +80,7 @@ public :
 	* Sets the corresponding FAssetData to the selected object in the PropertyEntryBox
 	* @param assetData_ the FAssetData 
 	*/
-	inline void SetAssetData(const FAssetData& assetData_) { _assetData = assetData_; };
+	inline void SetAssetData(const FAssetData& assetData_) { _openDRIVEAssetData = assetData_; };
 
 	/**
 	* Called when arrows' visibility chekbox state is changed 
@@ -122,11 +122,48 @@ private :
 
 	//openDRIVE asset box property
 	TSharedPtr<SObjectPropertyEntryBox> _openDRIVEAssetProBoxPtr;
-	FAssetData _assetData;
+	FAssetData _openDRIVEAssetData;
 	TSharedPtr<FAssetThumbnailPool> _assetThumbnailPoolPtr;
 	
 	/**
 	 * @return The current asset data path.
 	 */
-	inline FString GetAssetDataPath() const { return _assetData.IsValid() ? _assetData.GetObjectPathString() : ""; };
+	inline FString GetAssetDataPath() const { return _openDRIVEAssetData.IsValid() ? _openDRIVEAssetData.GetObjectPathString() : ""; };
 };
+
+
+/*
+_assetThumbnailPoolPtr = MakeShareable(new FAssetThumbnailPool(24));
+
+_openDRIVEAssetProBoxPtr = SNew(SObjectPropertyEntryBox)
+	.DisplayBrowse(true)
+	.EnableContentPicker(true)
+	.DisplayThumbnail(true)
+	.ThumbnailPool(_assetThumbnailPoolPtr)
+	.AllowedClass(UOpenDriveAsset::StaticClass())
+	.AllowClear(true)
+	.OnObjectChanged(FOnSetObject::CreateSP(this, &SOpenDRIVEEditorModeWidget::OnObjectChanged))
+	.ObjectPath(this, &SOpenDRIVEEditorModeWidget::GetAssetDataPath);
+	*/
+
+/*
+	+ SVerticalBox::Slot()
+	.AutoHeight()
+	.Padding(0.f, 30.f, 0.f, 0.f)
+	[
+		SNew(SHorizontalBox)
+		+ SHorizontalBox::Slot()
+		.FillWidth(0.5f)
+		.Padding(20, 10, 0, 0)
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString(TEXT("OpenDRIVE Asset")))
+		]
+		+ SHorizontalBox::Slot()
+		.FillWidth(0.5f)
+		.Padding(10, 0, 20, 0)
+		[
+			_openDRIVEAssetProBoxPtr.ToSharedRef()
+		]
+	]
+*/

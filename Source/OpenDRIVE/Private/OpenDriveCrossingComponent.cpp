@@ -1,13 +1,13 @@
-#include "PedestrianCrossingComponent.h"
+#include "OpenDriveCrossingComponent.h"
 
-UPedestrianCrossingComponent::UPedestrianCrossingComponent()
+UOpenDriveCrossingComponent::UOpenDriveCrossingComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPedestrianCrossingComponent::CreatePathToOppositeSidewalk(UOpenDrivePosition* Odp, float endSOffset, ECrossingPathType pathType, TArray<FVector>& positions)
+void UOpenDriveCrossingComponent::CreatePathToOppositeSidewalk(UOpenDrivePosition* Odp, float endSOffset, ECrossingPathType pathType, TArray<FVector>& positions)
 {
 	Odp->SetTransform(GetOwner()->GetActorTransform());
 
@@ -60,12 +60,14 @@ void UPedestrianCrossingComponent::CreatePathToOppositeSidewalk(UOpenDrivePositi
 				break;
 
 			case(ECrossingPathType::SIDEWALK):
-				FindNearCrosswalk(roadId, currentLaneId, oppositeLaneId,5000.f, positions);
-				targetPos.Init();
-				targetPos.SetSnapLaneTypes(lane->GetLaneType());
-				targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
-				targetPos.MoveAlongS(endSOffset);
-				positions.Add(CoordTranslate::OdrToUe::ToLocation(targetPos));
+				if (FindNearCrosswalk(roadId, currentLaneId, oppositeLaneId, 5000.f, positions) == false)
+				{
+					targetPos.Init();
+					targetPos.SetSnapLaneTypes(lane->GetLaneType());
+					targetPos.SetLanePos(roadId, lane->GetId(), startPos.GetS(), 0.);
+					targetPos.MoveAlongS(endSOffset);
+					positions.Add(CoordTranslate::OdrToUe::ToLocation(targetPos));
+				}
 				break;
 			}
 			break;
@@ -73,7 +75,7 @@ void UPedestrianCrossingComponent::CreatePathToOppositeSidewalk(UOpenDrivePositi
 	}
 }
 
-void UPedestrianCrossingComponent::FindNearCrosswalk(int roadID, int currentlaneId, int targetlaneId, float SearchAreaRadius, TArray<FVector>& crosswalkPath)
+bool UOpenDriveCrossingComponent::FindNearCrosswalk(int roadID, int currentlaneId, int targetlaneId, float SearchAreaRadius, TArray<FVector>& crosswalkPath)
 {
 	FCollisionShape sphere = FCollisionShape::MakeSphere(SearchAreaRadius * 100);
 
@@ -103,33 +105,18 @@ void UPedestrianCrossingComponent::FindNearCrosswalk(int roadID, int currentlane
 					{
 						crosswalkPath.Add(*p);
 					}
+					return true;
 				}
 			}
 		}
+		return false;
+	}
+	else
+	{
+		return false;
 	}
 }
 
-USplineComponent* UPedestrianCrossingComponent::AddNewPathSpline(TArray<FVector> positions)
-{
-	USplineComponent* newSpline = NewObject<USplineComponent>(this);
-	newSpline->RegisterComponent();
-	GetOwner()->AddInstanceComponent(newSpline);
-
-	newSpline->EditorUnselectedSplineSegmentColor = FLinearColor::MakeRandomColor();
-	newSpline->ClearSplinePoints();
-
-	for (const FVector p : positions)
-	{
-		newSpline->AddSplineWorldPoint(p);
-	}
-
-	for (int i = 0; i < newSpline->GetNumberOfSplinePoints(); i++)
-	{
-		newSpline->SetSplinePointType(i, ESplinePointType::Linear);
-	}
-
-	return newSpline;
-}
 
 
 	

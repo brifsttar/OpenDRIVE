@@ -5,7 +5,7 @@
 #include "OpenDrivePosition.h"
 #include "Components/SplineComponent.h"
 #include "OpenDriveCrosswalk.h"
-#include "PedestrianCrossingComponent.generated.h"
+#include "OpenDriveCrossingComponent.generated.h"
 
 
 UENUM(BlueprintType)
@@ -21,7 +21,7 @@ UENUM(BlueprintType)
 * Add this component on a pedestrian to allow him to cross roads by himself
 */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class OPENDRIVE_API UPedestrianCrossingComponent : public UActorComponent
+class OPENDRIVE_API UOpenDriveCrossingComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -29,7 +29,7 @@ public:
 	/**
 	 * Sets default values for this component's properties
 	 */ 
-	UPedestrianCrossingComponent();
+	UOpenDriveCrossingComponent();
 
 	/**
 	* @param Odp The OpenDRIVEPosition
@@ -41,14 +41,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CreatePathToOppositeSidewalk(UOpenDrivePosition* Odp, float endSOffset, ECrossingPathType pathType,TArray<FVector>& positions);
 
-	/**
-	* Add a new spline component following the given positions
-	* @param positions the path to follow 
-	* @param pathType the pathType 
-	*/
-	UFUNCTION(BlueprintCallable)
-	USplineComponent* AddNewPathSpline(TArray<FVector> positions);
-
 protected : 
 
 	/**
@@ -59,5 +51,5 @@ protected :
 	* @param SearchAreaRadius the search area radius (in meter)
 	* @return the crosswalkPath the path to follow 
 	*/
-	void FindNearCrosswalk(int roadID, int currentlaneId, int targetlaneId, float SearchAreaRadius, TArray<FVector>& crosswalkPath);
+	bool FindNearCrosswalk(int roadID, int currentlaneId, int targetlaneId, float SearchAreaRadius, TArray<FVector>& crosswalkPath);
 };

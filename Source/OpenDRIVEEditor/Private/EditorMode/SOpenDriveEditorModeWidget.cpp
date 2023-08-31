@@ -6,19 +6,7 @@
 void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 {
 	_fontInfoPtr = MakeShareable(new FSlateFontInfo(FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Light.ttf"), 12));
-	/*
-	_assetThumbnailPoolPtr = MakeShareable(new FAssetThumbnailPool(24));
 
-	_openDRIVEAssetProBoxPtr = SNew(SObjectPropertyEntryBox)
-		.DisplayBrowse(true)
-		.EnableContentPicker(true)
-		.DisplayThumbnail(true)
-		.ThumbnailPool(_assetThumbnailPoolPtr)
-		.AllowedClass(UOpenDriveAsset::StaticClass())
-		.AllowClear(true)
-		.OnObjectChanged(FOnSetObject::CreateSP(this, &SOpenDRIVEEditorModeWidget::OnObjectChanged))
-		.ObjectPath(this, &SOpenDRIVEEditorModeWidget::GetAssetDataPath);
-		*/
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -40,27 +28,6 @@ void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 		[
 			ConstructLaneInfoBox(InArgs)
 		]
-		/*
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(0.f, 30.f, 0.f, 0.f)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			.FillWidth(0.5f)
-			.Padding(20, 10, 0, 0)
-			[
-				SNew(STextBlock)
-				.Text(FText::FromString(TEXT("OpenDRIVE Asset")))
-			]
-			+ SHorizontalBox::Slot()
-			.FillWidth(0.5f)
-			.Padding(10, 0, 20, 0)
-			[
-				_openDRIVEAssetProBoxPtr.ToSharedRef()
-			]
-		]
-		*/	
 	];
 }
 
@@ -318,7 +285,7 @@ void SOpenDRIVEEditorModeWidget::OnObjectChanged(const FAssetData& assetData_)
 
 	if (IsValid(openDRIVEAsset))
 	{
-		_assetData = assetData_;
+		_openDRIVEAssetData = assetData_;
 	}
 }
 
