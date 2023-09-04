@@ -104,3 +104,22 @@ No material are included with the plugin, but many can be found for free on [Qui
 This Editor Utility Blueprint allows any actor to be duplicated along any road at a fixed step. The process runs until it encounters a junction, so it can actually span multiple roads.
 
 For this to work, actors are assumed to use the standard Unreal Engine alignment (X+ forward, Z+ up), except Decals, for which Y- forward and X- up are expected.
+
+### OpenDRIVE Editor Mode
+
+![OpenDRIVE_EdMode](https://github.com/brifsttar/OpenDRIVE/assets/131620935/80879d3d-3c27-4e40-a465-f715cafbe39d)
+
+This editor mode allows to visualize OpenDRIVE files in the viewport. 
+
+You can access it by selecting "OpenDRIVE" in the editor mode menu (located next to the save button in the editor). To exit this mode, just go back to default mode (Selection). 
+
+**Please avoid entering this mode in play mode (or simulate mode).**
+
+![image](https://github.com/brifsttar/OpenDRIVE/assets/131620935/80ad2739-b66c-48aa-a7c2-49a501944186)
+
+By clicking on a lane, some basic lane's informations will be displayed.
+
+![image](https://github.com/brifsttar/OpenDRIVE/assets/131620935/c24fdacb-5df9-4ce0-a816-2d1b1207812a)
+
+Note : if you encounter any issue with the editor mode, feel free to report its in the [Issues](https://github.com/brifsttar/OpenDRIVE/issues) section. 
+
