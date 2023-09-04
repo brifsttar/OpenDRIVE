@@ -14,7 +14,21 @@ public :
 	 * Constructs the window
 	 */
 	void Construct(const FArguments& InArgs);
-	
+
+	/**
+	 * Returns the Editor mode 
+	 * @return The OpenDRIVE Editor Mode
+	 */
+	class FOpenDRIVEEditorMode* GetEdMode() const;
+
+	/**
+	 * Displays the last selected lane's informations
+	 * @param lane The lane
+	 */
+	void UpdateLaneInfo(AOpenDriveEditorLane* lane_);
+
+protected : 
+
 	/**
 	 * Constructs the lane info box (road id, ...)
 	 */
@@ -29,12 +43,6 @@ public :
 	* Constructs the road generation parameters box (offset / step)
 	*/
 	TSharedRef<SBorder> ConstructRoadGenerationParameters(const FArguments& InArgs);
-
-	/**
-	 * Returns the Editor mode 
-	 * @return The OpenDRIVE Editor Mode
-	 */
-	class FOpenDRIVEEditorMode* GetEdMode() const;
 
 	/**
 	* Link the Generate() function in the OpenDRIVEEditorMode.cpp file
@@ -59,43 +67,25 @@ public :
 	bool CheckIfSimulating() const;
 
 	/**
-	 * Displays the last selected lane's informations
-	 * @param lane The lane
-	 */
-	void UpdateLaneInfo(AOpenDriveRoadEd* lane_);
-
-	/**
-	 * Sets the road offset 
+	 * Sets the road offset
 	 * @param newOffset The new offset
 	 */
-	void SetOffset(const FText &newOffset);
+	void SetOffset(const FText& newOffset);
 
 	/**
-	 * Called when an openDRIVE asset is selected, and sends it to the editor mode.
-	 * @param assetData_ The new object's data 
-	 */
-	void OnObjectChanged(const FAssetData& assetData_);
-
-	/**
-	* Sets the corresponding FAssetData to the selected object in the PropertyEntryBox
-	* @param assetData_ the FAssetData 
-	*/
-	inline void SetAssetData(const FAssetData& assetData_) { _openDRIVEAssetData = assetData_; };
-
-	/**
-	* Called when arrows' visibility chekbox state is changed 
+	* Called when arrows' visibility chekbox state is changed
 	* @param state the new checkbox state
 	*/
 	void OnCheckStateChanged(ECheckBoxState state);
 
 	/**
-	* Called when the offset value is changed with the slider 
-	* @param value The new value 
+	* Called when the offset value is changed with the slider
+	* @param value The new value
 	*/
 	void OnOffsetValueChanged(float value);
 
 	/**
-	* Called when the step value is changed with the slider 
+	* Called when the step value is changed with the slider
 	* @param value The new value
 	*/
 	void OnStepValueChanged(float value);
@@ -119,51 +109,4 @@ private :
 	TSharedPtr<STextBlock> _laneTypeTextPtr;
 	TSharedPtr<STextBlock> _successorIdTextPtr;
 	TSharedPtr<STextBlock> _predecessorIdTextPtr;
-
-	//openDRIVE asset box property
-	TSharedPtr<SObjectPropertyEntryBox> _openDRIVEAssetProBoxPtr;
-	FAssetData _openDRIVEAssetData;
-	TSharedPtr<FAssetThumbnailPool> _assetThumbnailPoolPtr;
-	
-	/**
-	 * @return The current asset data path.
-	 */
-	inline FString GetAssetDataPath() const { return _openDRIVEAssetData.IsValid() ? _openDRIVEAssetData.GetObjectPathString() : ""; };
 };
-
-
-/*
-_assetThumbnailPoolPtr = MakeShareable(new FAssetThumbnailPool(24));
-
-_openDRIVEAssetProBoxPtr = SNew(SObjectPropertyEntryBox)
-	.DisplayBrowse(true)
-	.EnableContentPicker(true)
-	.DisplayThumbnail(true)
-	.ThumbnailPool(_assetThumbnailPoolPtr)
-	.AllowedClass(UOpenDriveAsset::StaticClass())
-	.AllowClear(true)
-	.OnObjectChanged(FOnSetObject::CreateSP(this, &SOpenDRIVEEditorModeWidget::OnObjectChanged))
-	.ObjectPath(this, &SOpenDRIVEEditorModeWidget::GetAssetDataPath);
-	*/
-
-/*
-	+ SVerticalBox::Slot()
-	.AutoHeight()
-	.Padding(0.f, 30.f, 0.f, 0.f)
-	[
-		SNew(SHorizontalBox)
-		+ SHorizontalBox::Slot()
-		.FillWidth(0.5f)
-		.Padding(20, 10, 0, 0)
-		[
-			SNew(STextBlock)
-			.Text(FText::FromString(TEXT("OpenDRIVE Asset")))
-		]
-		+ SHorizontalBox::Slot()
-		.FillWidth(0.5f)
-		.Padding(10, 0, 20, 0)
-		[
-			_openDRIVEAssetProBoxPtr.ToSharedRef()
-		]
-	]
-*/

@@ -42,4 +42,3 @@ void FOpenDRIVEEditorModule::AddModuleListeners()
 }
 
 #undef LOCTEXT_NAMESPACE
-	

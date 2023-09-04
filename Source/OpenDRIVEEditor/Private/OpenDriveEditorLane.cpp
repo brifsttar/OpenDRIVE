@@ -1,14 +1,14 @@
-#include "OpenDriveRoadEd.h"
+#include "OpenDriveEditorLane.h"
 
 // Sets default values
-AOpenDriveRoadEd::AOpenDriveRoadEd()
+AOpenDriveEditorLane::AOpenDriveEditorLane()
 {
 	PrimaryActorTick.bCanEverTick = false; 
 	_laneMeshPtr = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/EditorLandscapeResources/SplineEditorMesh"));
 	_baseMeshSize = _laneMeshPtr->GetBoundingBox().GetSize().Y; // The mesh's width. Used to set our lanes widths correctly.
 }
 
-void AOpenDriveRoadEd::Initialize(int roadId_, int junctionId_,int successorId_, int predecessorId_,roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_)
+void AOpenDriveEditorLane::Initialize(int roadId_, int junctionId_,int successorId_, int predecessorId_,roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_)
 {
 	_roadId = roadId_;
 	_junctionId = junctionId_;
@@ -16,49 +16,11 @@ void AOpenDriveRoadEd::Initialize(int roadId_, int junctionId_,int successorId_,
 	_predecessorId = predecessorId_;
 	_laneSection = laneSection_;
 	_lane = lane_;
-	SetLaneType();
 
 	DrawLane(step_, offset_);
 }
 
-void AOpenDriveRoadEd::SetLaneType()
-{
-	switch (_lane->GetLaneType())
-	{
-	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
-		_laneType = "Driving road";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
-		_laneType = "Bike path";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
-		_laneType = "Sidewalk lane";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
-		_laneType = "Parking slot(s)";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_BORDER):
-		_laneType = "Border";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_RAIL):
-		_laneType = "Rail";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_TRAM):
-		_laneType = "Tram";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
-		_laneType = "Shoulder";
-		break;
-	case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
-		_laneType = "Restricted lane";
-		break;
-	default:
-		_laneType = "Any";
-		break;
-	}
-}
-
-void AOpenDriveRoadEd::DrawLane(double step, float offset)
+void AOpenDriveEditorLane::DrawLane(double step, float offset)
 {
 	roadmanager::Position position;
 
@@ -93,6 +55,8 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 		CheckLastTwoPointsDistance(laneSpline, step);
 	}
 
+	bool bIsInJunction = _junctionId != -1;
+
 	//arrow meshes 
 	TObjectPtr<UStaticMesh> mesh;
 	switch (_lane->GetLaneType())
@@ -111,17 +75,10 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	}
 	if (mesh != nullptr)
 	{
-		if (_junctionId == -1)
-		{
-			SetArrowMeshes(laneSpline, mesh, false);
-		}
-		else
-		{
-			SetArrowMeshes(laneSpline, mesh, true);
-		}
+		SetArrowMeshes(laneSpline, mesh, bIsInJunction);
 	}
 	//if its not a junction, we draw the spline meshes, else we just keep the spline line 
-	if (_junctionId == -1)
+	if (bIsInJunction == false)
 	{
 		// Spline meshes creation 
 		SetColoredLaneMeshes(laneSpline);
@@ -146,7 +103,48 @@ void AOpenDriveRoadEd::DrawLane(double step, float offset)
 	}
 }
 
-void AOpenDriveRoadEd::SetLanePoint(USplineComponent* laneSpline_, roadmanager::Position& position, double s, float offset)
+FString AOpenDriveEditorLane::GetLaneType()
+{
+	FString type;
+
+	switch (_lane->GetLaneType())
+	{
+	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
+		type = "Driving road";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
+		type = "Bike path";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
+		type = "Sidewalk lane";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
+		type = "Parking slot(s)";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_BORDER):
+		type = "Border";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_RAIL):
+		type = "Rail";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_TRAM):
+		type = "Tram";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
+		type = "Shoulder";
+		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
+		type = "Restricted lane";
+		break;
+	default:
+		type = "Any";
+		break;
+	}
+
+	return type;
+}
+
+void AOpenDriveEditorLane::SetLanePoint(USplineComponent* laneSpline_, roadmanager::Position& position, double s, float offset)
 {
 	position.SetLanePos(_roadId, _lane->GetId(), s, 0.);
 	
@@ -161,7 +159,7 @@ void AOpenDriveRoadEd::SetLanePoint(USplineComponent* laneSpline_, roadmanager::
 	laneSpline_->SetScaleAtSplinePoint(laneSpline_->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
 }
 
-void AOpenDriveRoadEd::CheckLastTwoPointsDistance(USplineComponent* laneSpline_, float step_)
+void AOpenDriveEditorLane::CheckLastTwoPointsDistance(USplineComponent* laneSpline_, float step_)
 {
 	float dist = FVector::Distance(laneSpline_->GetWorldLocationAtSplinePoint(laneSpline_->GetNumberOfSplinePoints() - 2),
 		laneSpline_->GetWorldLocationAtSplinePoint(laneSpline_->GetNumberOfSplinePoints() - 1));
@@ -171,7 +169,7 @@ void AOpenDriveRoadEd::CheckLastTwoPointsDistance(USplineComponent* laneSpline_,
 	}
 }
 
-void AOpenDriveRoadEd::SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<UStaticMesh> mesh, bool isJunction)
+void AOpenDriveEditorLane::SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<UStaticMesh> mesh, bool isJunction)
 {
 	for (int i = 1; i < laneSpline_->GetNumberOfSplinePoints() - 1; i += 2)
 	{
@@ -181,7 +179,7 @@ void AOpenDriveRoadEd::SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<
 		newStaticMesh->SetStaticMesh(mesh);
 		newStaticMesh->SetWorldLocation(laneSpline_->GetWorldLocationAtSplinePoint(i) + FVector(0.f,0.f,5.0f));
 		FRotator rotation = laneSpline_->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::World);
-		rotation.Yaw += _roadDirection == -1 ? FMath::RadiansToDegrees(PI) : 0.f;
+		rotation.Yaw += _roadDirection == -1 ? 180.0 : 0.0;
 		newStaticMesh->SetWorldRotation(rotation);
 
 		if (isJunction == true)
@@ -199,7 +197,7 @@ void AOpenDriveRoadEd::SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<
 	}
 }
 
-void AOpenDriveRoadEd::SetColoredLaneMeshes(USplineComponent* laneSpline_)
+void AOpenDriveEditorLane::SetColoredLaneMeshes(USplineComponent* laneSpline_)
 {	
 	for (int i = 0; i < laneSpline_->GetNumberOfSplinePoints() - 1; i++)
 	{
@@ -266,7 +264,7 @@ void AOpenDriveRoadEd::SetColoredLaneMeshes(USplineComponent* laneSpline_)
 	laneSpline_->DestroyComponent();
 }
 
-void AOpenDriveRoadEd::SetArrowVisibility(bool _isVisible)
+void AOpenDriveEditorLane::SetArrowVisibility(bool _isVisible)
 {
 	if (_junctionId == -1)
 	{
@@ -276,4 +274,3 @@ void AOpenDriveRoadEd::SetArrowVisibility(bool _isVisible)
 		}
 	}
 }
-

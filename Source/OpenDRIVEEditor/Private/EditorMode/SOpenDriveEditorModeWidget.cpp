@@ -255,7 +255,7 @@ FReply SOpenDRIVEEditorModeWidget::Generate()
 	return FReply::Handled();
 }
 
-void SOpenDRIVEEditorModeWidget::UpdateLaneInfo(AOpenDriveRoadEd* lane_)
+void SOpenDRIVEEditorModeWidget::UpdateLaneInfo(AOpenDriveEditorLane* lane_)
 {
 	_roadIdTextPtr.Get()->SetText(FText::FromString("Road Id : " + FString::FromInt(lane_->GetRoadId())));
 
@@ -279,33 +279,9 @@ void SOpenDRIVEEditorModeWidget::SetOffset(const FText &newOffset_)
 	GetEdMode()->SetRoadOffset(offset);
 }
 
-void SOpenDRIVEEditorModeWidget::OnObjectChanged(const FAssetData& assetData_)
-{
-	UOpenDriveAsset* openDRIVEAsset = Cast<UOpenDriveAsset>(assetData_.GetAsset());
-
-	if (IsValid(openDRIVEAsset))
-	{
-		_openDRIVEAssetData = assetData_;
-	}
-}
-
 void SOpenDRIVEEditorModeWidget::OnCheckStateChanged(ECheckBoxState state)
 {
-	switch (state)
-	{
-	case(ECheckBoxState::Checked):
-		GetEdMode()->SetRoadsArrowsVisibilityInEditor(true);
-		break;
-	case(ECheckBoxState::Unchecked):
-		GetEdMode()->SetRoadsArrowsVisibilityInEditor(false);
-		break;
-	case(ECheckBoxState::Undetermined):
-		GetEdMode()->SetRoadsArrowsVisibilityInEditor(false);
-		break;
-	default:
-		GetEdMode()->SetRoadsArrowsVisibilityInEditor(false);
-		break;
-	}
+	GetEdMode()->SetRoadsArrowsVisibilityInEditor(state == ECheckBoxState::Checked);
 }
 
 void SOpenDRIVEEditorModeWidget::OnOffsetValueChanged(float value)
@@ -319,4 +295,3 @@ void SOpenDRIVEEditorModeWidget::OnStepValueChanged(float value)
 	_stepTextPtr->SetText(FText::FromString("Step : " + FString::FormatAsNumber(value)));
 	GetEdMode()->SetStep(value);
 }
-

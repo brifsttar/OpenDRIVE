@@ -28,7 +28,7 @@ public:
 	void SetTrackPosition(const roadmanager::Position &p);
 
 	UFUNCTION(BlueprintCallable, CallInEditor)
-		class UOpenDrivePosition* GetTrackPosition() const;
+	class UOpenDrivePosition* GetTrackPosition() const;
 
 	/**
 	* Computes the current OpenDRIVE position and updates the public position variables accordingly

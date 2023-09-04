@@ -57,7 +57,7 @@ void FOpenDRIVEEditorMode::Reset()
 {
 	if (FRoadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveRoadEd* road : FRoadsArray)
+		for (AOpenDriveEditorLane* road : FRoadsArray)
 		{
 			if (IsValid(road))
 			{
@@ -135,7 +135,7 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 
 				if (!lane || lane->GetId() == 0) continue;
 
-				AOpenDriveRoadEd* newRoad = GetWorld()->SpawnActor<AOpenDriveRoadEd>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
+				AOpenDriveEditorLane* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorLane>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
 				newRoad->SetActorHiddenInGame(true);
 				newRoad->Initialize(road->GetId(), road->GetJunction(), succId, predId, laneSection, lane, _roadOffset, _step);
 				FRoadsArray.Add(newRoad);
@@ -149,7 +149,7 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 {
 	if (FRoadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveRoadEd* road : FRoadsArray)
+		for (AOpenDriveEditorLane* road : FRoadsArray)
 		{
 			road->SetIsTemporarilyHiddenInEditor(bIsVisible);
 		}
@@ -160,7 +160,7 @@ void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
 {
 	if (FRoadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveRoadEd* road : FRoadsArray)
+		for (AOpenDriveEditorLane* road : FRoadsArray)
 		{
 			road->SetArrowVisibility(bIsVisible);
 		}
@@ -169,7 +169,7 @@ void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
 
 void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
 {
-	AOpenDriveRoadEd* selectedRoad = Cast<AOpenDriveRoadEd>(selectedObject);
+	AOpenDriveEditorLane* selectedRoad = Cast<AOpenDriveEditorLane>(selectedObject);
 
 	if (IsValid(selectedRoad) == true)
 	{

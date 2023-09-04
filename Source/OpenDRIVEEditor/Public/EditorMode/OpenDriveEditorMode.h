@@ -2,9 +2,9 @@
 #include "EditorModes.h"
 #include "EdMode.h"
 #include "../../../OpenDRIVE/Public/OpenDriveAsset.h"
-#include "../OpenDriveRoadEd.h"
+#include "../OpenDriveEditorLane.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveRoadEd* road)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveEditorLane* road)
 
 class FOpenDRIVEEditorMode : public FEdMode
 {
@@ -84,7 +84,7 @@ protected :
 	 */
 	void LoadRoadsNetwork();
 
-	TArray<AOpenDriveRoadEd*> FRoadsArray;
+	TArray<AOpenDriveEditorLane*> FRoadsArray;
 
 private :
 

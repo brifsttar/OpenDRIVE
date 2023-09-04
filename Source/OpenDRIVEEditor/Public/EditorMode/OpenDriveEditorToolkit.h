@@ -21,5 +21,4 @@ public :
 private :
 
 	TSharedPtr<SOpenDRIVEEditorModeWidget> OpenDriveEditorModeWidget;
-
 };

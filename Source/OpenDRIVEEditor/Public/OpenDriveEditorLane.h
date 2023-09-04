@@ -8,16 +8,16 @@
 #include "Components/SplineMeshComponent.h"
 #include "RoadManager.hpp"
 #include "CoordTranslate.h"
-#include "OpenDriveRoadEd.generated.h"
+#include "OpenDriveEditorLane.generated.h"
 
 UCLASS()
-class OPENDRIVEEDITOR_API AOpenDriveRoadEd : public AActor
+class OPENDRIVEEDITOR_API AOpenDriveEditorLane : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AOpenDriveRoadEd();
+	AOpenDriveEditorLane();
 
 	/**
 	 * Initializes the lane parameters and draw it 
@@ -29,18 +29,6 @@ public:
 	 * @param step The step (the lower it is, the more precise it will be)  
 	 */
 	void Initialize(int roadId_, int junctionId_, int successorId_, int predecessorId_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_);
-
-	/**
-	* Sets the laneType string to display in the editor mode widget
-	*/
-	void SetLaneType();
-
-	/**
-	 * Draws the lane 
-	 * @param step The distance between each lane's points
-	 * @param offset The road's Z's offset
-	 */
-	void DrawLane(double step, float offset);
 
 	/**
 	* Gets the road Id
@@ -58,7 +46,7 @@ public:
 	* Gets the lane type
 	* @return The lane type 
 	*/
-	inline FString GetLaneType() { return _laneType; };
+	FString GetLaneType();
 
 	/**
 	* Gets the lane Id
@@ -77,9 +65,24 @@ public:
 	inline int GetPredecessorId() { return _predecessorId; };
 
 	/**
+    * Sets arrows visibility
+    * @param _isVisible New visibility
+    */
+	void SetArrowVisibility(bool _isVisible);
+
+protected : 
+
+	/**
+	 * Draws the lane
+	 * @param step The distance between each lane's points
+	 * @param offset The road's Z's offset
+	 */
+	void DrawLane(double step, float offset);
+
+	/**
 	* Sets a lane's spline point
-	* @param laneSpline_ The lane spline where the point is added 
-	* @param position Reference to roadmanager::Position 
+	* @param laneSpline_ The lane spline where the point is added
+	* @param position Reference to roadmanager::Position
 	* @param ds Distance to move along lane
 	*/
 	void SetLanePoint(USplineComponent* laneSpline_, roadmanager::Position& position, double s, float offset);
@@ -93,21 +96,15 @@ public:
 
 	/**
 	* Sets the arrow meshes along the lane's spline
-	* @param laneSpline_ The lane's spline 
+	* @param laneSpline_ The lane's spline
 	*/
-	void SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<UStaticMesh> mesh,bool isJunction);
+	void SetArrowMeshes(USplineComponent* laneSpline_, TObjectPtr<UStaticMesh> mesh, bool isJunction);
 
 	/**
 	* Sets the colored spline meshes along the lane's spline
-	* @param laneSpline_ The lane's spline 
+	* @param laneSpline_ The lane's spline
 	*/
 	void SetColoredLaneMeshes(USplineComponent* laneSpline_);
-
-	/**
-    * Sets arrows visibility
-    * @param _isVisible New visibility
-    */
-	void SetArrowVisibility(bool _isVisible);
 
 private : 
 
@@ -121,7 +118,6 @@ private :
 	int _roadDirection = 0;
 	int _predecessorId = 0;
 	int _successorId = 0;
-	FString _laneType = "Any";
 
 	roadmanager::LaneSection* _laneSection;
 	roadmanager::Lane* _lane;
