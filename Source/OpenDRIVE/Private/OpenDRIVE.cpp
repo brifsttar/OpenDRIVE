@@ -4,6 +4,8 @@
 
 #define LOCTEXT_NAMESPACE "FOpenDRIVEModule"
 
+DEFINE_LOG_CATEGORY(OpenDriveLog);
+
 void FOpenDRIVEModule::StartupModule() {
 }
 

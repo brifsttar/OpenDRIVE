@@ -14,13 +14,11 @@ FVector CoordTranslate::OdrToUe::ToLocation(const roadmanager::Position &P) {
 }
 
 FRotator CoordTranslate::OdrToUe::ToRotation(const roadmanager::Position &P) {
-	double h = M_PI - P.GetH();
 	return FRotator(
-		FMath::RadiansToDegrees(P.GetP()),
-		FMath::RadiansToDegrees(h),
-		-FMath::RadiansToDegrees(P.GetR())
+		FMath::RadiansToDegrees( P.GetP()),
+		FMath::RadiansToDegrees(-P.GetH()),
+		FMath::RadiansToDegrees( P.GetR())
 	);
-	//return FRotator(FQuat(FVector(0, 0, 1), h));
 }
 
 FVector CoordTranslate::OdrToUe::Location(const FVector &P) {

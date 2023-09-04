@@ -2,6 +2,7 @@
 
 
 #include "OpenDriveWorldSettings.h"
+#include "OpenDRIVE.h"
 #include "Misc/UObjectToken.h"
 #include "Logging/MessageLog.h"
 #include "Roadmanager.hpp"

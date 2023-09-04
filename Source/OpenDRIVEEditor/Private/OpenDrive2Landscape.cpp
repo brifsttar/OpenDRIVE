@@ -14,7 +14,6 @@
 #include "ILandscapeSplineInterface.h"
 #include "RoadManager.hpp"
 #include "CoordTranslate.h"
-#include "OpenDriveScriptActor.h"
 
 
 UOpenDrive2Landscape::UOpenDrive2Landscape() {

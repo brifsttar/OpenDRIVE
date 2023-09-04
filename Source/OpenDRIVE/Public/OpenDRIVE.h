@@ -4,6 +4,8 @@
 
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(OpenDriveLog, Log, All);
+
 class FOpenDRIVEModule : public IModuleInterface
 {
 public:
