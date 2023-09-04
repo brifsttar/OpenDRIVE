@@ -8,15 +8,12 @@ AOpenDriveEditorLane::AOpenDriveEditorLane()
 	_baseMeshSize = _laneMeshPtr->GetBoundingBox().GetSize().Y; // The mesh's width. Used to set our lanes widths correctly.
 }
 
-void AOpenDriveEditorLane::Initialize(int roadId_, int junctionId_,int successorId_, int predecessorId_,roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_)
+void AOpenDriveEditorLane::Initialize(roadmanager::Road* road_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_)
 {
-	_roadId = roadId_;
-	_junctionId = junctionId_;
-	_successorId = successorId_;
-	_predecessorId = predecessorId_;
+	_road = road_;
 	_laneSection = laneSection_;
 	_lane = lane_;
-
+	
 	DrawLane(step_, offset_);
 }
 
@@ -55,7 +52,7 @@ void AOpenDriveEditorLane::DrawLane(double step, float offset)
 		CheckLastTwoPointsDistance(laneSpline, step);
 	}
 
-	bool bIsInJunction = _junctionId != -1;
+	bool bIsInJunction = GetJunctionId() != -1;
 
 	//arrow meshes 
 	TObjectPtr<UStaticMesh> mesh;
@@ -144,9 +141,21 @@ FString AOpenDriveEditorLane::GetLaneType()
 	return type;
 }
 
+inline int AOpenDriveEditorLane::GetSuccessorId()
+{
+	roadmanager::RoadLink* link = _road->GetLink(roadmanager::LinkType::SUCCESSOR);
+	return  link != nullptr ? link->GetElementId() :  0;
+}
+
+inline int AOpenDriveEditorLane::GetPredecessorId()
+{
+	roadmanager::RoadLink* link = _road->GetLink(roadmanager::LinkType::PREDECESSOR);
+	return  link != nullptr ? link->GetElementId() : 0;
+}
+
 void AOpenDriveEditorLane::SetLanePoint(USplineComponent* laneSpline_, roadmanager::Position& position, double s, float offset)
 {
-	position.SetLanePos(_roadId, _lane->GetId(), s, 0.);
+	position.SetLanePos(GetRoadId(), _lane->GetId(), s, 0.);
 	
 	FVector sp;
 	sp = CoordTranslate::OdrToUe::ToLocation(position);
@@ -266,7 +275,7 @@ void AOpenDriveEditorLane::SetColoredLaneMeshes(USplineComponent* laneSpline_)
 
 void AOpenDriveEditorLane::SetArrowVisibility(bool _isVisible)
 {
-	if (_junctionId == -1)
+	if (GetJunctionId() == -1)
 	{
 		for (UStaticMeshComponent* arrow : FArrowMeshes)
 		{

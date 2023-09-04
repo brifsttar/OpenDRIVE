@@ -28,19 +28,19 @@ public:
 	 * @param offset The road offset
 	 * @param step The step (the lower it is, the more precise it will be)  
 	 */
-	void Initialize(int roadId_, int junctionId_, int successorId_, int predecessorId_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_);
+	void Initialize(roadmanager::Road* road_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_);
 
 	/**
 	* Gets the road Id
 	* @return The Road Id
 	*/
-	inline int GetRoadId() { return _roadId; };
+	inline int GetRoadId() { return _road->GetId(); };
 
 	/**
 	* Gets the junction Id
 	* @return The Junction Id
 	*/
-	inline int GetJunctionId() { return _junctionId; };
+	inline int GetJunctionId() { return _road->GetJunction(); };
 
 	/**
 	* Gets the lane type
@@ -57,12 +57,12 @@ public:
 	/**
 	* @return The successor's road Id
 	*/
-	inline int GetSuccessorId() { return _successorId; };
+	inline int GetSuccessorId();
 
 	/**
 	* @return The predecessor's road Id
 	*/
-	inline int GetPredecessorId() { return _predecessorId; };
+	inline int GetPredecessorId();
 
 	/**
     * Sets arrows visibility
@@ -113,12 +113,9 @@ private :
 	TObjectPtr<UStaticMesh> _laneMeshPtr;
 	float _baseMeshSize;
 
-	int _roadId = 0; 
-	int _junctionId = 0;
 	int _roadDirection = 0;
-	int _predecessorId = 0;
-	int _successorId = 0;
 
+	roadmanager::Road* _road;
 	roadmanager::LaneSection* _laneSection;
 	roadmanager::Lane* _lane;
 };

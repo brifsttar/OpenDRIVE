@@ -1,7 +1,6 @@
 #pragma once 
 #include "EditorModes.h"
 #include "EdMode.h"
-#include "../../../OpenDRIVE/Public/OpenDriveAsset.h"
 #include "../OpenDriveEditorLane.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveEditorLane* road)
@@ -84,7 +83,7 @@ protected :
 	 */
 	void LoadRoadsNetwork();
 
-	TArray<AOpenDriveEditorLane*> FRoadsArray;
+	TArray<AOpenDriveEditorLane*> roadsArray;
 
 private :
 

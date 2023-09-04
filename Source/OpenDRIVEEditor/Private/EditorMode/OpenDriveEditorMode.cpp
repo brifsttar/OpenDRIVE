@@ -55,16 +55,16 @@ void FOpenDRIVEEditorMode::Exit()
 
 void FOpenDRIVEEditorMode::Reset()
 {
-	if (FRoadsArray.IsEmpty() == false)
+	if (roadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveEditorLane* road : FRoadsArray)
+		for (AOpenDriveEditorLane* road : roadsArray)
 		{
 			if (IsValid(road))
 			{
 				road->Destroy();
 			}
 		}
-		FRoadsArray.Empty();
+		roadsArray.Empty();
 		bHasBeenLoaded = false;
 	}
 }
@@ -94,7 +94,7 @@ void FOpenDRIVEEditorMode::OnMapOpenedCallback(uint32 type)
 void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 {
 	// empty the array if needed
-	if (FRoadsArray.IsEmpty() == false)
+	if (roadsArray.IsEmpty() == false)
 	{
 		Reset();
 	}
@@ -104,8 +104,6 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 	roadmanager::Road* road = 0;
 	roadmanager::LaneSection* laneSection = 0;
 	roadmanager::Lane* lane = 0;
-	roadmanager::RoadLink* predecessorLink;
-	roadmanager::RoadLink* successorLink;
 	size_t nrOfRoads = Odr->GetNumOfRoads();
 	
 	// Actor spawn params
@@ -117,11 +115,6 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 	{
 		road = Odr->GetRoadByIdx(i);
 		if (!road) continue;
-
-		predecessorLink = road->GetLink(roadmanager::LinkType::PREDECESSOR);
-		successorLink = road->GetLink(roadmanager::LinkType::SUCCESSOR);
-		int predId = predecessorLink != nullptr ? predecessorLink->GetElementId() : 0;
-		int succId = successorLink != nullptr ? successorLink->GetElementId() : 0;
 
 		for (int j = 0; j < road->GetNumberOfLaneSections(); j++)
 		{
@@ -137,8 +130,8 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 
 				AOpenDriveEditorLane* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorLane>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
 				newRoad->SetActorHiddenInGame(true);
-				newRoad->Initialize(road->GetId(), road->GetJunction(), succId, predId, laneSection, lane, _roadOffset, _step);
-				FRoadsArray.Add(newRoad);
+				newRoad->Initialize(road, laneSection, lane, _roadOffset, _step);
+				roadsArray.Add(newRoad);
 			}
 		}
 	}
@@ -147,9 +140,9 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 
 void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 {
-	if (FRoadsArray.IsEmpty() == false)
+	if (roadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveEditorLane* road : FRoadsArray)
+		for (AOpenDriveEditorLane* road : roadsArray)
 		{
 			road->SetIsTemporarilyHiddenInEditor(bIsVisible);
 		}
@@ -158,9 +151,9 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 
 void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
 {
-	if (FRoadsArray.IsEmpty() == false)
+	if (roadsArray.IsEmpty() == false)
 	{
-		for (AOpenDriveEditorLane* road : FRoadsArray)
+		for (AOpenDriveEditorLane* road : roadsArray)
 		{
 			road->SetArrowVisibility(bIsVisible);
 		}
