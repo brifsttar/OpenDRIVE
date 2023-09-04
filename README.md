@@ -117,9 +117,13 @@ You can access it by selecting "OpenDRIVE" in the editor mode menu (located next
 
 ![image](https://github.com/brifsttar/OpenDRIVE/assets/131620935/80ad2739-b66c-48aa-a7c2-49a501944186)
 
-By clicking on a lane, some basic lane's informations will be displayed.
+By clicking on a lane, some basic lane's informations will be displayed. 
 
 ![image](https://github.com/brifsttar/OpenDRIVE/assets/131620935/c24fdacb-5df9-4ce0-a816-2d1b1207812a)
+
+There's also some parameters available in the editor mode to edit your OpenDRIVE files' visualization.
+
+![EdModeExample](https://github.com/brifsttar/OpenDRIVE/assets/131620935/749fef07-6e59-40ee-9ed2-5bc268635b83)
 
 Note : if you encounter any issue with the editor mode, feel free to report its in the [Issues](https://github.com/brifsttar/OpenDRIVE/issues) section. 
 
