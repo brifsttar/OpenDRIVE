@@ -161,9 +161,9 @@ void AOpenDriveEditorLane::SetLanePoint(USplineComponent* laneSpline_, roadmanag
 	sp = CoordTranslate::OdrToUe::ToLocation(position);
 	sp.Z += offset;
 	laneSpline_->AddSplineWorldPoint(sp);
-	FRotator rot = FRotator::ZeroRotator;
-	rot.Yaw = -FMath::RadiansToDegrees(position.GetH());
+	FRotator rot = CoordTranslate::OdrToUe::ToRotation(position);
 	laneSpline_->SetRotationAtSplinePoint(laneSpline_->GetNumberOfSplinePoints() - 1, rot, ESplineCoordinateSpace::World);
+	
 	float Yscale = (_laneSection->GetWidth(position.GetS(), _lane->GetId()) * 100) / _baseMeshSize;
 	laneSpline_->SetScaleAtSplinePoint(laneSpline_->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
 }
