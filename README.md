@@ -50,11 +50,17 @@ Once that is done, your OpenDRIVE file should be properly loaded, and you can st
 
 ## Features
 
-### OpenDRIVE Component
+### OpenDRIVE Viewer
 
-![OpenDRIVE Component](Resources/odr_comp.jpg)
+![OpenDRIVE Viewer](Resources/odr_viewer.gif)
 
-The OpenDRIVE component can be attached to any actor to get or set its position on OpenDRIVE's track coordinate. It also interfaces some basic OpenDRIVE functions to Blueprint.
+You can visualize your OpenDRIVE network using the plugin's OpenDRIVE Editor Mode, accessible from the Editor Mode menu. In this mode, you can select individual lanes and get access their OpenDRIVE information (e.g., connection, ID).
+
+### OpenDRIVE Position
+
+![OpenDRIVE Position](Resources/odr_methods.png)
+
+The [OpenDRIVE Position](Source/OpenDRIVE/Public/OpenDrivePosition.h) object can be used to manipulate OpenDRIVE coordinates, and convert back and forth with Unreal's coordinate system.
 
 ### OpenDRIVE Vehicle Component
 
@@ -110,26 +116,3 @@ No material are included with the plugin, but many can be found for free on [Qui
 This Editor Utility Blueprint allows any actor to be duplicated along any road at a fixed step. The process runs until it encounters a junction, so it can actually span multiple roads.
 
 For this to work, actors are assumed to use the standard Unreal Engine alignment (X+ forward, Z+ up), except Decals, for which Y- forward and X- up are expected.
-
-### OpenDRIVE Editor Mode
-
-![OpenDRIVE_EdMode](https://github.com/brifsttar/OpenDRIVE/assets/131620935/80879d3d-3c27-4e40-a465-f715cafbe39d)
-
-This editor mode allows to visualize OpenDRIVE files in the viewport. 
-
-You can access it by selecting "OpenDRIVE" in the editor mode menu (located next to the save button in the editor). To exit this mode, just go back to default mode (Selection). 
-
-**Please avoid entering this mode in play mode (or simulate mode).**
-
-![image](https://github.com/brifsttar/OpenDRIVE/assets/131620935/80ad2739-b66c-48aa-a7c2-49a501944186)
-
-By clicking on a lane, some basic lane's informations will be displayed. 
-
-![image](https://github.com/brifsttar/OpenDRIVE/assets/131620935/c24fdacb-5df9-4ce0-a816-2d1b1207812a)
-
-There's also some parameters available in the editor mode to edit your OpenDRIVE files' visualization.
-
-![EdModeExample](https://github.com/brifsttar/OpenDRIVE/assets/131620935/749fef07-6e59-40ee-9ed2-5bc268635b83)
-
-Note : if you encounter any issue with the editor mode, feel free to report its in the [Issues](https://github.com/brifsttar/OpenDRIVE/issues) section. 
-
