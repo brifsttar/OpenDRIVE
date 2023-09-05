@@ -48,6 +48,7 @@ void FOpenDRIVEEditorMode::Exit()
 	if (bIsMapOpening == false) //prevents the function's call in case of level change 
 	{
 		SetRoadsVisibilityInEditor(true);
+		SetRoadsArrowsVisibilityInEditor(false);
 	}
 
 	FEdMode::Exit();

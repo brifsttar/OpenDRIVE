@@ -252,6 +252,7 @@ bool SOpenDRIVEEditorModeWidget::CheckIfSimulating() const
 FReply SOpenDRIVEEditorModeWidget::Generate()
 {
 	GetEdMode()->Generate();
+	_showArrowsCheckBox.Get()->SetIsChecked(ECheckBoxState::Unchecked);
 	return FReply::Handled();
 }
 
