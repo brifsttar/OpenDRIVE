@@ -108,7 +108,7 @@ protected :
 
 private : 
 
-	TArray<UStaticMeshComponent*> FArrowMeshes;
+	TArray<UStaticMeshComponent*> _arrowMeshes;
 
 	TObjectPtr<UStaticMesh> _laneMeshPtr;
 	float _baseMeshSize;

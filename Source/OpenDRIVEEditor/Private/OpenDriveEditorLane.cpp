@@ -202,7 +202,7 @@ void AOpenDriveEditorLane::SetArrowMeshes(USplineComponent* laneSpline_, TObject
 
 		newStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		newStaticMesh->RegisterComponent();
-		FArrowMeshes.Add(newStaticMesh);
+		_arrowMeshes.Add(newStaticMesh);
 	}
 }
 
@@ -277,7 +277,7 @@ void AOpenDriveEditorLane::SetArrowVisibility(bool _isVisible)
 {
 	if (GetJunctionId() == -1)
 	{
-		for (UStaticMeshComponent* arrow : FArrowMeshes)
+		for (UStaticMeshComponent* arrow : _arrowMeshes)
 		{
 			arrow->SetVisibility(_isVisible);
 		}
