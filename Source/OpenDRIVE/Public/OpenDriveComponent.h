@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "CoordTranslate.h"
+#include "OpenDrivePosition.h"
 #include "OpenDriveComponent.generated.h"
 
 using CoordTranslate::UuToMeters;
@@ -19,14 +20,15 @@ protected:
 	void MovePositionToActor() const;
 	void MoveActorToPosition();
 
-	class UOpenDrivePosition* GetTrackPosition() const;
-
 public:
 	UOpenDriveComponent();
 
 	virtual roadmanager::Position OdrPosition() const;
 
 	void SetTrackPosition(const roadmanager::Position &p);
+
+	UFUNCTION(BlueprintCallable, CallInEditor)
+	class UOpenDrivePosition* GetTrackPosition() const;
 
 	/**
 	* Computes the current OpenDRIVE position and updates the public position variables accordingly

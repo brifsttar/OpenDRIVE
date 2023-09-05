@@ -72,4 +72,3 @@ EReimportResult::Type UOpenDriveFactory::Reimport(UObject *Object) {
 	if (!r) return EReimportResult::Failed;
 	return EReimportResult::Succeeded;
 }
-

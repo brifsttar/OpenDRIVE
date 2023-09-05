@@ -28,6 +28,18 @@ public class OpenDRIVEEditor : ModuleRules
 			new string[]
 			{
 				"Core",
+				"Engine",
+				"CoreUObject",
+				"InputCore",
+				"LevelEditor",
+				"Slate",
+				"EditorStyle",
+				"AssetTools",
+				"EditorWidgets",
+				"UnrealEd",
+				"BlueprintGraph",
+				"AnimGraph",
+				"ComponentVisualizers",
 				"OpenDRIVE",
 				"RoadManager",
 			}
@@ -37,12 +49,20 @@ public class OpenDRIVEEditor : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"Core",
 				"CoreUObject",
 				"Engine",
+				"AppFramework",
 				"Slate",
 				"SlateCore",
+				"EditorFramework",
+				"AnimGraph",
 				"Blutility",
 				"UnrealEd",
+				"KismetWidgets",
+				"MainFrame",
+				"PropertyEditor",
+				"ComponentVisualizers",
 				"Landscape",
 				"EditorScriptingUtilities",
 			}

@@ -1,5 +1,4 @@
 #include "OpenDriveComponent.h"
-#include "OpenDrivePosition.h"
 
 UOpenDriveComponent::UOpenDriveComponent() {
 	_TrackPosition = CreateDefaultSubobject<UOpenDrivePosition>(FName("TrackPosition"));
