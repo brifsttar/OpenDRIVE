@@ -50,11 +50,17 @@ Once that is done, your OpenDRIVE file should be properly loaded, and you can st
 
 ## Features
 
-### OpenDRIVE Component
+### OpenDRIVE Viewer
 
-![OpenDRIVE Component](Resources/odr_comp.jpg)
+![OpenDRIVE Viewer](Resources/odr_viewer.gif)
 
-The OpenDRIVE component can be attached to any actor to get or set its position on OpenDRIVE's track coordinate. It also interfaces some basic OpenDRIVE functions to Blueprint.
+You can visualize your OpenDRIVE network using the plugin's OpenDRIVE Editor Mode, accessible from the Editor Mode menu. In this mode, you can select individual lanes and get access their OpenDRIVE information (e.g., connection, ID).
+
+### OpenDRIVE Position
+
+![OpenDRIVE Position](Resources/odr_methods.png)
+
+The [OpenDRIVE Position](Source/OpenDRIVE/Public/OpenDrivePosition.h) object can be used to manipulate OpenDRIVE coordinates, and convert back and forth with Unreal's coordinate system.
 
 ### OpenDRIVE Vehicle Component
 

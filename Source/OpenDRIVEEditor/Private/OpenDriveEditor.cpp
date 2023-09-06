@@ -3,14 +3,26 @@
 #include "Public/OpenDRIVEEditor.h"
 #include "OpenDriveAssetActions.h"
 #include "AssetToolsModule.h"
+#include "Public/EditorMode/OpenDriveEdModeTool.h"
+
+IMPLEMENT_MODULE(FOpenDRIVEEditorModule, OpenDRIVEEditor)
 
 #define LOCTEXT_NAMESPACE "FOpenDRIVEEditorModule"
 
-void FOpenDRIVEEditorModule::StartupModule() {
-	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+TSharedRef<FWorkspaceItem> FOpenDRIVEEditorModule::MenuRoot =
+FWorkspaceItem::NewGroup(FText::FromString("Menu Root"));
 
-	OpenDRIVEAssetTypeActions = MakeShareable(new FOpenDRIVEAssetActions);
-	AssetTools.RegisterAssetTypeActions(OpenDRIVEAssetTypeActions.ToSharedRef());
+void FOpenDRIVEEditorModule::StartupModule() {
+
+	if (!IsRunningCommandlet())
+	{
+		IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+
+		OpenDRIVEAssetTypeActions = MakeShareable(new FOpenDRIVEAssetActions);
+		AssetTools.RegisterAssetTypeActions(OpenDRIVEAssetTypeActions.ToSharedRef());
+	}
+
+	IOpenDRIVEModuleInterface::StartupModule();
 }
 
 void FOpenDRIVEEditorModule::ShutdownModule() {
@@ -20,8 +32,13 @@ void FOpenDRIVEEditorModule::ShutdownModule() {
 			AssetTools.UnregisterAssetTypeActions(OpenDRIVEAssetTypeActions.ToSharedRef());
 		}
 	}
+
+	IOpenDRIVEModuleInterface::ShutdownModule();
+}
+
+void FOpenDRIVEEditorModule::AddModuleListeners()
+{
+	ModuleListeners.Add(MakeShareable(new OpenDRIVEEdModeTool));
 }
 
 #undef LOCTEXT_NAMESPACE
-	
-IMPLEMENT_MODULE(FOpenDRIVEEditorModule, OpenDRIVEEditor)
