@@ -136,7 +136,7 @@ TSharedRef<SHorizontalBox> SOpenDRIVEEditorModeWidget::ConstructButtons(const FA
 	StaticCast<STextBlock&>(resetButton.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
 
 	TSharedPtr<SButton> generateButton = SNew(SButton).Text(FText::FromString("Generate"))
-		.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate).IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfSimulating)
+		.OnClicked(this, &SOpenDRIVEEditorModeWidget::Generate).IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfInEditorMode)
 		.ToolTipText(FText::FromString(TEXT("Draws roads (will reset currently drawn roads).")));
 
 	StaticCast<STextBlock&>(generateButton.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
@@ -170,11 +170,13 @@ TSharedRef<SBorder> SOpenDRIVEEditorModeWidget::ConstructRoadGenerationParameter
 	TSharedRef<SSlider> OffsetSlider = SNew(SSlider).MinValue(0.f).MaxValue(80.f)
 		.Value(GetEdMode()->GetRoadOffset())
 		.OnValueChanged(this, &SOpenDRIVEEditorModeWidget::OnOffsetValueChanged);
+
 	TSharedRef<SSlider> StepSlider = SNew(SSlider).MinValue(1.f).MaxValue(10.f)
 		.Value(GetEdMode()->GetStep())
 		.OnValueChanged(this, &SOpenDRIVEEditorModeWidget::OnStepValueChanged);
 
 	_showArrowsCheckBox = SNew(SCheckBox)
+		.IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfInEditorMode)
 		.OnCheckStateChanged(this, &SOpenDRIVEEditorModeWidget::OnCheckStateChanged);
 
 	TSharedRef<SBorder> border = SNew(SBorder)
@@ -234,19 +236,19 @@ FOpenDRIVEEditorMode* SOpenDRIVEEditorModeWidget::GetEdMode() const
 
 FReply SOpenDRIVEEditorModeWidget::Reset()
 {
-	GetEdMode()->Reset();
+	GetEdMode()->ResetRoadsArray();
 	_showArrowsCheckBox.Get()->SetIsChecked(ECheckBoxState::Unchecked);
 	return FReply::Handled();
 }
 
 bool SOpenDRIVEEditorModeWidget::IsLoaded() const
 {
-	return (GetEdMode()->GetHasBeenLoaded() && CheckIfSimulating());
+	return (GetEdMode()->GetHasBeenLoaded() && CheckIfInEditorMode());
 }
 
-bool SOpenDRIVEEditorModeWidget::CheckIfSimulating() const
+bool SOpenDRIVEEditorModeWidget::CheckIfInEditorMode() const
 {
-	return !(GEditor->IsSimulateInEditorInProgress());
+	return !(GEditor->IsPlayingSessionInEditor());
 }
 
 FReply SOpenDRIVEEditorModeWidget::Generate()

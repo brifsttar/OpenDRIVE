@@ -34,7 +34,7 @@ public :
 	/**
 	 * Deletes drawn roads.
 	 */
-	void Reset();
+	void ResetRoadsArray();
 
 	/**
 	 * Generates roads.

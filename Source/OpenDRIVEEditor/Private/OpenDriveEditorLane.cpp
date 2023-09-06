@@ -3,7 +3,8 @@
 // Sets default values
 AOpenDriveEditorLane::AOpenDriveEditorLane()
 {
-	PrimaryActorTick.bCanEverTick = false; 
+	PrimaryActorTick.bCanEverTick = false;
+	bEditable = true;
 	_laneMeshPtr = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/EditorLandscapeResources/SplineEditorMesh"));
 	_baseMeshSize = _laneMeshPtr->GetBoundingBox().GetSize().Y; // The mesh's width. Used to set our lanes widths correctly.
 }
@@ -32,7 +33,7 @@ void AOpenDriveEditorLane::DrawLane(double step, float offset)
 
 	// Start point
 	position.Init();
-	position.SetSnapLaneTypes(_lane->GetLaneType());
+	position.SetSnapLaneTypes(roadmanager::Lane::LANE_TYPE_ANY);
 	SetLanePoint(laneSpline, position, s, offset);
 
 	//Driving direction
@@ -133,8 +134,11 @@ FString AOpenDriveEditorLane::GetLaneType()
 	case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
 		type = "Restricted lane";
 		break;
+	case(roadmanager::Lane::LaneType::LANE_TYPE_MEDIAN):
+		type = "Median";
+		break;
 	default:
-		type = "Any";
+		type = "None";
 		break;
 	}
 
@@ -155,15 +159,15 @@ inline int AOpenDriveEditorLane::GetPredecessorId()
 
 void AOpenDriveEditorLane::SetLanePoint(USplineComponent* laneSpline_, roadmanager::Position& position, double s, float offset)
 {
-	position.SetLanePos(GetRoadId(), _lane->GetId(), s, 0.);
-	
+	position.SetLanePos(GetRoadId(), GetLaneId(), s, 0.);
+
 	FVector sp;
 	sp = CoordTranslate::OdrToUe::ToLocation(position);
 	sp.Z += offset;
 	laneSpline_->AddSplineWorldPoint(sp);
 	FRotator rot = CoordTranslate::OdrToUe::ToRotation(position);
 	laneSpline_->SetRotationAtSplinePoint(laneSpline_->GetNumberOfSplinePoints() - 1, rot, ESplineCoordinateSpace::World);
-	
+
 	float Yscale = (_laneSection->GetWidth(position.GetS(), _lane->GetId()) * 100) / _baseMeshSize;
 	laneSpline_->SetScaleAtSplinePoint(laneSpline_->GetNumberOfSplinePoints() - 1, FVector(1.0f, Yscale, 1.0f));
 }

@@ -64,7 +64,7 @@ protected :
 	 * Gets if editor is in simulation mode or not
 	 * @return True if simulating, False if not
 	 */
-	bool CheckIfSimulating() const;
+	bool CheckIfInEditorMode() const;
 
 	/**
 	 * Sets the road offset

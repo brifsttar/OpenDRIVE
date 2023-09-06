@@ -29,8 +29,8 @@ void FOpenDRIVEEditorMode::Enter()
 		Toolkit = MakeShareable(new FOpenDRIVEEditorModeToolkit);
 		Toolkit->Init(Owner->GetToolkitHost());
 	}
-
-	if (bHasBeenLoaded == false)
+	
+	if (bHasBeenLoaded == false	&& (GEditor->IsSimulateInEditorInProgress() == false && GEditor->IsPlaySessionInProgress() == false))
 	{
 		LoadRoadsNetwork();
 	}
@@ -54,20 +54,17 @@ void FOpenDRIVEEditorMode::Exit()
 	FEdMode::Exit();
 }
 
-void FOpenDRIVEEditorMode::Reset()
+void FOpenDRIVEEditorMode::ResetRoadsArray()
 {
-	if (roadsArray.IsEmpty() == false)
+	for (auto road : roadsArray)
 	{
-		for (AOpenDriveEditorLane* road : roadsArray)
+		if (IsValid(road) == true)
 		{
-			if (IsValid(road))
-			{
-				road->Destroy();
-			}
+			road->Destroy();
 		}
-		roadsArray.Empty();
-		bHasBeenLoaded = false;
 	}
+	roadsArray.Reset();
+	bHasBeenLoaded = false;
 }
 
 void FOpenDRIVEEditorMode::Generate()
@@ -87,6 +84,7 @@ void FOpenDRIVEEditorMode::OnMapOpenedCallback(uint32 type)
 	{
 		UE_LOG(LogClass, Warning, TEXT("a new map has been opened"));
 
+		roadsArray.Reset();
 		bIsMapOpening = true;
 		bHasBeenLoaded = false;
 	}
@@ -95,11 +93,12 @@ void FOpenDRIVEEditorMode::OnMapOpenedCallback(uint32 type)
 void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 {
 	// empty the array if needed
+
 	if (roadsArray.IsEmpty() == false)
 	{
-		Reset();
+		ResetRoadsArray();
 	}
-
+	
 	// roadmanager params
 	roadmanager::OpenDrive* Odr = roadmanager::Position::GetOpenDrive();
 	roadmanager::Road* road = 0;
