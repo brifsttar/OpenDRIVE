@@ -89,21 +89,18 @@ void AOpenDRIVEActor::PostEditMove(bool bFinished)
 
 	if (openDRIVEActorInScene.Num() > 1)
 	{
-		Destroy();
+		openDRIVEActorInScene[0]->Destroy();
 	}
-	else
-	{
-		Super::PostEditMove(bFinished);
-	}
+	
+	Super::PostEditMove(bFinished);
 }
 #endif
 
 void AOpenDRIVEActor::PostLoad()
 {
 	Super::PostLoad();
-	TArray<AActor*> OpenDRIVEActors;
 
-		LoadOpenDrive();
+	LoadOpenDrive();
 }
 
 

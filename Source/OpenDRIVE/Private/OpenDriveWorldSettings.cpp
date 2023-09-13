@@ -6,6 +6,7 @@
 #include "Misc/UObjectToken.h"
 #include "Logging/MessageLog.h"
 #include "Roadmanager.hpp"
+#include "Kismet/GameplayStatics.h"
 #if WITH_EDITOR
 #include "Editor.h"
 #include "Editor/EditorEngine.h"
@@ -26,6 +27,11 @@ void AOpenDriveWorldSettings::CheckForErrors() {
 	Super::CheckForErrors();
 	FMessageLog MapCheck("MapCheck");
 
+	if (HasOpenDriveActor() == false)
+	{
+		MapCheck.Warning()->AddToken(FTextToken::Create(FText::FromString("OpenDriveWorldSettings are now deprecated. Use OpenDRIVEActor instead (see the readme.md on the plugin's repository for more info.")));
+	}
+
 	if (!GetLevel()) return;
 	if (GetLevel()->IsPersistentLevel()) return;
 	if (OpenDriveAsset) {
@@ -38,11 +44,13 @@ void AOpenDriveWorldSettings::CheckForErrors() {
 
 void AOpenDriveWorldSettings::BeginPlay() {
 	Super::BeginPlay();
+
 	LoadOpenDrive();
 }
 
 void AOpenDriveWorldSettings::LoadOpenDrive() {
 	if (!OpenDriveAsset) return;
+	if (HasOpenDriveActor() == true) return;
 	if (GetLevel() && !GetLevel()->IsPersistentLevel()) {
 		UE_LOG(OpenDriveLog, Warning, TEXT("%s is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored"), *(GetFName().ToString()));
 		return;
@@ -61,7 +69,21 @@ void AOpenDriveWorldSettings::LoadOpenDrive() {
 
 void AOpenDriveWorldSettings::PostLoad() {
 	Super::PostLoad();
+
 	LoadOpenDrive();
+}
+
+bool AOpenDriveWorldSettings::HasOpenDriveActor()
+{
+	TArray<AActor*> actors;
+	
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOpenDRIVEActor::StaticClass(), actors);
+	
+	if (actors.Num() > 0)
+	{
+		return true;
+	}
+	return false;
 }
 
 #if WITH_EDITOR

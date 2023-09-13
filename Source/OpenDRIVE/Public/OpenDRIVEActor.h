@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "OpenDriveAsset.h"
-#include "OpenDRIVEEditor/Public/OpenDriveEditorLane.h"
 #include "OpenDRIVEActor.generated.h"
 
 /*
@@ -32,12 +31,12 @@ public:
 	virtual void CheckForErrors() override;
 #endif
 
+	void LoadOpenDrive();
+
 protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	void LoadOpenDrive();
 
 #if WITH_EDITOR 
 	void OnObjectReimported(UObject* InObject);
@@ -46,8 +45,6 @@ protected:
 	bool bRegisteredReimportCallback = false;
 
 private : 
-
-	TArray<AOpenDRIVEActor*> _lanes;
 
 #if WITH_EDITOR
 	/*

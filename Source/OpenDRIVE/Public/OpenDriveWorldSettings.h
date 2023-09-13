@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/WorldSettings.h"
 #include "OpenDriveAsset.h"
+#include "OpenDRIVEActor.h"
 #include "OpenDriveWorldSettings.generated.h"
 
 /**
@@ -28,6 +29,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	void LoadOpenDrive();
+
+	/**
+	* Checks if there's an OpenDRIVEActor in the current scene 
+	* @return true if there's an actor, false else 
+	*/
+	bool HasOpenDriveActor();
 
 #if WITH_EDITOR
 	void OnObjectReimported(UObject* InObject);

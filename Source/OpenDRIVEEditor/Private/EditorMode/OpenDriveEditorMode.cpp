@@ -128,7 +128,7 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 
 				if (!lane || lane->GetId() == 0) continue;
 
-				AOpenDriveEditorLane* newRoad = NewObject<AOpenDriveEditorLane>(_openDriveActor);
+				AOpenDriveEditorLane* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorLane>(spawnParam);
 				newRoad->SetActorHiddenInGame(true);
 				newRoad->Initialize(road, laneSection, lane, _roadOffset, _step);
 				roadsArray.Add(newRoad);
