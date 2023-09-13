@@ -2,6 +2,7 @@
 #include "EditorModes.h"
 #include "EdMode.h"
 #include "../OpenDriveEditorLane.h"
+#include "../../../OpenDRIVE/Public/OpenDRIVEActor.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveEditorLane* road)
 
@@ -34,7 +35,7 @@ public :
 	/**
 	 * Deletes drawn roads.
 	 */
-	void ResetRoadsArray();
+	void ResetLanesArray();
 
 	/**
 	 * Generates roads.
@@ -86,6 +87,8 @@ protected :
 	TArray<AOpenDriveEditorLane*> roadsArray;
 
 private :
+
+	AOpenDRIVEActor* _openDriveActor;
 
 	float _roadOffset = 20.0f;
 	float _step = 5.f;

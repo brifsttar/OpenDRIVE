@@ -1,0 +1,58 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "OpenDriveAsset.h"
+#include "OpenDRIVEEditor/Public/OpenDriveEditorLane.h"
+#include "OpenDRIVEActor.generated.h"
+
+/*
+* Actor that hold the OpenDriveAsset containing the.xodr file.
+* Drag and drop one of these actors in your scene.
+* You can only drop one in each scene : if you want to change the .xodr, just edit the OpenDriveAsset property.
+**/
+UCLASS()
+class OPENDRIVE_API AOpenDRIVEActor : public AActor
+{
+	GENERATED_BODY()
+	
+public:
+
+	// Sets default values for this actor's properties
+	AOpenDRIVEActor();
+
+	UPROPERTY(EditAnywhere, Category = "OpenDRIVE")
+	UOpenDriveAsset* OpenDriveAsset;
+
+	virtual void PostLoad() override;
+
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+	virtual void CheckForErrors() override;
+#endif
+
+protected:
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	void LoadOpenDrive();
+
+#if WITH_EDITOR 
+	void OnObjectReimported(UObject* InObject);
+#endif
+
+	bool bRegisteredReimportCallback = false;
+
+private : 
+
+	TArray<AOpenDRIVEActor*> _lanes;
+
+#if WITH_EDITOR
+	/*
+	* Called when actor is placed in editor (this is where we check if there's already one actor in the scene).
+	**/
+	virtual void PostEditMove(bool bFinished) override;
+#endif
+};

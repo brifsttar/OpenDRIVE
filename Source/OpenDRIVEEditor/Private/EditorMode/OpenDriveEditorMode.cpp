@@ -54,7 +54,7 @@ void FOpenDRIVEEditorMode::Exit()
 	FEdMode::Exit();
 }
 
-void FOpenDRIVEEditorMode::ResetRoadsArray()
+void FOpenDRIVEEditorMode::ResetLanesArray()
 {
 	for (auto road : roadsArray)
 	{
@@ -96,7 +96,7 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 
 	if (roadsArray.IsEmpty() == false)
 	{
-		ResetRoadsArray();
+		ResetLanesArray();
 	}
 	
 	// roadmanager params
@@ -128,7 +128,7 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 
 				if (!lane || lane->GetId() == 0) continue;
 
-				AOpenDriveEditorLane* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorLane>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
+				AOpenDriveEditorLane* newRoad = NewObject<AOpenDriveEditorLane>(_openDriveActor);
 				newRoad->SetActorHiddenInGame(true);
 				newRoad->Initialize(road, laneSection, lane, _roadOffset, _step);
 				roadsArray.Add(newRoad);
