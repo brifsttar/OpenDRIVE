@@ -181,6 +181,6 @@ public:
 	 * @return The lane type 
 	 */
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
-	LaneType GetLaneType();
+	LaneType GetLaneType() const;
 
 };

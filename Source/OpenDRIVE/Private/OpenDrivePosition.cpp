@@ -148,9 +148,8 @@ void UOpenDrivePosition::AlignWithLaneCenter() {
 	SetTrackPosition(GetRoadId(), GetLaneId(), GetS(), 0.f, 0.f);
 }
 
-LaneType UOpenDrivePosition::GetLaneType()
-{
-	roadmanager::LaneSection* laneSec = _TrackPos.GetRoad()->GetLaneSectionByS(GetS());
+LaneType UOpenDrivePosition::GetLaneType() const {
+	roadmanager::LaneSection* laneSec = OdrPosition().GetRoad()->GetLaneSectionByS(GetS());
 	roadmanager::Lane* lane = laneSec->GetLaneById(GetLaneId());
 
 	LaneType laneType;
