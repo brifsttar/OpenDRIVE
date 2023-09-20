@@ -37,49 +37,18 @@ void AOpenDRIVEActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 		LoadOpenDrive();
 	}
 }
-
-void AOpenDRIVEActor::CheckForErrors()
-{
-	Super::CheckForErrors();
-	FMessageLog MapCheck("MapCheck");
-
-	if (!GetLevel()) return;
-	if (GetLevel()->IsPersistentLevel()) return;
-	if (OpenDriveAsset) {
-		MapCheck.Warning()
-			->AddToken(FUObjectToken::Create(this))
-			->AddToken(FTextToken::Create(FText::FromString("is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored")));
-	}
-}
 #endif
 
 void AOpenDRIVEActor::LoadOpenDrive()
 {
 	if (!OpenDriveAsset) return;
-	if (GetLevel() && !GetLevel()->IsPersistentLevel()) {
-		UE_LOG(OpenDriveLog, Warning, TEXT("%s is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored"), *(GetFName().ToString()));
-		return;
-	}
 	if (!roadmanager::Position::GetOpenDrive()->LoadOpenDriveContent(TCHAR_TO_UTF8(*(OpenDriveAsset->XodrContent)))) {
 		UE_LOG(OpenDriveLog, Error, TEXT("Failed to load OpenDRIVE asset %s"), *(OpenDriveAsset->GetFName().ToString()));
 		return;
 	}
-#if WITH_EDITOR
-	if (GEditor && !bRegisteredReimportCallback) {
-		GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetReimport.AddUObject(this, &AOpenDRIVEActor::OnObjectReimported);
-		bRegisteredReimportCallback = true;
-	}
-#endif
 }
 
 #if WITH_EDITOR
-void AOpenDRIVEActor::OnObjectReimported(UObject* InObject)
-{
-	if (InObject == OpenDriveAsset)
-	{
-		LoadOpenDrive();
-	}
-}
 
 void AOpenDRIVEActor::PostEditMove(bool bFinished)
 {

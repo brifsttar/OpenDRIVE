@@ -20,6 +20,8 @@ public:
 	// Sets default values for this actor's properties
 	AOpenDRIVEActor();
 
+	friend class UOpenDriveActorFactory;
+
 	UPROPERTY(EditAnywhere, Category = "OpenDRIVE")
 	UOpenDriveAsset* OpenDriveAsset;
 
@@ -27,22 +29,12 @@ public:
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-	virtual void CheckForErrors() override;
 #endif
-
-	void LoadOpenDrive();
 
 protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-#if WITH_EDITOR 
-	void OnObjectReimported(UObject* InObject);
-#endif
-
-	bool bRegisteredReimportCallback = false;
 
 private : 
 
@@ -52,4 +44,5 @@ private :
 	**/
 	virtual void PostEditMove(bool bFinished) override;
 #endif
+	void LoadOpenDrive();
 };

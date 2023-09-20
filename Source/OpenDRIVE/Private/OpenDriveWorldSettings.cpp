@@ -12,6 +12,7 @@
 #include "Editor/EditorEngine.h"
 #include "Subsystems/ImportSubsystem.h"
 #endif
+#include "OpenDRIVEActor.h"
 
 #if WITH_EDITOR
 void AOpenDriveWorldSettings::PostEditChangeProperty(FPropertyChangedEvent& e) {
@@ -27,7 +28,7 @@ void AOpenDriveWorldSettings::CheckForErrors() {
 	Super::CheckForErrors();
 	FMessageLog MapCheck("MapCheck");
 
-	if (HasOpenDriveActor() == false)
+	if (HasOpenDriveActor() == false && IsValid(OpenDriveAsset))
 	{
 		MapCheck.Warning()->AddToken(FTextToken::Create(FText::FromString("OpenDriveWorldSettings are now deprecated. Use OpenDRIVEActor instead (see the readme.md on the plugin's repository for more info.")));
 	}

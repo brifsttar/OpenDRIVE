@@ -1,8 +1,8 @@
 #pragma once 
 #include "EditorModes.h"
 #include "EdMode.h"
-#include "../OpenDriveEditorLane.h"
-#include "../../../OpenDRIVE/Public/OpenDRIVEActor.h"
+#include "OpenDriveEditorLane.h"
+#include "OpenDRIVEActor.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveEditorLane* road)
 

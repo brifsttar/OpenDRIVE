@@ -1,7 +1,7 @@
 #include "OpenDriveActorFactory.h"
 #include "AssetRegistry/AssetData.h"
-#include "OpenDRIVE/Public/OpenDRIVEActor.h"
-#include "OpenDRIVE/Public/OpenDriveAsset.h"
+#include "OpenDRIVEActor.h"
+#include "OpenDriveAsset.h"
 
 UOpenDriveActorFactory::UOpenDriveActorFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -16,18 +16,8 @@ void UOpenDriveActorFactory::PostSpawnActor(UObject* Asset, AActor* NewActor)
 
 	if (UOpenDriveAsset* openDriveAsset_ = Cast<UOpenDriveAsset>(Asset))
 	{
+		NewActor->SetActorLabel("OpenDRIVEActor");
 		AOpenDRIVEActor* openDriveActor = CastChecked<AOpenDRIVEActor>(NewActor);
-		openDriveActor->OpenDriveAsset = openDriveAsset_;
-		openDriveActor->LoadOpenDrive();
-	}
-}
-
-void UOpenDriveActorFactory::PostCreateBlueprint(UObject* Asset, AActor* CDO)
-{
-	if (Asset != nullptr && CDO != nullptr)
-	{
-		UOpenDriveAsset* openDriveAsset_ = CastChecked<UOpenDriveAsset>(Asset);
-		AOpenDRIVEActor* openDriveActor = CastChecked<AOpenDRIVEActor>(CDO);
 		openDriveActor->OpenDriveAsset = openDriveAsset_;
 		openDriveActor->LoadOpenDrive();
 	}

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/WorldSettings.h"
 #include "OpenDriveAsset.h"
-#include "OpenDRIVEActor.h"
 #include "OpenDriveWorldSettings.generated.h"
 
 /**
