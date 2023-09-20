@@ -183,4 +183,11 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	LaneType GetLaneType() const;
 
+	/**
+	* @param LookaheadDist Distance in front to use as reference for computation
+	* @return Road curvature angle in degrees
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	float GetRoadCurvatureAngle(float LookaheadDist) const;
+
 };

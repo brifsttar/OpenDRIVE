@@ -183,3 +183,11 @@ LaneType UOpenDrivePosition::GetLaneType() const {
 
 	return laneType;
 }
+
+float UOpenDrivePosition::GetRoadCurvatureAngle(float LookaheadDist) const {
+	float h1 = OdrPosition().GetH();
+	roadmanager::Position p2 = OdrPosition();
+	p2.MoveAlongS(CoordTranslate::UuToMeters(LookaheadDist));
+	float h2 = p2.GetH();
+	return FMath::RadiansToDegrees(h2 - h1);
+}
