@@ -80,11 +80,7 @@ bool AOpenDriveWorldSettings::HasOpenDriveActor()
 	
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOpenDRIVEActor::StaticClass(), actors);
 	
-	if (actors.Num() > 0)
-	{
-		return true;
-	}
-	return false;
+	return actors.Num() > 0;
 }
 
 #if WITH_EDITOR
