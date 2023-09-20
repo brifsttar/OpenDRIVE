@@ -15,14 +15,16 @@ AOpenDRIVEActor::AOpenDRIVEActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRootComponent")));
 }
 
 // Called when the game starts or when spawned
 void AOpenDRIVEActor::BeginPlay()
 {
 	Super::BeginPlay();
-	LoadOpenDrive();
+	
+	CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
+		: LoadOpenDrive();
 }
 
 #if WITH_EDITOR 
@@ -34,10 +36,28 @@ void AOpenDRIVEActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(AOpenDRIVEActor, OpenDriveAsset))
 	{
-		LoadOpenDrive();
+		CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
+			: LoadOpenDrive();
 	}
 }
 #endif
+
+void AOpenDRIVEActor::BeginDestroy()
+{
+	TArray<AActor*> actors;
+	if (CheckForMultipleOpenDRIVEActors(actors) == false )
+	{
+		if (actors.IsEmpty() == false)
+		{
+			if (AOpenDRIVEActor* openDriveActor = Cast<AOpenDRIVEActor>(actors[0]))
+			{
+				openDriveActor->LoadOpenDrive();
+			}
+		}
+	}
+
+	Super::BeginDestroy();
+}
 
 void AOpenDRIVEActor::LoadOpenDrive()
 {
@@ -48,19 +68,29 @@ void AOpenDRIVEActor::LoadOpenDrive()
 	}
 }
 
+bool AOpenDRIVEActor::CheckForMultipleOpenDRIVEActors()
+{
+	TArray<AActor*> openDRIVEActorInScene;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOpenDRIVEActor::StaticClass(), openDRIVEActorInScene);
+
+	return (openDRIVEActorInScene.Num() > 1);
+}
+
+bool AOpenDRIVEActor::CheckForMultipleOpenDRIVEActors(TArray<AActor*> &actors)
+{
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOpenDRIVEActor::StaticClass(), actors);
+
+	return (actors.Num() > 1);
+}
+
 #if WITH_EDITOR
 
 void AOpenDRIVEActor::PostEditMove(bool bFinished)
 {
-	TArray<AActor*> openDRIVEActorInScene;
-	
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOpenDRIVEActor::StaticClass(), openDRIVEActorInScene);
+	CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
+		: LoadOpenDrive();
 
-	if (openDRIVEActorInScene.Num() > 1)
-	{
-		openDRIVEActorInScene[0]->Destroy();
-	}
-	
 	Super::PostEditMove(bFinished);
 }
 #endif
@@ -69,7 +99,8 @@ void AOpenDRIVEActor::PostLoad()
 {
 	Super::PostLoad();
 
-	LoadOpenDrive();
+	CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
+		: LoadOpenDrive();
 }
 
 

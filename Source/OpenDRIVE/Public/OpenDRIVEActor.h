@@ -20,8 +20,6 @@ public:
 	// Sets default values for this actor's properties
 	AOpenDRIVEActor();
 
-	friend class UOpenDriveActorFactory;
-
 	UPROPERTY(EditAnywhere, Category = "OpenDRIVE")
 	UOpenDriveAsset* OpenDriveAsset;
 
@@ -30,6 +28,8 @@ public:
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
+
+	virtual void BeginDestroy() override;
 
 protected:
 
@@ -45,4 +45,14 @@ private :
 	virtual void PostEditMove(bool bFinished) override;
 #endif
 	void LoadOpenDrive();
+
+	/*
+	* Checks if there's more than one OpenDRIVEActor in the current scene
+	**/
+	bool CheckForMultipleOpenDRIVEActors();
+
+	/*
+	* Checks if there's more than one OpenDRIVEActor in the current scene
+	**/
+	bool CheckForMultipleOpenDRIVEActors(TArray<AActor*> &actors);
 };

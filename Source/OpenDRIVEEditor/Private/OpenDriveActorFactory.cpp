@@ -19,7 +19,6 @@ void UOpenDriveActorFactory::PostSpawnActor(UObject* Asset, AActor* NewActor)
 		NewActor->SetActorLabel("OpenDRIVEActor");
 		AOpenDRIVEActor* openDriveActor = CastChecked<AOpenDRIVEActor>(NewActor);
 		openDriveActor->OpenDriveAsset = openDriveAsset_;
-		openDriveActor->LoadOpenDrive();
 	}
 }
 

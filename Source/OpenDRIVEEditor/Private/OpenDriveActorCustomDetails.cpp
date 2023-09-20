@@ -15,6 +15,7 @@ void FOpenDriveActorCustomDetails::CustomizeDetails(IDetailLayoutBuilder& Detail
 
 	AOpenDRIVEActor* actor = Cast<AOpenDRIVEActor>(Objects[0].Get());
 
+	/*
 	TArray<FName> categoriesName;
 	DetailBuilder.GetCategoryNames(categoriesName);
 
@@ -25,6 +26,7 @@ void FOpenDriveActorCustomDetails::CustomizeDetails(IDetailLayoutBuilder& Detail
 			DetailBuilder.HideCategory(name);
 		}
 	}
+	*/
 }
 
 TSharedRef<IDetailCustomization> FOpenDriveActorCustomDetails::MakeInstance()
