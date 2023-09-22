@@ -3,18 +3,19 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "OpenDriveAsset.h"
+#include "Engine/ViewportStatsSubsystem.h"
 #include "OpenDRIVEActor.generated.h"
 
 /*
 * Actor that hold the OpenDriveAsset containing the.xodr file.
 * Drag and drop one of these actors in your scene.
-* You can only drop one in each scene : if you want to change the .xodr, just edit the OpenDriveAsset property.
+* You can only drop one in each scene.
 **/
 UCLASS()
 class OPENDRIVE_API AOpenDRIVEActor : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	// Sets default values for this actor's properties
@@ -31,6 +32,8 @@ public:
 
 	virtual void BeginDestroy() override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -38,21 +41,21 @@ protected:
 
 private : 
 
-#if WITH_EDITOR
-	/*
-	* Called when actor is placed in editor (this is where we check if there's already one actor in the scene).
-	**/
-	virtual void PostEditMove(bool bFinished) override;
-#endif
+	/**
+	* Loads the OpenDRIVE's file
+	*/
 	void LoadOpenDrive();
+
+	/*
+	* Checks if there's more than one OpenDRIVEActor in the current scene
+	**/
+	bool CheckForMultipleOpenDRIVEActors(TArray<AActor*>& actors);
 
 	/*
 	* Checks if there's more than one OpenDRIVEActor in the current scene
 	**/
 	bool CheckForMultipleOpenDRIVEActors();
 
-	/*
-	* Checks if there's more than one OpenDRIVEActor in the current scene
-	**/
-	bool CheckForMultipleOpenDRIVEActors(TArray<AActor*> &actors);
+	void OpenDRIVEError(bool bError);
+	int32 _displayDelegateIdx;
 };

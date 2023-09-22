@@ -9,7 +9,7 @@
 #include "Editor/EditorEngine.h"
 #include "Subsystems/ImportSubsystem.h"
 #endif
- 
+
 // Sets default values
 AOpenDRIVEActor::AOpenDRIVEActor()
 {
@@ -18,34 +18,43 @@ AOpenDRIVEActor::AOpenDRIVEActor()
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("DefaultRootComponent")));
 }
 
+void AOpenDRIVEActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	LoadOpenDrive();
+}
+
 // Called when the game starts or when spawned
 void AOpenDRIVEActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
-		: LoadOpenDrive();
+	LoadOpenDrive();
+}
+
+void AOpenDRIVEActor::PostLoad()
+{
+	Super::PostLoad();
+	LoadOpenDrive();
 }
 
 #if WITH_EDITOR 
 void AOpenDRIVEActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-
 	FName PropertyName = (PropertyChangedEvent.MemberProperty != NULL) ? PropertyChangedEvent.MemberProperty->GetFName() : NAME_None;
-
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(AOpenDRIVEActor, OpenDriveAsset))
 	{
-		CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
-			: LoadOpenDrive();
+		LoadOpenDrive();
 	}
 }
 #endif
 
 void AOpenDRIVEActor::BeginDestroy()
-{
+{	
 	TArray<AActor*> actors;
-	if (CheckForMultipleOpenDRIVEActors(actors) == false )
+	bool bIsMultiple = CheckForMultipleOpenDRIVEActors(actors);
+	OpenDRIVEError(bIsMultiple);
+	if (bIsMultiple == false)
 	{
 		if (actors.IsEmpty() == false)
 		{
@@ -55,12 +64,14 @@ void AOpenDRIVEActor::BeginDestroy()
 			}
 		}
 	}
-
 	Super::BeginDestroy();
 }
 
 void AOpenDRIVEActor::LoadOpenDrive()
 {
+	bool bIsMultiple = CheckForMultipleOpenDRIVEActors();
+	OpenDRIVEError(bIsMultiple);
+	if (bIsMultiple == true) return;
 	if (!OpenDriveAsset) return;
 	if (!roadmanager::Position::GetOpenDrive()->LoadOpenDriveContent(TCHAR_TO_UTF8(*(OpenDriveAsset->XodrContent)))) {
 		UE_LOG(OpenDriveLog, Error, TEXT("Failed to load OpenDRIVE asset %s"), *(OpenDriveAsset->GetFName().ToString()));
@@ -68,40 +79,41 @@ void AOpenDRIVEActor::LoadOpenDrive()
 	}
 }
 
-bool AOpenDRIVEActor::CheckForMultipleOpenDRIVEActors()
-{
-	TArray<AActor*> openDRIVEActorInScene;
-
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOpenDRIVEActor::StaticClass(), openDRIVEActorInScene);
-
-	return (openDRIVEActorInScene.Num() > 1);
-}
-
-bool AOpenDRIVEActor::CheckForMultipleOpenDRIVEActors(TArray<AActor*> &actors)
+bool AOpenDRIVEActor::CheckForMultipleOpenDRIVEActors(TArray<AActor*>& actors)
 {
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOpenDRIVEActor::StaticClass(), actors);
-
 	return (actors.Num() > 1);
 }
 
-#if WITH_EDITOR
-
-void AOpenDRIVEActor::PostEditMove(bool bFinished)
+bool AOpenDRIVEActor::CheckForMultipleOpenDRIVEActors()
 {
-	CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
-		: LoadOpenDrive();
-
-	Super::PostEditMove(bFinished);
+	TArray<AActor*> openDRIVEActorInScene;
+	return (CheckForMultipleOpenDRIVEActors(openDRIVEActorInScene));
 }
-#endif
 
-void AOpenDRIVEActor::PostLoad()
+void AOpenDRIVEActor::OpenDRIVEError(bool bError)
 {
-	Super::PostLoad();
+	if (GetWorld())
+	{
+		if (UViewportStatsSubsystem* StatsSubsystem = GetWorld()->GetSubsystem<UViewportStatsSubsystem>())
+		{
+			FString Message("TOO MANY OPENDRIVEACTOR IN LEVEL. Please keep only OpenDRIVEActor in your scene.");
 
-	CheckForMultipleOpenDRIVEActors() ? GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, TEXT("Multiple OpenDRIVEActor detected. Must be only OpenDRIVEActor per scene. \n The plugin can't work correctly."))
-		: LoadOpenDrive();
+			StatsSubsystem->RemoveDisplayDelegate(_displayDelegateIdx);
+			_displayDelegateIdx = StatsSubsystem->AddDisplayDelegate([this, Message, bError](FText& OutText, FLinearColor& OutColor)
+				{
+					OutText = FText::FromString(Message);
+					OutColor = FLinearColor::Red;
+					return IsValid(this) && bError;
+				}
+			);
+		}
+	}
 }
+
+
+
+
 
 
 
