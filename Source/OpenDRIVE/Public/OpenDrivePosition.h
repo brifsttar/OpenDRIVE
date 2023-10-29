@@ -105,6 +105,15 @@ public:
 	bool MoveAlongS(float S, int Strategy=0);
 
 	/**
+	* Moves the object along the lanes on the road
+	* @param LaneOffset Lane Offset
+	* @param LaneFilter Which type of lane to include in the move
+	* @return Success
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	bool MoveAlongLanes(int LaneOffset, LaneType LaneFilter=LaneType::ANY);
+
+	/**
 	* Resets the OpenDRIVE position buffer, in case the object was moved away from its previous position
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))

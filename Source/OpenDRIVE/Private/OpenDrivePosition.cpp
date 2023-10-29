@@ -51,6 +51,34 @@ bool UOpenDrivePosition::MoveAlongS(float S, int Strategy) {
 	return ret >= roadmanager::Position::ReturnCode::OK;
 }
 
+bool UOpenDrivePosition::MoveAlongLanes(int LaneOffset, LaneType LaneFilter) {
+	if (LaneOffset == 0) return false;
+	roadmanager::Position p = OdrPosition();
+	roadmanager::LaneSection* ls = p.GetRoad()->GetLaneSectionByS(p.GetS());
+	roadmanager::Lane* targetLane = nullptr;
+	int laneId = p.GetLaneId();
+	int currentLaneOffset = 0;
+	int laneOffsetUnit = LaneOffset / abs(LaneOffset);
+
+	roadmanager::Lane::LaneType laneTypeFilter = (roadmanager::Lane::LaneType)LaneFilter;
+	for (
+		int i = laneId + laneOffsetUnit;
+		currentLaneOffset != LaneOffset;
+		i += laneOffsetUnit
+	) {
+		targetLane = ls->GetLaneById(i);
+		if (targetLane == nullptr) break;
+		if (targetLane->GetLaneType() == laneTypeFilter) {
+			currentLaneOffset += laneOffsetUnit;
+		}
+	}
+	if (targetLane == nullptr) return false;
+	p.SetLanePos(p.GetTrackId(), targetLane->GetId(), p.GetS(), p.GetOffset());
+	p.SetHeading(p.GetDrivingDirection());
+	SetTrackPosition(p);
+	return true;
+}
+
 void UOpenDrivePosition::ResetPosition() {
 	SetTrackPosition(roadmanager::Position());
 }
