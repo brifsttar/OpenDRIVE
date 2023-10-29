@@ -149,39 +149,7 @@ void UOpenDrivePosition::AlignWithLaneCenter() {
 }
 
 LaneType UOpenDrivePosition::GetLaneType() const {
-	roadmanager::LaneSection* laneSec = OdrPosition().GetRoad()->GetLaneSectionByS(GetS());
-	roadmanager::Lane* lane = laneSec->GetLaneById(GetLaneId());
-
-	LaneType laneType;
-
-	switch (lane->GetLaneType())
-	{
-	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
-		laneType = DrivingRoad;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
-		laneType = ParkingSlot;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_BORDER):
-		laneType = Border;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
-		laneType = Shoulder;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
-		laneType = SidewalkLane;
-		break;
-
-	default:
-		laneType = Any;
-		break;
-	}
-
-	return laneType;
+	return (LaneType)OdrPosition().GetLane()->GetLaneType();
 }
 
 float UOpenDrivePosition::GetRoadCurvatureAngle(float LookaheadDist) const {
