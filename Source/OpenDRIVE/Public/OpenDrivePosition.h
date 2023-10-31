@@ -9,7 +9,7 @@ using CoordTranslate::UuToMeters;
 using CoordTranslate::MetersToUu;
 
 UENUM(BlueprintType)
-enum LaneType
+enum LaneType : int64
 {
 	NONE            = roadmanager::Lane::LaneType::LANE_TYPE_NONE,
 	DRIVING         = roadmanager::Lane::LaneType::LANE_TYPE_DRIVING,
@@ -108,10 +108,12 @@ public:
 	* Moves the object along the lanes on the road
 	* @param LaneOffset Lane Offset
 	* @param LaneFilter Which type of lane to include in the move
+	* TODO: Set LaneFilter default to ANY, which isn't currently possible due to UnrealPython not
+	*       handling signed (or non-uint8) enums. It causes a crash at startup.
 	* @return Success
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
-	bool MoveAlongLanes(int LaneOffset, LaneType LaneFilter=LaneType::ANY);
+	bool MoveAlongLanes(int LaneOffset, LaneType LaneFilter/*=ANY*/);
 
 	/**
 	* Resets the OpenDRIVE position buffer, in case the object was moved away from its previous position
