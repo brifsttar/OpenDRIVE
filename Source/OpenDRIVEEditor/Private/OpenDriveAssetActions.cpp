@@ -38,6 +38,23 @@ void FOpenDRIVEAssetActions::GetActions(
 	auto UIAction = FUIAction(TDelegateExecuteAction);
 
 	MenuBuilder.AddMenuEntry(ButtonLabel, ButtonToolTip, FSlateIcon(), UIAction);
+
+	//
+
+	FText ButtonLabel2 = FText::FromString("Export .xodr");
+	FText ButtonToolTip2 = FText::FromString("Export the source .xodr file");
+
+	auto OdrAssets2 = GetTypedWeakObjectPtrs<UOpenDriveAsset>(InObjects);
+
+	auto TDelegateExecuteAction2 = FExecuteAction::CreateSP(
+		this,
+		&FOpenDRIVEAssetActions::ExportXODR,
+		OdrAssets2
+	);
+
+	auto UIAction2 = FUIAction(TDelegateExecuteAction2);
+
+	MenuBuilder.AddMenuEntry(ButtonLabel2, ButtonToolTip2, FSlateIcon(), UIAction2);
 }
 
 void FOpenDRIVEAssetActions::ReimportOdrAsset(TArray<TWeakObjectPtr<UOpenDriveAsset>> OdrAssets) {
@@ -46,6 +63,22 @@ void FOpenDRIVEAssetActions::ReimportOdrAsset(TArray<TWeakObjectPtr<UOpenDriveAs
 
 		if (IsValid(OdrAsset)) {
 			FReimportManager::Instance()->Reimport(OdrAsset, true);
+		}
+	}
+}
+
+void FOpenDRIVEAssetActions::ExportXODR(TArray<TWeakObjectPtr<UOpenDriveAsset>> OdrAssets)
+{
+	for (auto OdrAssetWeak : OdrAssets) {
+
+		UOpenDriveAsset* OdrAsset = OdrAssetWeak.Get();
+
+		if (IsValid(OdrAsset)) {
+
+			FFileHelper::SaveStringToFile(OdrAsset->XodrContent,
+				*(FPaths::ProjectSavedDir() + "Export/xodr/" + OdrAsset->GetName() + ".xodr")
+			);
+
 		}
 	}
 }
