@@ -25,12 +25,12 @@ void UOpenDrivePosition::SetTransform(const FTransform& T) {
 	FVector r = CoordTranslate::UeToOdr::Rotation(T.Rotator().Euler());
 	_TrackPos.SetX(p.X);
 	_TrackPos.SetY(p.Y);
-	//_TrackPos.SetZ(p.Z);
-	_TrackPos.XYZH2TrackPos(p.X, p.Y, p.Z, _TrackPos.GetH(), false, -1, false, _HintRoad);
+	_TrackPos.XYZ2TrackPos(p.X, p.Y, p.Z, false, -1, false, _HintRoad);
+	_TrackPos.SetZ(p.Z);
 	_TrackPos.SetHeading(r.X);
 	_TrackPos.SetPitch(r.Y);
 	_TrackPos.SetRoll(r.Z);
-	_TrackPos.EvaluateOrientation();
+	//_TrackPos.EvaluateOrientation();
 }
 
 FTransform UOpenDrivePosition::GetTransform() const {
