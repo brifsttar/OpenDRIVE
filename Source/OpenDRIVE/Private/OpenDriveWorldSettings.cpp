@@ -5,6 +5,7 @@
 #include "OpenDRIVE.h"
 #include "Misc/UObjectToken.h"
 #include "Logging/MessageLog.h"
+#include "OpenDRIVESubsystem.h"
 #include "Roadmanager.hpp"
 #if WITH_EDITOR
 #include "Editor.h"
@@ -18,7 +19,15 @@ void AOpenDriveWorldSettings::PostEditChangeProperty(FPropertyChangedEvent& e) {
 
 	FName PropertyName = (e.MemberProperty != NULL) ? e.MemberProperty->GetFName() : NAME_None;
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(AOpenDriveWorldSettings, OpenDriveAsset)) {
-		LoadOpenDrive();
+
+		if (GetLevel() && !GetLevel()->IsPersistentLevel()) {
+			UE_LOG(OpenDriveLog, Warning, TEXT("%s is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored"), *(GetFName().ToString()));
+			return;
+		}
+		else 
+		{
+			GetWorld()->GetSubsystem<UOpenDRIVESubsystem>()->LoadOpenDrive(OpenDriveAsset);
+		}
 	}
 }
 
@@ -38,36 +47,4 @@ void AOpenDriveWorldSettings::CheckForErrors() {
 
 void AOpenDriveWorldSettings::BeginPlay() {
 	Super::BeginPlay();
-	LoadOpenDrive();
 }
-
-void AOpenDriveWorldSettings::LoadOpenDrive() {
-	if (!OpenDriveAsset) return;
-	if (GetLevel() && !GetLevel()->IsPersistentLevel()) {
-		UE_LOG(OpenDriveLog, Warning, TEXT("%s is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored"), *(GetFName().ToString()));
-		return;
-	}
-	if (!roadmanager::Position::GetOpenDrive()->LoadOpenDriveContent(TCHAR_TO_UTF8(*(OpenDriveAsset->XodrContent)))) {
-		UE_LOG(OpenDriveLog, Error, TEXT("Failed to load OpenDRIVE asset %s"), *(OpenDriveAsset->GetFName().ToString()));
-		return;
-	}
-#if WITH_EDITOR
-	if (GEditor && !bRegisteredReimportCallback) {
-		GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetReimport.AddUObject(this, &AOpenDriveWorldSettings::OnObjectReimported);
-		bRegisteredReimportCallback = true;
-	}
-#endif
-}
-
-void AOpenDriveWorldSettings::PostLoad() {
-	Super::PostLoad();
-	LoadOpenDrive();
-}
-
-#if WITH_EDITOR
-void AOpenDriveWorldSettings::OnObjectReimported(UObject* InObject) {
-	if (InObject == OpenDriveAsset) {
-		LoadOpenDrive();
-	}
-}
-#endif
