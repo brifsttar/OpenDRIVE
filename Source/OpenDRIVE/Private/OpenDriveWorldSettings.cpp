@@ -43,8 +43,11 @@ void AOpenDriveWorldSettings::CheckForErrors() {
 			->AddToken(FTextToken::Create(FText::FromString("is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored")));
 	}
 }
-#endif
 
-void AOpenDriveWorldSettings::BeginPlay() {
-	Super::BeginPlay();
+void AOpenDriveWorldSettings::OnObjectReimported(UObject* InObject)
+{
+	if (InObject == OpenDriveAsset) {
+		GetWorld()->GetSubsystem<UOpenDRIVESubsystem>()->LoadOpenDrive(OpenDriveAsset);
+	}
 }
+#endif

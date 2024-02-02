@@ -22,8 +22,10 @@ public:
 	void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
 
 	virtual void CheckForErrors() override;
-#endif
 
-protected:
-	virtual void BeginPlay() override;
+	bool bRegisteredReimportCallback = false;
+
+	void OnObjectReimported(UObject* InObject);
+
+#endif
 };
