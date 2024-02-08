@@ -22,13 +22,19 @@ void AOpenDriveWorldSettings::PostEditChangeProperty(FPropertyChangedEvent& e) {
 
 		if (GetLevel() && !GetLevel()->IsPersistentLevel()) {
 			UE_LOG(OpenDriveLog, Warning, TEXT("%s is a streamed level but has an OpenDRIVE set, its OpenDRIVE will be ignored"), *(GetFName().ToString()));
-			return;
 		}
 		else 
 		{
 			GetWorld()->GetSubsystem<UOpenDRIVESubsystem>()->LoadOpenDrive(OpenDriveAsset);
 		}
 	}
+
+#if WITH_EDITOR
+	if (GEditor && !bRegisteredReimportCallback) {
+		GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetReimport.AddUObject(this, &AOpenDriveWorldSettings::OnObjectReimported);
+		bRegisteredReimportCallback = true;
+	}
+#endif
 }
 
 void AOpenDriveWorldSettings::CheckForErrors() {
@@ -49,5 +55,17 @@ void AOpenDriveWorldSettings::OnObjectReimported(UObject* InObject)
 	if (InObject == OpenDriveAsset) {
 		GetWorld()->GetSubsystem<UOpenDRIVESubsystem>()->LoadOpenDrive(OpenDriveAsset);
 	}
+}
+
+void AOpenDriveWorldSettings::PostLoad()
+{
+	Super::PostLoad();
+	GetWorld()->GetSubsystem<UOpenDRIVESubsystem>()->LoadOpenDrive(OpenDriveAsset);
+}
+
+void AOpenDriveWorldSettings::BeginPlay()
+{
+	Super::BeginPlay();
+	GetWorld()->GetSubsystem<UOpenDRIVESubsystem>()->LoadOpenDrive(OpenDriveAsset);
 }
 #endif

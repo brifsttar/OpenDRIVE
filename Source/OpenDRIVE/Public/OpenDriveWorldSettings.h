@@ -28,4 +28,10 @@ public:
 	void OnObjectReimported(UObject* InObject);
 
 #endif
+
+	virtual void PostLoad() override;
+
+protected :
+
+	virtual void BeginPlay() override;
 };
