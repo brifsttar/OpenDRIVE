@@ -29,6 +29,7 @@ public:
 	struct LaneData {
 		roadmanager::Lane* laneRef;
 		roadmanager::Lane::LaneType laneType;
+		TArray<FTransform> A_transform;
 	};
 
 	struct LaneSectionData {
@@ -53,8 +54,8 @@ public:
 
 	FTransform MakeTransform(double offset);
 
-	TArray<FTransform> MakeTransformArrayV2(RoadData road);
-
+	void MakeTransformArrayV2(RoadData& road);
+	void updateTransform(roadmanager::Road* road, LaneSectionData& LSData, double offset, double length);
 
 	void SetRoad(roadmanager::Road* road);
 	void SetRoad(int id);
@@ -67,14 +68,16 @@ public:
 	TArray<UOpenDriveSolver::LaneRef> GetAllLanesOfType(roadmanager::Lane::LaneType lineType = roadmanager::Lane::LANE_TYPE_ANY);
 
 
-	UOpenDriveSolver::RoadData getRoad(int roadId);
-	TArray<UOpenDriveSolver::RoadData> getAllRoad();
+	UOpenDriveSolver::RoadData getRoad(int roadId, int laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
+	TArray<UOpenDriveSolver::RoadData> getAllRoad(int laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
+
+	TArray<FTransform> extractRoadTransform(TArray<RoadData>& A_road);
 
 private:
 
 	roadmanager::OpenDrive* _odr;
 
-	void FindPoint(double offset);
+	void FindPoint(double offset, roadmanager::Road* road = nullptr,roadmanager::Lane* lane = nullptr);
 
 	LaneRef _currentLane;
 

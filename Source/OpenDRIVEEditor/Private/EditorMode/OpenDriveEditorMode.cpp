@@ -197,14 +197,6 @@ void FOpenDRIVEEditorMode::CreateNavemeshObject()
 		ResetNavMeshArray();
 	}
 
-	// roadmanager params
-	roadmanager::OpenDrive* Odr = roadmanager::Position::GetOpenDrive();
-	roadmanager::Road* road = 0;
-	roadmanager::LaneSection* laneSection = 0;
-	roadmanager::Lane* lane = 0;
-	size_t nrOfRoads = Odr->GetNumOfRoads();
-
-
 	//Get the manager in the scene
 	TArray<AActor*> OutActors;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), "NavMeshManager", OutActors);
@@ -235,6 +227,20 @@ void FOpenDRIVEEditorMode::CreateNavemeshObject()
 	//Call the manager to spawn all the line
 	UOpenDriveSolver* Solver = NewObject<UOpenDriveSolver>();
 
+
+
+
+	TArray<UOpenDriveSolver::RoadData> A_road = Solver->getAllRoad();
+	for (UOpenDriveSolver::RoadData road : A_road) {
+		Solver->MakeTransformArrayV2(road);
+	}
+	
+	//Solver->extractRoadTransform(A_road);
+	Arg.Arg01 = Solver->extractRoadTransform(A_road);
+
+	NavMeshManager->ProcessEvent(GenerateFromOpenDrive, &Arg);
+
+	/*
 	TArray<UOpenDriveSolver::LaneRef> allSidewalk = Solver->GetAllLanesOfType(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK);
 
 	for (UOpenDriveSolver::LaneRef sidewalk : allSidewalk) {
@@ -245,7 +251,7 @@ void FOpenDRIVEEditorMode::CreateNavemeshObject()
 		NavMeshManager->ProcessEvent(GenerateFromOpenDrive, &Arg);
 
 
-	}
+	}*/
 	bHasBeenLoaded = true;
 
 }
