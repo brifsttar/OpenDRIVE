@@ -144,6 +144,7 @@ bool UOpenDrivePosition::Delta(const UOpenDrivePosition* Other, float& Ds, float
 	return ret;
 }
 
+
 void UOpenDrivePosition::AlignWithLaneCenter() {
 	SetTrackPosition(GetRoadId(), GetLaneId(), GetS(), 0.f, 0.f);
 }

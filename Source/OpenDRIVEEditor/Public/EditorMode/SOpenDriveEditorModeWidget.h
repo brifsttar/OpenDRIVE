@@ -47,7 +47,12 @@ protected :
 	/**
 	* Link the Generate() function in the OpenDRIVEEditorMode.cpp file
 	*/
-	FReply Generate();
+	FReply Generate();	
+	
+	/**
+	* Will create the navemesh limit from the openDriveFile
+	*/
+	FReply CreateNavemeshObject();
 
 	/**
 	* Link the Reset() function in the OpenDRIVEEditorMode.cpp file

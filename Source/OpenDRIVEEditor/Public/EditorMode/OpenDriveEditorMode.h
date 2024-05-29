@@ -1,4 +1,5 @@
 #pragma once 
+
 #include "EditorModes.h"
 #include "EdMode.h"
 #include "../OpenDriveEditorLane.h"
@@ -36,11 +37,15 @@ public :
 	 */
 	void ResetRoadsArray();
 
+	void ResetNavMeshArray();
+
 	/**
 	 * Generates roads.
 	 * It will call Reset() if there's already a generation done.
 	 */
 	void Generate();
+
+	void CreateNavemeshObject();
 
 	/**
 	 * Sets the road offset 
@@ -84,6 +89,7 @@ protected :
 	void LoadRoadsNetwork();
 
 	TArray<AOpenDriveEditorLane*> roadsArray;
+	TArray<roadmanager::Lane*> ARoadBorderLane;
 
 private :
 
