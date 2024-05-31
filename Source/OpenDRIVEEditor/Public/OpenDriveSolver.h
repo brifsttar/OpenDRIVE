@@ -55,7 +55,7 @@ public:
 	FTransform MakeTransform(double offset);
 
 	void MakeTransformArrayV2(RoadData& road);
-	void updateTransform(roadmanager::Road* road, LaneSectionData& LSData, double offset, double length);
+	void updateTransform(roadmanager::Road* road, LaneSectionData* LSData, double offset, double length);
 
 	void SetRoad(roadmanager::Road* road);
 	void SetRoad(int id);
@@ -68,16 +68,27 @@ public:
 	TArray<UOpenDriveSolver::LaneRef> GetAllLanesOfType(roadmanager::Lane::LaneType lineType = roadmanager::Lane::LANE_TYPE_ANY);
 
 
-	UOpenDriveSolver::RoadData getRoad(int roadId, int laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
-	TArray<UOpenDriveSolver::RoadData> getAllRoad(int laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
+	
+	//validated methode
 
+public :
+	TArray<UOpenDriveSolver::RoadData> getAllRoad(roadmanager::Lane::LaneType laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
 	TArray<FTransform> extractRoadTransform(TArray<RoadData>& A_road);
 
 private:
-
 	roadmanager::OpenDrive* _odr;
 
-	void FindPoint(double offset, roadmanager::Road* road = nullptr,roadmanager::Lane* lane = nullptr);
+
+	TArray<UOpenDriveSolver::LaneData> getLane(roadmanager::Road* roadRef, roadmanager::LaneSection*, roadmanager::Lane::LaneType laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
+	TArray<UOpenDriveSolver::LaneSectionData> getLaneSection(roadmanager::Road* roadRef, roadmanager::Lane::LaneType laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
+	TArray<roadmanager::Geometry*> getGeometries(roadmanager::Road* roadRef);
+	RoadData getRoad(int roadId, roadmanager::Lane::LaneType laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
+
+	
+	void FindPoint(double offset, roadmanager::Road* road = nullptr, roadmanager::Lane* lane = nullptr);
+
+
+
 
 	LaneRef _currentLane;
 
