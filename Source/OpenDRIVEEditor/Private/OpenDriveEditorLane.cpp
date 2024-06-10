@@ -39,7 +39,7 @@ void AOpenDriveEditorLane::DrawLane(double step, float offset)
 	//Driving direction
 	_roadDirection = position.GetDrivingDirectionRelativeRoad();
 
-	// Had a lane spline point every 5 meters
+	// Add a lane spline point every 5 meters
 	s += step;
 	for (s ; s < _laneSection->GetS() + laneLength; s += step)
 	{

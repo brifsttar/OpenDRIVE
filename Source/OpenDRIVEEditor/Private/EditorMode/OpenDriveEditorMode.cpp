@@ -205,6 +205,25 @@ void FOpenDRIVEEditorMode::CreateNavemeshObject()
 		break;
 	}
 
+
+
+	// Actor spawn params
+	FActorSpawnParameters spawnParam;
+	spawnParam.bHideFromSceneOutliner = true;
+	spawnParam.bTemporaryEditorActor = true;
+
+	UOpenDriveSolver* Solver = NewObject<UOpenDriveSolver>();
+	TArray<UOpenDriveSolver::LaneRef> laneList = Solver->GetAllLanesOfType(roadmanager::Lane::LANE_TYPE_BORDER);
+
+	for (UOpenDriveSolver::LaneRef lane : laneList) {
+		AOpenDriveEditorNavMeshModifier* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorNavMeshModifier>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
+		newRoad->Initialize(lane.road, lane.laneSection, lane.lane, _roadOffset, _step);
+		newRoad->CreateSpline();
+		//newRoad->SetType();
+		OutActors.Add(newRoad);
+	}
+
+	/*
 	struct FDynamicArgs
 	{
 		TArray<FTransform> Arg01;
@@ -230,5 +249,6 @@ void FOpenDRIVEEditorMode::CreateNavemeshObject()
 	NavMeshManager->ProcessEvent(GenerateFromOpenDrive, &Arg);
 
 	bHasBeenLoaded = true;
+	*/
 
 }

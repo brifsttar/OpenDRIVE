@@ -4,6 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SplineComponent.h"
+#include "Components/SplineMeshComponent.h"
+#include <RoadManager.hpp>
+#include <NavigationSystem.h>
+#include <OpenDriveComponent.h>
+#include <SplineMeshBuilder.h>
 #include "OpenDriveEditorNavMeshModifier.generated.h"
 
 UCLASS()
@@ -12,10 +18,26 @@ class OPENDRIVEEDITOR_API AOpenDriveEditorNavMeshModifier : public AActor
 	GENERATED_BODY()
 	
 public:	
+
+	virtual void OnConstruction(const FTransform& transform) override;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat)
+	USplineMeshBuilder* _splineMeshBuilder;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat)
+	USplineComponent* _spline;
+
+
+
 	// Sets default values for this actor's properties
 	AOpenDriveEditorNavMeshModifier();
 
 	void Initialize(roadmanager::Road* road_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_);
+
+	void CreateSpline();
+
+	void SetLanePoint(double s);
 
 	TArray<FTransform> makeTransformArray(double offset);
 
@@ -24,13 +46,6 @@ public:
 	void findPoint(double offset);
 
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 
 private: 
@@ -38,6 +53,9 @@ private:
 	roadmanager::LaneSection* _laneSection;
 	roadmanager::Lane* _lane;
 
+	float _offset;
+	double _step;
+	float _baseMeshSize;
 	double _laneLength;
 	int _blockCount;
 	float _blockSize;

@@ -65,6 +65,7 @@ public class OpenDRIVEEditor : ModuleRules
 				"ComponentVisualizers",
 				"Landscape",
 				"EditorScriptingUtilities",
+				"NavigationSystem",
 			}
 		);
     }
