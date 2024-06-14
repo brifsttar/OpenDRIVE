@@ -21,7 +21,7 @@ AOpenDriveEditorNavMeshModifier::AOpenDriveEditorNavMeshModifier()
 	_splineMeshBuilder->Mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/EditorLandscapeResources/SplineEditorMesh"));
 	_baseMeshSize = _splineMeshBuilder->Mesh->GetBoundingBox().GetSize().Y; // The mesh's width. Used to set our lanes widths correctly.
 	_splineMeshBuilder->AddNavAreas = true;
-	//_splineMeshBuilder->Rebuild();
+	
 }
 
 void AOpenDriveEditorNavMeshModifier::Initialize(roadmanager::Road* road_, roadmanager::LaneSection* laneSection_, roadmanager::Lane* lane_, float offset_, float step_)
@@ -41,7 +41,6 @@ void AOpenDriveEditorNavMeshModifier::Initialize(roadmanager::Road* road_, roadm
 
 	_position.Init();
 	_position.SetSnapLaneTypes(_lane->GetLaneType());
-
 }
 
 
@@ -115,5 +114,14 @@ FTransform AOpenDriveEditorNavMeshModifier::MakeTransform(double offset) {
 
 void AOpenDriveEditorNavMeshModifier::findPoint(double offset) {
 	_position.SetLanePos(_road->GetId(), _lane->GetId(), offset, 0.);
+}
+
+void AOpenDriveEditorNavMeshModifier::SetNavType(TSubclassOf<UNavArea> navArea){
+	_splineMeshBuilder->AreaClass = navArea;
+
+}
+
+void AOpenDriveEditorNavMeshModifier::Rebuild(){
+	_splineMeshBuilder->Rebuild();
 }
 

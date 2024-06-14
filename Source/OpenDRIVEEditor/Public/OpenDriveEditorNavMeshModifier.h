@@ -45,8 +45,9 @@ public:
 
 	void findPoint(double offset);
 
+	void SetNavType(TSubclassOf<UNavArea> navArea);
 
-
+	void Rebuild();
 
 private: 
 	roadmanager::Road* _road;

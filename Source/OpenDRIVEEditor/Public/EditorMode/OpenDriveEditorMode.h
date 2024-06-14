@@ -45,6 +45,10 @@ public :
 	 */
 	void Generate();
 
+	void OutlinerFolder_Clear(FString folder);
+
+	TArray<AActor*> OutlinerFolder_GetAll(FString folder);
+
 	void CreateNavemeshObject();
 
 	/**
@@ -80,6 +84,10 @@ public :
 	* @param bIsVisible True for visible, False for hidden
 	*/
 	void SetRoadsVisibilityInEditor(bool bIsVisible);
+
+
+	TSubclassOf<UNavArea> getNavArea(roadmanager::Lane::LaneType laneType);
+
 
 protected :
 

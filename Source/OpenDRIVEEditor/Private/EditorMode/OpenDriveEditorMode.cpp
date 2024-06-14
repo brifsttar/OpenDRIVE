@@ -154,6 +154,11 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 	}
 }
 
+TSubclassOf<UNavArea> FOpenDRIVEEditorMode::getNavArea(roadmanager::Lane::LaneType laneType){
+	return LoadClass<UNavArea>(nullptr, TEXT("//D:/git/vhcd/Content/VHCD/Test/Forbidden"));
+
+}
+
 void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
 {
 	if (roadsArray.IsEmpty() == false)
@@ -187,6 +192,28 @@ void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
 	}
 }
 
+
+void FOpenDRIVEEditorMode::OutlinerFolder_Clear(FString folder) {
+	
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		AActor* Actor = *ActorItr;
+		if (Actor && Actor->GetFolderPath().ToString() == folder) {
+			Actor->Destroy();
+		}
+	}
+}
+
+TArray<AActor*> FOpenDRIVEEditorMode::OutlinerFolder_GetAll(FString folder) {
+	TArray<AActor*> actorList;
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		AActor* Actor = *ActorItr;
+		if (Actor && Actor->GetFolderPath().ToString() == folder) {
+			actorList.Add(Actor);
+		}
+	}
+	return actorList;
+}
+
 void FOpenDRIVEEditorMode::CreateNavemeshObject()
 {
 	//Get the manager in the scene
@@ -209,17 +236,26 @@ void FOpenDRIVEEditorMode::CreateNavemeshObject()
 
 	// Actor spawn params
 	FActorSpawnParameters spawnParam;
-	spawnParam.bHideFromSceneOutliner = true;
+	spawnParam.bHideFromSceneOutliner = false;
 	spawnParam.bTemporaryEditorActor = true;
+	TArray<ULevel*> levels = GetWorld()->GetLevels();
+	spawnParam.OverrideLevel = levels[0];
+
+	OutlinerFolder_Clear("/NavMeshObject");
 
 	UOpenDriveSolver* Solver = NewObject<UOpenDriveSolver>();
-	TArray<UOpenDriveSolver::LaneRef> laneList = Solver->GetAllLanesOfType(roadmanager::Lane::LANE_TYPE_BORDER);
-
+	//TArray<UOpenDriveSolver::LaneRef> laneList = Solver->GetAllLanesOfType(roadmanager::Lane::LANE_TYPE_BORDER);
+	TArray<UOpenDriveSolver::LaneRef> laneList = Solver->GetAllLanesOfType();
 	for (UOpenDriveSolver::LaneRef lane : laneList) {
+
 		AOpenDriveEditorNavMeshModifier* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorNavMeshModifier>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
 		newRoad->Initialize(lane.road, lane.laneSection, lane.lane, _roadOffset, _step);
 		newRoad->CreateSpline();
-		//newRoad->SetType();
+		TSubclassOf<UNavArea> area = getNavArea(lane.lane->GetLaneType());
+		newRoad->SetNavType(area);
+		newRoad->SetFolderPath("/NavMeshObject");
+		newRoad->Rebuild();
+
 		OutActors.Add(newRoad);
 	}
 

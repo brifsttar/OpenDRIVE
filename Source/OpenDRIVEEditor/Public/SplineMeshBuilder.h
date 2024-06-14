@@ -36,10 +36,13 @@ public:
 	UPhysicalMaterial* PhysicalMaterial;
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//TSubclassOf<UNavArea> AreaClass;
 	TSubclassOf<UNavArea> AreaClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool AddNavAreas = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsShown = false;
 
 	UFUNCTION(BlueprintCallable)
 	void Rebuild();
@@ -56,8 +59,15 @@ protected:
 	TArray<TArray<FVector>> NavAreas;
 
 	void ClearCurrentMeshes();
-	USplineMeshComponent* CreateMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent);
+	USplineMeshComponent* CreateMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, FVector2D startScale, FVector2D endScale);
 	void AddMeshesToOwner();
 
 	virtual void GetNavigationData(FNavigationRelevantData& Data) const override;
+
+	FVector perpCW(double x, double y);
+	FVector perpCW(FVector dir);
+	FVector perpCCW(double x, double y);
+	FVector perpCCW(FVector dir);
+
+
 };
