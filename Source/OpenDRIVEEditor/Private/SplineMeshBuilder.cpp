@@ -28,14 +28,14 @@ void USplineMeshBuilder::ClearCurrentMeshes()
 	NavAreas.Empty();
 }
 
-USplineMeshComponent* USplineMeshBuilder::CreateMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, FVector2D startScale, FVector2D endScale)
+USplineMeshComponent* USplineMeshBuilder::CreateMeshComponent(SplinePointData startPoint, SplinePointData endPoint)
 {
 	FName Name = MakeUniqueObjectName(GetOwner(), USplineMeshComponent::StaticClass());
 	USplineMeshComponent* MeshComponent = NewObject<USplineMeshComponent>(this, Name);
 	MeshComponent->SetStaticMesh(Mesh);
-	MeshComponent->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent);
-	MeshComponent->SetStartScale(startScale);
-	MeshComponent->SetEndScale(endScale);
+	MeshComponent->SetStartAndEnd(startPoint.Position, startPoint.tangent, endPoint.Position, endPoint.tangent);
+	MeshComponent->SetStartScale(FVector2D(startPoint.Scale.Y, startPoint.Scale.X));
+	MeshComponent->SetEndScale(FVector2D(endPoint.Scale.Y, endPoint.Scale.X));
 	MeshComponent->SetCollisionProfileName(CollisionProfile.Name);
 	//MeshComponent->GetBodySetup()->CollisionTraceFlag = ECollisionTraceFlag::CTF_UseComplexAsSimple;
 
@@ -43,17 +43,23 @@ USplineMeshComponent* USplineMeshBuilder::CreateMeshComponent(FVector StartPos, 
 	MeshComponent->CreationMethod = EComponentCreationMethod::Instance;
 	//MeshComponent->SetPhysMaterialOverride(PhysicalMaterial);
 
+	MeshComponent->SetVisibility(IsShown);
+	GetOwner()->AddOwnedComponent(MeshComponent);
+	MeshComponent->RegisterComponent();
+
+
 	return MeshComponent;
 }
 
 
 
-void USplineMeshBuilder::AddMeshesToOwner()
-{
-	if (!Mesh || !Spline)
-	{
-		return;
-	}
+void USplineMeshBuilder::AddMeshesToOwner(){
+	if (!Mesh || !Spline) return;
+
+	SplinePointData startPoint;
+	SplinePointData endPoint;
+	float Distance;
+
 	float SectionLength = Mesh->GetBounds().BoxExtent.X * 2.0f;
 	float SectionHalfWidth = Mesh->GetBounds().BoxExtent.Y * 0.75f;
 	float SplineLength = Spline->GetSplineLength();
@@ -61,71 +67,47 @@ void USplineMeshBuilder::AddMeshesToOwner()
 
 	Bounds.Init();
 
+	EvaluateAtPoint(startPoint, 0, SectionLength);
+
 	for (int32 Index = 0; Index < NumSegments; ++Index)
 	{
-		float Distance = SectionLength * Index;
+		EvaluateAtPoint(endPoint, Distance + SectionLength, SectionLength);
 
-		FVector StartPos = Spline->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		FVector StartTangent = Spline->GetTangentAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-		FVector StartScale = Spline->GetScaleAtDistanceAlongSpline(Distance);
-		StartTangent = StartTangent.GetClampedToMaxSize(SectionLength);
-		FVector EndPos = Spline->GetLocationAtDistanceAlongSpline(Distance + SectionLength, ESplineCoordinateSpace::World);
-		FVector EndTangent = Spline->GetTangentAtDistanceAlongSpline(Distance + SectionLength, ESplineCoordinateSpace::World);
-		FVector EndScale = Spline->GetScaleAtDistanceAlongSpline(Distance);
-		EndTangent = EndTangent.GetClampedToMaxSize(SectionLength);
+		SplineMeshComponents.Add(CreateMeshComponent(startPoint, endPoint));
 
-		USplineMeshComponent* MeshComponent = CreateMeshComponent(StartPos, StartTangent, EndPos, EndTangent, FVector2D(StartScale.Y, StartScale.X), FVector2D(EndScale.Y, EndScale.X));
-
-		MeshComponent->SetVisibility(IsShown);
-		GetOwner()->AddOwnedComponent(MeshComponent);
-		MeshComponent->RegisterComponent();
-
-		SplineMeshComponents.Add(MeshComponent);
-
-		if (AddNavAreas)
-		{
-
-			FVector StartFace = perpCW(StartTangent.X, StartTangent.Y);
-			FVector EndFace = perpCW(StartTangent.X, StartTangent.Y);
-			StartFace.Normalize();
-			EndFace.Normalize();
-
-			//FVector StartRight = Spline->GetRightVectorAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-			//FVector EndRight = Spline->GetRightVectorAtDistanceAlongSpline(Distance + SectionLength, ESplineCoordinateSpace::World);
-
-			FVector ZOffset(0.0f, 0.0f, 200.0f);
-
-			TArray<FVector> Points;
-
-			Points.Add(StartPos + StartScale * StartFace * 50); // (*) 100 m->cm | (/) 2 from middle of scale
-			Points.Add(StartPos - StartFace * StartScale * 50);
-			Points.Add(Points[0] + ZOffset);
-			Points.Add(Points[1] + ZOffset);
-			Points.Add(EndPos + EndFace * EndScale * 50);
-			Points.Add(EndPos - EndFace * EndScale * 50);
-			Points.Add(Points[4] + ZOffset * 50);
-			Points.Add(Points[5] + ZOffset * 50);
-			/*Points.Add(StartPos + StartScale * 100 * StartRight / 2);
-			Points.Add(StartPos - StartScale * 100 * StartRight / 2);
-			Points.Add(StartPos + StartScale * 100 * StartRight / 2 + ZOffset);
-			Points.Add(StartPos - StartScale * 100 * StartRight / 2 + ZOffset);
-			Points.Add(EndPos + EndScale * 100 * EndRight / 2);
-			Points.Add(EndPos - EndScale * 100 * EndRight / 2);
-			Points.Add(EndPos + EndScale * 100 * EndRight / 2 + ZOffset);
-			Points.Add(EndPos - EndScale * 100 * EndRight / 2 + ZOffset);
-			*/
+		if (AddNavAreas){
+			TArray<FVector> Points = EvaluateBound(startPoint,endPoint);
 			NavAreas.Add(Points);
-
-			for (auto Point : Points)
-			{
+			for (auto Point : Points){
 				Bounds += Point;
 			}
 		}
+		Distance += SectionLength;
+		startPoint = endPoint;
 	}
 
 	bBoundsInitialized = true;
 	RefreshNavigationModifiers();
 }
+
+
+
+
+
+
+TArray<FVector> USplineMeshBuilder::EvaluateBound(SplinePointData startPoint, SplinePointData endPoint) {
+	TArray<FVector> points;
+	points.Add(startPoint.Position + startPoint.Scale.Y * startPoint.faceTangent * 50); // (*) 100 m->cm | (/) 2 from middle of scale
+	points.Add(startPoint.Position - startPoint.Scale.Y * startPoint.faceTangent * 50);
+	points.Add(points[0] + ZOffset);
+	points.Add(points[1] + ZOffset);
+	points.Add(endPoint.Position + endPoint.Scale.Y * endPoint.faceTangent * 50);
+	points.Add(endPoint.Position - endPoint.Scale.Y * endPoint.faceTangent * 50);
+	points.Add(points[4] + ZOffset * 50);
+	points.Add(points[5] + ZOffset * 50);
+	return points;
+}
+
 
 void USplineMeshBuilder::GetNavigationData(FNavigationRelevantData& Data) const
 {
@@ -135,18 +117,27 @@ void USplineMeshBuilder::GetNavigationData(FNavigationRelevantData& Data) const
 		Data.Modifiers.Add(Area);
 	}
 }
-FVector USplineMeshBuilder::perpCW(double x, double y){
+FVector USplineMeshBuilder::FastCW(double x, double y){
 	return FVector (y,-x,0);
 }
-FVector USplineMeshBuilder::perpCW(FVector dir)
+FVector USplineMeshBuilder::FastCW(FVector dir)
 {
 	return FVector(dir.Y,-dir.X,0);
 }
-FVector USplineMeshBuilder::perpCCW(double x, double y)
+FVector USplineMeshBuilder::FastCCW(double x, double y)
 {
 	return FVector(-y, x, 0);
 }
-FVector USplineMeshBuilder::perpCCW(FVector dir)
+FVector USplineMeshBuilder::FastCCW(FVector dir)
 {
 	return FVector(-dir.Y,dir.X,0);
+}
+
+void USplineMeshBuilder::EvaluateAtPoint(SplinePointData& pointData, float dist, float length){
+	pointData.Position = Spline->GetLocationAtDistanceAlongSpline(dist, ESplineCoordinateSpace::World);
+	pointData.tangent = Spline->GetTangentAtDistanceAlongSpline(dist, ESplineCoordinateSpace::World);
+	pointData.Scale = Spline->GetScaleAtDistanceAlongSpline(dist);
+	pointData.tangent = pointData.tangent.GetClampedToMaxSize(length);
+	pointData.faceTangent = FastCW(pointData.tangent.X, pointData.tangent.Y);
+	pointData.faceTangent.Normalize();
 }

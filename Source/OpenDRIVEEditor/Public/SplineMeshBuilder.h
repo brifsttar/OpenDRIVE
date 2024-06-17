@@ -50,6 +50,14 @@ public:
 	virtual void CalcAndCacheBounds() const override;
 
 protected:
+
+	struct SplinePointData {
+		FVector Position;
+		FVector Scale;
+		FVector tangent;
+		FVector faceTangent;
+	};
+
 	UPROPERTY()
 	TArray<USplineMeshComponent*> SplineMeshComponents;
 
@@ -59,15 +67,23 @@ protected:
 	TArray<TArray<FVector>> NavAreas;
 
 	void ClearCurrentMeshes();
-	USplineMeshComponent* CreateMeshComponent(FVector StartPos, FVector StartTangent, FVector EndPos, FVector EndTangent, FVector2D startScale, FVector2D endScale);
+	USplineMeshComponent* CreateMeshComponent(SplinePointData startPoint, SplinePointData endPoint);
 	void AddMeshesToOwner();
+
+
+	TArray<FVector> EvaluateBound(SplinePointData startPoint, SplinePointData endPoint);
 
 	virtual void GetNavigationData(FNavigationRelevantData& Data) const override;
 
-	FVector perpCW(double x, double y);
-	FVector perpCW(FVector dir);
-	FVector perpCCW(double x, double y);
-	FVector perpCCW(FVector dir);
+	FVector FastCW(double x, double y);
+	FVector FastCW(FVector dir);
+	FVector FastCCW(double x, double y);
+	FVector FastCCW(FVector dir);
+
+	void EvaluateAtPoint(SplinePointData& pointData, float dist, float length);
+
+
+	const FVector ZOffset = FVector(0.0f, 0.0f, 200.0f);
 
 
 };
