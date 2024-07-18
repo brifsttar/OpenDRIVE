@@ -9,9 +9,11 @@ This plugin allows you to manipulate your [OpenDRIVE](https://www.asam.net/stand
 git clone --recurse-submodules https://github.com/brifsttar/OpenDRIVE.git
 ```
 
+If you're using a standard engine release (i.e., you're not building it yourself), do not clone the project in the engine's `Plugins` directory, but instead to a C++ projet's `Plugins` directory. After that, you'll need to rebuild your project in order to build this plugin.
+
 Currently, this plugin  supports **Windows only**. For Linux support, it is being discussed in [#8](https://github.com/brifsttar/OpenDRIVE/issues/8).
 
-The plugin's `master` branch works for UE5. If you need UE4 support, you can use use the [`ue4`](https://github.com/brifsttar/OpenDRIVE/tree/ue4) branch (tested on 4.26+).
+The plugin's `master` branch is tested against the latest Unreal version. If you work with a previous release of the engine, check the tags for a compatible plugin version (earliest is 4.26).
 
 *For [CARLA](https://github.com/carla-simulator/carla) users*: due to conflicting classes name, the plugin doesn't work as-is alongside CARLA. The simplest workaround is to delete this plugin's `ATrafficLightController` class to remove the conflict.
 
