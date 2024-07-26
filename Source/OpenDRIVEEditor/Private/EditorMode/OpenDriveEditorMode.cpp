@@ -6,7 +6,6 @@
 #include "RoadManager.hpp"
 #include <NavigationSystem.h>
 #include "Kismet/GameplayStatics.h"
-#include <OpenDriveEditorNavMeshModifier.h>
 #include <OpenDriveSolver.h>
 
 const FEditorModeID FOpenDRIVEEditorMode::EM_RoadMode(TEXT("EM_RoadMode"));
@@ -131,18 +130,6 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 	bHasBeenLoaded = true;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 {
 	if (roadsArray.IsEmpty() == false)
@@ -156,7 +143,6 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 
 TSubclassOf<UNavArea> FOpenDRIVEEditorMode::getNavArea(roadmanager::Lane::LaneType laneType){
 	return LoadClass<UNavArea>(nullptr, TEXT("//D:/git/vhcd/Content/VHCD/Test/Forbidden"));
-
 }
 
 void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
@@ -212,79 +198,4 @@ TArray<AActor*> FOpenDRIVEEditorMode::OutlinerFolder_GetAll(FString folder) {
 		}
 	}
 	return actorList;
-}
-
-void FOpenDRIVEEditorMode::CreateNavemeshObject()
-{
-	//Get the manager in the scene
-	TArray<AActor*> OutActors;
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), "NavMeshManager", OutActors);
-	AActor* NavMeshManager = nullptr;
-	UFunction* GenerateFromOpenDrive = nullptr;
-	for (AActor* Actor : OutActors)
-	{
-		GenerateFromOpenDrive = Actor->GetClass()->FindFunctionByName(FName("GenerateFromOpenDrive"));
-		if (GenerateFromOpenDrive == nullptr)
-		{
-			continue;
-		}
-		NavMeshManager = Actor;
-		break;
-	}
-
-
-
-	// Actor spawn params
-	FActorSpawnParameters spawnParam;
-	spawnParam.bHideFromSceneOutliner = false;
-	spawnParam.bTemporaryEditorActor = true;
-	TArray<ULevel*> levels = GetWorld()->GetLevels();
-	spawnParam.OverrideLevel = levels[0];
-
-	OutlinerFolder_Clear("/NavMeshObject");
-
-	UOpenDriveSolver* Solver = NewObject<UOpenDriveSolver>();
-	//TArray<UOpenDriveSolver::LaneRef> laneList = Solver->GetAllLanesOfType(roadmanager::Lane::LANE_TYPE_BORDER);
-	TArray<UOpenDriveSolver::LaneRef> laneList = Solver->GetAllLanesOfType();
-	for (UOpenDriveSolver::LaneRef lane : laneList) {
-
-		AOpenDriveEditorNavMeshModifier* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorNavMeshModifier>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
-		newRoad->Initialize(lane.road, lane.laneSection, lane.lane, _roadOffset, _step);
-		newRoad->CreateSpline();
-		TSubclassOf<UNavArea> area = getNavArea(lane.lane->GetLaneType());
-		newRoad->SetNavType(area);
-		newRoad->SetFolderPath("/NavMeshObject");
-		newRoad->Rebuild();
-
-		OutActors.Add(newRoad);
-	}
-
-	/*
-	struct FDynamicArgs
-	{
-		TArray<FTransform> Arg01;
-		TSubclassOf<UNavArea> NewAreaClass;
-	};
-	FDynamicArgs Arg;
-	
-	
-	// Actor spawn params
-	FActorSpawnParameters spawnParam;
-	spawnParam.bHideFromSceneOutliner = false;
-	//Call the manager to spawn all the line
-	UOpenDriveSolver* Solver = NewObject<UOpenDriveSolver>();
-
-
-
-
-	TArray<UOpenDriveSolver::RoadData> A_road = Solver->getAllRoad(roadmanager::Lane::LANE_TYPE_SHOULDER);
-	
-	if (NavMeshManager)
-	Arg.Arg01 = Solver->extractRoadTransform(A_road);
-
-	NavMeshManager->ProcessEvent(GenerateFromOpenDrive, &Arg);
-
-	bHasBeenLoaded = true;
-	*/
-
 }

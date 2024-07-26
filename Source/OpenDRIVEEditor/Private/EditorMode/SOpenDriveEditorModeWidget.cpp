@@ -141,13 +141,8 @@ TSharedRef<SHorizontalBox> SOpenDRIVEEditorModeWidget::ConstructButtons(const FA
 
 	StaticCast<STextBlock&>(generateButton.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
 
-	TSharedPtr<SButton> NavMeshReady = SNew(SButton).Text(FText::FromString("Prepare for Navmesh"))
-		.OnClicked(this, &SOpenDRIVEEditorModeWidget::CreateNavemeshObject).IsEnabled(this, &SOpenDRIVEEditorModeWidget::CheckIfInEditorMode)
-		.ToolTipText(FText::FromString(TEXT("Will create or refresh the navmesh modifier.")));
 
-	StaticCast<STextBlock&>(NavMeshReady.ToSharedRef().Get().GetContent().Get()).SetJustification(ETextJustify::Center);
-
-	TSharedRef<SHorizontalBox> horBox = 
+	TSharedRef<SHorizontalBox> horBox =
 		SNew(SHorizontalBox)
 		+ SHorizontalBox::Slot().Padding(20, 0, 0, 0).FillWidth(0.5f)
 		[
@@ -156,10 +151,6 @@ TSharedRef<SHorizontalBox> SOpenDRIVEEditorModeWidget::ConstructButtons(const FA
 		+ SHorizontalBox::Slot().Padding(10, 0, 20, 0).FillWidth(0.5f)
 		[
 			generateButton.ToSharedRef()
-		]
-		+SHorizontalBox::Slot().Padding(10, 0, 20, 0).FillWidth(0.5f)
-		[
-			NavMeshReady.ToSharedRef()
 		];
 
 	return horBox;
@@ -270,11 +261,6 @@ FReply SOpenDRIVEEditorModeWidget::Generate()
 	return FReply::Handled();
 }
 
-FReply SOpenDRIVEEditorModeWidget::CreateNavemeshObject()
-{
-	GetEdMode()->CreateNavemeshObject();
-	return FReply::Handled();
-}
 
 void SOpenDRIVEEditorModeWidget::UpdateLaneInfo(AOpenDriveEditorLane* lane_)
 {

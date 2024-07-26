@@ -49,7 +49,7 @@ public :
 
 	TArray<AActor*> OutlinerFolder_GetAll(FString folder);
 
-	void CreateNavemeshObject();
+	//void CreateNavemeshObject();
 
 	/**
 	 * Sets the road offset 

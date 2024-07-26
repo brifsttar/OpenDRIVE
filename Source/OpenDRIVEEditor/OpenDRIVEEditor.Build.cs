@@ -41,7 +41,7 @@ public class OpenDRIVEEditor : ModuleRules
 				"AnimGraph",
 				"ComponentVisualizers",
 				"OpenDRIVE",
-				"RoadManager",
+				"RoadManager"
 			}
 		);
 			
@@ -65,7 +65,7 @@ public class OpenDRIVEEditor : ModuleRules
 				"ComponentVisualizers",
 				"Landscape",
 				"EditorScriptingUtilities",
-				"NavigationSystem",
+				"NavigationSystem"
 			}
 		);
     }
