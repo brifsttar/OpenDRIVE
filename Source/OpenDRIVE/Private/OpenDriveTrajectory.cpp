@@ -43,7 +43,7 @@ void AOpenDriveTrajectory::AlignPointsWithLanes() {
 		// Have a nice day!
 		newPos = CoordTranslate::OdrToUe::ToLocation(trackPos);
 		Spline->SetLocationAtSplinePoint(i, newPos, ESplineCoordinateSpace::World);
-		trackPos.SetHeadingRelative(0.);
+		trackPos.SetHeading(trackPos.GetDrivingDirection());
 		newRot = CoordTranslate::OdrToUe::ToRotation(trackPos);
 		AT = FVector(AT.Size(), 0.f, 0.f);
 		LT = FVector(LT.Size(), 0.f, 0.f);
