@@ -5,6 +5,8 @@
 #include "Gizmo/UOpenDriveTranslateComponent.h"
 #include "OpenDriveGizmoSubsystem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGizmoActorChanged, AActor*, Actor);
+
 UCLASS()
 class UOpenDriveGizmoSubsystem : public UEditorSubsystem
 {
@@ -29,6 +31,9 @@ public :
 	void SetEnableGizmo();
 
 	bool bEnabled = false;
+
+	UPROPERTY(BlueprintAssignable)
+	FGizmoActorChanged OnGizmoActorChanged;
 
 private : 
 

@@ -21,8 +21,6 @@ FOpenDRIVEEditorMode::FOpenDRIVEEditorMode()
 
 void FOpenDRIVEEditorMode::Enter()
 {
-	UE_LOG(LogClass, Warning, TEXT("Enter"));
-
 	FEdMode::Enter();
 
 	bIsMapOpening = false;
@@ -80,10 +78,6 @@ void FOpenDRIVEEditorMode::Generate()
 	LoadRoadsNetwork();
 }
 
-
-
-
-
 FOpenDRIVEEditorMode::~FOpenDRIVEEditorMode()
 {
 	FEditorDelegates::OnMapOpened.Remove(MapOpenedDelegateHandle);
@@ -108,6 +102,7 @@ void FOpenDRIVEEditorMode::LoadRoadsNetwork()
 	FActorSpawnParameters spawnParam;
 	spawnParam.bHideFromSceneOutliner = true;
 	spawnParam.bTemporaryEditorActor = true;
+	spawnParam.ObjectFlags = EObjectFlags::RF_Transient;
 
 	// empty the array if needed
 
@@ -139,10 +134,6 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 			road->SetIsTemporarilyHiddenInEditor(bIsVisible);
 		}
 	}
-}
-
-TSubclassOf<UNavArea> FOpenDRIVEEditorMode::getNavArea(roadmanager::Lane::LaneType laneType){
-	return LoadClass<UNavArea>(nullptr, TEXT("//D:/git/vhcd/Content/VHCD/Test/Forbidden"));
 }
 
 void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
@@ -177,7 +168,6 @@ void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
 		}
 	}
 }
-
 
 void FOpenDRIVEEditorMode::OutlinerFolder_Clear(FString folder) {
 	

@@ -4,8 +4,6 @@
 #include "EdMode.h"
 #include "OpenDriveEditorLane.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveEditorLane* road)
-
 class FOpenDRIVEEditorMode : public FEdMode
 {
 public :
@@ -84,10 +82,6 @@ public :
 	* @param bIsVisible True for visible, False for hidden
 	*/
 	void SetRoadsVisibilityInEditor(bool bIsVisible);
-
-
-	TSubclassOf<UNavArea> getNavArea(roadmanager::Lane::LaneType laneType);
-
 
 protected :
 

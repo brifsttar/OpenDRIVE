@@ -71,6 +71,7 @@ void UOpenDriveGizmoSubsystem::OnSelectionChanged(UObject* newObject)
 	{
 		AddGizmo(newActor);
 		currentActor = newActor;
+		OnGizmoActorChanged.Broadcast(newActor);
 	}
 	else
 	{
