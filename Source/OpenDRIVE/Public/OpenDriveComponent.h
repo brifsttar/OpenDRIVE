@@ -27,19 +27,19 @@ public:
 
 	void SetTrackPosition(const roadmanager::Position &p);
 
-	UFUNCTION(BlueprintCallable, CallInEditor)
+	UFUNCTION(BlueprintCallable)
 	class UOpenDrivePosition* GetTrackPosition() const;
 
 	/**
 	* Computes the current OpenDRIVE position and updates the public position variables accordingly
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE", DeprecatedFunction))
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", DeprecatedFunction))
 	void GetPosition();
 
 	/**
 	* Sets the OpenDRIVE position based on the public position variables values
 	*/
-	UFUNCTION(BlueprintCallable, CallInEditor, meta = (Category = "OpenDRIVE", DeprecatedFunction))
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", DeprecatedFunction))
 	void SetPosition();
 
 	/**

@@ -14,4 +14,6 @@ class FOpenDRIVEAssetActions : public FAssetTypeActions_Base {
 	virtual void GetActions(const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder) override;
 
 	void ReimportOdrAsset(TArray<TWeakObjectPtr<UOpenDriveAsset>> OdrAssets);
+
+	void ExportXODR(TArray<TWeakObjectPtr<UOpenDriveAsset>> OdrAssets);
 };
