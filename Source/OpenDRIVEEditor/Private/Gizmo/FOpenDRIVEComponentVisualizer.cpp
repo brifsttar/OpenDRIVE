@@ -1,18 +1,27 @@
 #include "Gizmo/FOpenDRIVEComponentVisualizer.h"
+#include "Gizmo/OpenDriveGizmoSubsystem.h"
 #include "UnrealEd.h"
 
 IMPLEMENT_HIT_PROXY(HTargetingVisProxy, HComponentVisProxy);
 
 void FOpenDRIVEComponentVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI)
 {
-	if (const UOpenDriveTranslateComponent* targetComponent = Cast<UOpenDriveTranslateComponent>(Component))
+	UOpenDriveGizmoSubsystem* subsystem = GEditor->GetEditorSubsystem<UOpenDriveGizmoSubsystem>();
+	if (subsystem)
 	{
-		const FVector location = targetComponent->GetOwner()->GetActorLocation();
-		_pointPosition = FVector(location.X, location.Y, location.Z + targetComponent->PivotPosition);
+		if (subsystem->bEnabled)
+		{
+			const UOpenDriveTranslateComponent* targetComponent = Cast<UOpenDriveTranslateComponent>(Component);
+			if (targetComponent != nullptr)
+			{
+				const FVector location = targetComponent->GetOwner()->GetActorLocation();
+				_pointPosition = FVector(location.X, location.Y, location.Z + targetComponent->PivotPosition);
 
-		PDI->SetHitProxy(new HTargetingVisProxy(Component));
-		PDI->DrawPoint(_pointPosition, FLinearColor::Red, 20, SDPG_World);
-		PDI->SetHitProxy(NULL);
+				PDI->SetHitProxy(new HTargetingVisProxy(Component));
+				PDI->DrawPoint(_pointPosition, FLinearColor::Red, 20, SDPG_World);
+				PDI->SetHitProxy(NULL);
+			}
+		}
 	}
 }
 

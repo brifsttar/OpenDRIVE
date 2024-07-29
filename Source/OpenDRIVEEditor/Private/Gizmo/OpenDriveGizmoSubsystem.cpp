@@ -15,6 +15,7 @@ void UOpenDriveGizmoSubsystem::AddGizmo(AActor* OnActor)
 	if (!IsThereAGizmo(OnActor))
 	{
 		UOpenDriveTranslateComponent* translateComponent = NewObject<UOpenDriveTranslateComponent>(OnActor, TEXT("OdrTranslateComponent"));
+		translateComponent->SetFlags(EObjectFlags::RF_Transient);
 		USceneComponent* rootComp = OnActor->GetRootComponent();
 		if (rootComp != nullptr)
 		{
@@ -37,14 +38,24 @@ void UOpenDriveGizmoSubsystem::RemoveGizmo(AActor* OnActor)
 	}
 }
 
+bool UOpenDriveGizmoSubsystem::IsThereAGizmo(AActor* onActor, UOpenDriveTranslateComponent*& outComp)
+{
+	outComp = onActor->GetComponentByClass<UOpenDriveTranslateComponent>();  
+	return outComp != nullptr;
+}
+
+bool UOpenDriveGizmoSubsystem::IsThereAGizmo(AActor* onActor)
+{
+	UOpenDriveTranslateComponent* comp;  
+	return IsThereAGizmo(onActor, comp);
+}
+
 void UOpenDriveGizmoSubsystem::SetEnableGizmo()
 {
-	bEnabled = !bEnabled;
-	UE_LOG(LogTemp, Log, TEXT("Gizmo : %s"), (bEnabled ? TEXT("True") : TEXT("False")) );
-
 	if (currentActor != nullptr)
 	{
-		AddGizmo(currentActor);
+		bEnabled = !bEnabled;
+		UE_LOG(LogTemp, Display, TEXT("Odr Gizmo : %s"), bEnabled ? TEXT("TRUE") : TEXT("FALSE"));
 	}
 }
 
@@ -60,5 +71,9 @@ void UOpenDriveGizmoSubsystem::OnSelectionChanged(UObject* newObject)
 	{
 		AddGizmo(newActor);
 		currentActor = newActor;
+	}
+	else
+	{
+		bEnabled = false;
 	}
 }

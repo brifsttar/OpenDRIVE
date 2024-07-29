@@ -22,9 +22,9 @@ public :
 
 	void RemoveGizmo(AActor* OnActor);
 
-	inline bool IsThereAGizmo(AActor* onActor, UOpenDriveTranslateComponent*& outComp) { outComp = onActor->GetComponentByClass<UOpenDriveTranslateComponent>();  return outComp != nullptr; };
+	bool IsThereAGizmo(AActor* onActor, UOpenDriveTranslateComponent*& outComp);
 
-	inline bool IsThereAGizmo(AActor* onActor) { UOpenDriveTranslateComponent* comp;  return IsThereAGizmo(onActor, comp); };
+	bool IsThereAGizmo(AActor* onActor);
 
 	void SetEnableGizmo();
 
