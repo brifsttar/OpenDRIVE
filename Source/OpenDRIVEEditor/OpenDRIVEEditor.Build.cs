@@ -11,8 +11,7 @@ public class OpenDRIVEEditor : ModuleRules
 
 		PublicIncludePaths.AddRange(
 			new string[] {
-				ModuleDirectory,
-				Path.Combine(ModuleDirectory, "Public"),
+				Path.Combine(ModuleDirectory, "Public")
 			}
 		);
 		
@@ -40,6 +39,10 @@ public class OpenDRIVEEditor : ModuleRules
 				"BlueprintGraph",
 				"AnimGraph",
 				"ComponentVisualizers",
+				"OpenDRIVE",
+				"InputCore",
+				"LevelEditor",
+				"EditorSubsystem",
 				"OpenDRIVE",
 				"RoadManager"
 			}
