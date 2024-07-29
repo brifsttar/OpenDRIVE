@@ -1,9 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Public/OpenDRIVEEditor.h"
+#include "OpenDRIVEEditor.h"
 #include "OpenDriveAssetActions.h"
 #include "AssetToolsModule.h"
-#include "Public/EditorMode/OpenDriveEdModeTool.h"
+
+#include "EditorMode/OpenDriveEdModeTool.h"
+#include "OpenDriveCommands.h"
+#include "Gizmo/FOpenDRIVEComponentVisualizer.h"
 
 IMPLEMENT_MODULE(FOpenDRIVEEditorModule, OpenDRIVEEditor)
 
@@ -38,7 +41,9 @@ void FOpenDRIVEEditorModule::ShutdownModule() {
 
 void FOpenDRIVEEditorModule::AddModuleListeners()
 {
+	ModuleListeners.Add(MakeShareable(new OpenDriveCommandsModuleListener));
 	ModuleListeners.Add(MakeShareable(new OpenDRIVEEdModeTool));
+	ModuleListeners.Add(MakeShareable(new FOpenDriveCVModuleListener));
 }
 
 #undef LOCTEXT_NAMESPACE

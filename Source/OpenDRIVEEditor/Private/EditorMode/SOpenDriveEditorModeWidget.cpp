@@ -1,7 +1,7 @@
-#include "Public/EditorMode/SOpenDriveEditorModeWidget.h"
-#include "Public/OpenDriveEditor.h"
-#include "Public/EditorMode/OpenDriveEditorMode.h"
-#include "Public/EditorMode/SOpenDriveEditorModeWidget.h"
+#include "EditorMode/SOpenDriveEditorModeWidget.h"
+#include "OpenDriveEditor.h"
+#include "EditorMode/OpenDriveEditorMode.h"
+#include "EditorMode/SOpenDriveEditorModeWidget.h"
 
 void SOpenDRIVEEditorModeWidget::Construct(const FArguments& InArgs)
 {

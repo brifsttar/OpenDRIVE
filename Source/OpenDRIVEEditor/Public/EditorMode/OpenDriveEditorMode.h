@@ -2,7 +2,7 @@
 
 #include "EditorModes.h"
 #include "EdMode.h"
-#include "../OpenDriveEditorLane.h"
+#include "OpenDriveEditorLane.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLaneSelected, AOpenDriveEditorLane* road)
 

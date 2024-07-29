@@ -1,7 +1,7 @@
 #pragma once 
 #include "Toolkits/BaseToolkit.h"
-#include "Public/EditorMode/OpenDriveEditorMode.h"
-#include "Public/EditorMode/SOpenDriveEditorModeWidget.h"
+#include "EditorMode/OpenDriveEditorMode.h"
+#include "EditorMode/SOpenDriveEditorModeWidget.h"
 
 class FOpenDRIVEEditorModeToolkit : public FModeToolkit
 {

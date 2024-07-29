@@ -1,8 +1,8 @@
-#include "Public/EditorMode/OpenDriveEditorMode.h"
-#include "Public/OpenDriveEditor.h"
+#include "EditorMode/OpenDriveEditorMode.h"
+#include "OpenDriveEditor.h"
 #include "Toolkits/ToolkitManager.h"
 #include "ScopedTransaction.h"
-#include "Public/EditorMode/OpenDriveEditorToolkit.h"
+#include "EditorMode/OpenDriveEditorToolkit.h"
 #include "RoadManager.hpp"
 #include <NavigationSystem.h>
 #include "Kismet/GameplayStatics.h"
