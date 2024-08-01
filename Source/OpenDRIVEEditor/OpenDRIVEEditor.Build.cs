@@ -59,6 +59,7 @@ public class OpenDRIVEEditor : ModuleRules
 				"Slate",
 				"SlateCore",
 				"EditorFramework",
+				"EditorStyle",
 				"AnimGraph",
 				"Blutility",
 				"UnrealEd",
@@ -68,7 +69,10 @@ public class OpenDRIVEEditor : ModuleRules
 				"ComponentVisualizers",
 				"Landscape",
 				"EditorScriptingUtilities",
-				"NavigationSystem"
+				"NavigationSystem",
+				"InteractiveToolsFramework",
+				"EditorInteractiveToolsFramework",
+				"LevelEditor"
 			}
 		);
     }

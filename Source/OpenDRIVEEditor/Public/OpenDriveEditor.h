@@ -10,7 +10,7 @@
 #include "IAssetTypeActions.h"
 #include "IOpenDriveModuleInterface.h"
 
-class FOpenDRIVEEditorModule : public IOpenDRIVEModuleInterface
+class FOpenDriveEditorModule : public IOpenDRIVEModuleInterface
 {
 public:
 	/** IModuleInterface implementation **/
@@ -19,9 +19,9 @@ public:
 
 	virtual void AddModuleListeners() override;
 
-	static inline FOpenDRIVEEditorModule& Get()
+	static inline FOpenDriveEditorModule& Get()
 	{
-		return FModuleManager::LoadModuleChecked<FOpenDRIVEEditorModule>("OpenDriveEditor");
+		return FModuleManager::LoadModuleChecked<FOpenDriveEditorModule>("OpenDriveEditor");
 	}
 
 	static inline bool IsAvailable()

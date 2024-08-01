@@ -1,4 +1,4 @@
-#include "OpenDriveEditorLane.h"
+#include "EditorMode/OpenDriveEditorLane.h"
 
 // Sets default values
 AOpenDriveEditorLane::AOpenDriveEditorLane()
@@ -145,13 +145,13 @@ FString AOpenDriveEditorLane::GetLaneType()
 	return type;
 }
 
-inline int AOpenDriveEditorLane::GetSuccessorId()
+int AOpenDriveEditorLane::GetSuccessorId()
 {
 	roadmanager::RoadLink* link = _road->GetLink(roadmanager::LinkType::SUCCESSOR);
 	return  link != nullptr ? link->GetElementId() :  0;
 }
 
-inline int AOpenDriveEditorLane::GetPredecessorId()
+int AOpenDriveEditorLane::GetPredecessorId()
 {
 	roadmanager::RoadLink* link = _road->GetLink(roadmanager::LinkType::PREDECESSOR);
 	return  link != nullptr ? link->GetElementId() : 0;

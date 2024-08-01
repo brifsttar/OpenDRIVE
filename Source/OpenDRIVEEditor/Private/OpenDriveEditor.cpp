@@ -4,18 +4,20 @@
 #include "OpenDriveAssetActions.h"
 #include "AssetToolsModule.h"
 
-#include "EditorMode/OpenDriveEdModeTool.h"
+//#include "EditorMode/OpenDriveEdModeTool.h"
+#include "EditorMode/OpenDriveEditorModeCommands.h"
 #include "OpenDriveCommands.h"
 #include "Gizmo/FOpenDRIVEComponentVisualizer.h"
+#include "EditorMode/OpenDriveEditorModeStyle.h"
 
-IMPLEMENT_MODULE(FOpenDRIVEEditorModule, OpenDRIVEEditor)
+IMPLEMENT_MODULE(FOpenDriveEditorModule, OpenDRIVEEditor)
 
-#define LOCTEXT_NAMESPACE "FOpenDRIVEEditorModule"
+#define LOCTEXT_NAMESPACE "FOpenDriveEditorModule"
 
-TSharedRef<FWorkspaceItem> FOpenDRIVEEditorModule::MenuRoot =
+TSharedRef<FWorkspaceItem> FOpenDriveEditorModule::MenuRoot =
 FWorkspaceItem::NewGroup(FText::FromString("Menu Root"));
 
-void FOpenDRIVEEditorModule::StartupModule() {
+void FOpenDriveEditorModule::StartupModule() {
 
 	if (!IsRunningCommandlet())
 	{
@@ -28,7 +30,7 @@ void FOpenDRIVEEditorModule::StartupModule() {
 	IOpenDRIVEModuleInterface::StartupModule();
 }
 
-void FOpenDRIVEEditorModule::ShutdownModule() {
+void FOpenDriveEditorModule::ShutdownModule() {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools")) {
 		IAssetTools& AssetTools = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools").Get();
 		if (OpenDRIVEAssetTypeActions.IsValid()) {
@@ -39,10 +41,11 @@ void FOpenDRIVEEditorModule::ShutdownModule() {
 	IOpenDRIVEModuleInterface::ShutdownModule();
 }
 
-void FOpenDRIVEEditorModule::AddModuleListeners()
+void FOpenDriveEditorModule::AddModuleListeners()
 {
 	ModuleListeners.Add(MakeShareable(new OpenDriveCommandsModuleListener));
-	ModuleListeners.Add(MakeShareable(new OpenDRIVEEdModeTool));
+	ModuleListeners.Add(MakeShareable(new FOpenDriveEditorModeCommands));
+	ModuleListeners.Add(MakeShareable(new FOpenDriveEditorModeStyleSet));
 	ModuleListeners.Add(MakeShareable(new FOpenDriveCVModuleListener));
 }
 

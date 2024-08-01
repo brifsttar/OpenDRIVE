@@ -57,12 +57,12 @@ public:
 	/**
 	* @return The successor's road Id
 	*/
-	inline int GetSuccessorId();
+	int GetSuccessorId();
 
 	/**
 	* @return The predecessor's road Id
 	*/
-	inline int GetPredecessorId();
+	int GetPredecessorId();
 
 	/**
     * Sets arrows visibility

@@ -1,191 +1,75 @@
 #include "EditorMode/OpenDriveEditorMode.h"
-#include "OpenDriveEditor.h"
-#include "Toolkits/ToolkitManager.h"
-#include "ScopedTransaction.h"
-#include "EditorMode/OpenDriveEditorToolkit.h"
-#include "RoadManager.hpp"
-#include <NavigationSystem.h>
-#include "Kismet/GameplayStatics.h"
-#include <OpenDriveSolver.h>
+#include "EditorMode/OpenDriveEditorModeToolkit.h"
+#include "EditorMode/OpenDriveEditorModeCommands.h"
+#include "EditorMode/OpenDriveEditorModeStyle.h"
 
-const FEditorModeID FOpenDRIVEEditorMode::EM_RoadMode(TEXT("EM_RoadMode"));
+#include "EdModeInteractiveToolsContext.h"
+#include "InteractiveToolManager.h"
 
-FOpenDRIVEEditorMode::FOpenDRIVEEditorMode()
+//Tools
+#include "EditorMode/Tools/OpenDriveVisualizerTool.h"
+#include "EditorMode/Tools/OpenDriveUtilsTool.h"
+
+#define LOCTEXT_NAMESPACE "OpenDriveEditorMode"
+
+const FEditorModeID UOpenDriveEditorMode::EM_OpenDriveEditorModeId = TEXT("EM_OpenDrive");
+
+FString UOpenDriveEditorMode::OpenDriveVisualizerToolName = TEXT("Odr_VisualizationTool");
+FString UOpenDriveEditorMode::OpenDriveUtilsToolName = TEXT("Odr_UtilsTool");
+
+UOpenDriveEditorMode::UOpenDriveEditorMode()
 {
-	UE_LOG(LogClass, Warning, TEXT("Custom editor mode constructor called"));
+	FModuleManager::Get().LoadModule("EditorStyle");
 
-	FEdMode::FEdMode();
-	MapOpenedDelegateHandle = FEditorDelegates::MapChange.AddRaw(this, &FOpenDRIVEEditorMode::OnMapOpenedCallback);
-	OnActorSelectedHandle = USelection::SelectObjectEvent.AddRaw(this, &FOpenDRIVEEditorMode::OnActorSelected);
+	Info = FEditorModeInfo(
+		UOpenDriveEditorMode::EM_OpenDriveEditorModeId,
+		LOCTEXT("OpenDrive", "OpenDrive"),
+		FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveEditorModeIcon", "OpenDriveEditorModeIcon.Small"),
+		true,
+		1);
 }
 
-void FOpenDRIVEEditorMode::Enter()
+UOpenDriveEditorMode::~UOpenDriveEditorMode()
+{}
+
+void UOpenDriveEditorMode::Enter()
 {
-	FEdMode::Enter();
+	UEdMode::Enter();
 
-	bIsMapOpening = false;
+	UE::TransformGizmoUtil::RegisterTransformGizmoContextObject(GetInteractiveToolsContext());
 
-	if (!Toolkit.IsValid())
-	{
-		Toolkit = MakeShareable(new FOpenDRIVEEditorModeToolkit);
-		Toolkit->Init(Owner->GetToolkitHost());
-	}
-	
-	if (bHasBeenLoaded == false	&& (GEditor->IsSimulateInEditorInProgress() == false && GEditor->IsPlaySessionInProgress() == false))
-	{
-		LoadRoadsNetwork();
-	}
-	else
-	{
-		SetRoadsVisibilityInEditor(false);
-	}
+	const FOpenDriveEditorModeCommands& ToolCommands = FOpenDriveEditorModeCommands::Get();
+
+	RegisterTool(ToolCommands.OpenDriveVisualizerTool, OpenDriveVisualizerToolName, NewObject<UOpenDriveVisualizerToolBuilder>(this),EToolsContextScope::EdMode);
+	RegisterTool(ToolCommands.OpenDriveUtilsTool, OpenDriveUtilsToolName, NewObject<UOpenDriveUtilsToolBuilder>(this),EToolsContextScope::EdMode);
+
+
+	GetToolManager()->SelectActiveToolType(EToolSide::Left, OpenDriveVisualizerToolName);
+	GetToolManager()->ActivateTool(EToolSide::Left);
 }
 
-void FOpenDRIVEEditorMode::Exit()
+void UOpenDriveEditorMode::Exit()
 {
-	FToolkitManager::Get().CloseToolkit(Toolkit.ToSharedRef());
-	Toolkit.Reset();
-	
-	if (bIsMapOpening == false) //prevents the function's call in case of level change 
-	{
-		SetRoadsVisibilityInEditor(true);
-		SetRoadsArrowsVisibilityInEditor(false);
-	}
+	UE::TransformGizmoUtil::DeregisterTransformGizmoContextObject(GetInteractiveToolsContext());
 
-	FEdMode::Exit();
+	UE::TransformGizmoUtil::DeregisterTransformGizmoContextObject(GetInteractiveToolsContext());
+
+	UEdMode::Exit();
 }
 
-void FOpenDRIVEEditorMode::ResetRoadsArray()
+void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 {
-	for (auto road : roadsArray)
-	{
-		if (IsValid(road) == true)
-		{
-			road->Destroy();
-		}
-	}
-	roadsArray.Reset();
-	bHasBeenLoaded = false;
+
 }
 
-void FOpenDRIVEEditorMode::ResetNavMeshArray()
+void UOpenDriveEditorMode::CreateToolkit()
 {
-	ARoadBorderLane.Reset();
+	Toolkit = MakeShareable(new FOpenDriveEditorModeToolkit);
 }
 
-void FOpenDRIVEEditorMode::Generate()
+TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> UOpenDriveEditorMode::GetModeCommands() const
 {
-	LoadRoadsNetwork();
+	return FOpenDriveEditorModeCommands::Get().GetCommands();
 }
 
-FOpenDRIVEEditorMode::~FOpenDRIVEEditorMode()
-{
-	FEditorDelegates::OnMapOpened.Remove(MapOpenedDelegateHandle);
-	USelection::SelectObjectEvent.Remove(OnActorSelectedHandle);
-}
-
-void FOpenDRIVEEditorMode::OnMapOpenedCallback(uint32 type)
-{
-	if (type == MapChangeEventFlags::NewMap)
-	{
-		UE_LOG(LogClass, Warning, TEXT("a new map has been opened"));
-
-		roadsArray.Reset();
-		bIsMapOpening = true;
-		bHasBeenLoaded = false;
-	}
-}
-
-void FOpenDRIVEEditorMode::LoadRoadsNetwork()
-{
-	// Actor spawn params
-	FActorSpawnParameters spawnParam;
-	spawnParam.bHideFromSceneOutliner = true;
-	spawnParam.bTemporaryEditorActor = true;
-	spawnParam.ObjectFlags = EObjectFlags::RF_Transient;
-
-	// empty the array if needed
-
-	if (roadsArray.IsEmpty() == false)
-	{
-		ResetRoadsArray();
-	}
-
-	//Extract all the road from the opendrive file
-	UOpenDriveSolver* Solver = NewObject<UOpenDriveSolver>();
-	TArray<UOpenDriveSolver::LaneRef> laneList = Solver->GetAllLanesOfType(/*All*/);
-
-	//Draw them
-	for(UOpenDriveSolver::LaneRef lane : laneList ) {
-		AOpenDriveEditorLane* newRoad = GetWorld()->SpawnActor<AOpenDriveEditorLane>(FVector::ZeroVector, FRotator::ZeroRotator, spawnParam);
-		newRoad->SetActorHiddenInGame(true);
-		newRoad->Initialize(lane.road, lane.laneSection, lane.lane, _roadOffset, _step);
-		roadsArray.Add(newRoad);
-	}
-	bHasBeenLoaded = true;
-}
-
-void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
-{
-	if (roadsArray.IsEmpty() == false)
-	{
-		for (AOpenDriveEditorLane* road : roadsArray)
-		{
-			road->SetIsTemporarilyHiddenInEditor(bIsVisible);
-		}
-	}
-}
-
-void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
-{
-	if (roadsArray.IsEmpty() == false)
-	{
-		for (AOpenDriveEditorLane* road : roadsArray)
-		{
-			road->SetArrowVisibility(bIsVisible);
-		}
-	}
-}
-
-void FOpenDRIVEEditorMode::OnActorSelected(UObject* selectedObject)
-{
-	AOpenDriveEditorLane* selectedRoad = Cast<AOpenDriveEditorLane>(selectedObject);
-
-	if (IsValid(selectedRoad) == true)
-	{
-		UE_LOG(LogClass, Warning, TEXT("road selected"));
-	
-		TSharedPtr<FOpenDRIVEEditorModeToolkit> openDRIVEEdToolkit = StaticCastSharedPtr<FOpenDRIVEEditorModeToolkit>(Toolkit);
-
-		if (openDRIVEEdToolkit.IsValid())
-		{
-			TSharedPtr<SOpenDRIVEEditorModeWidget> openDRIVEEdWidget = StaticCastSharedPtr<SOpenDRIVEEditorModeWidget>(openDRIVEEdToolkit->GetInlineContent());
-
-			if (openDRIVEEdWidget.IsValid())
-			{
-				openDRIVEEdWidget->UpdateLaneInfo(selectedRoad);
-			}
-		}
-	}
-}
-
-void FOpenDRIVEEditorMode::OutlinerFolder_Clear(FString folder) {
-	
-	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-		AActor* Actor = *ActorItr;
-		if (Actor && Actor->GetFolderPath().ToString() == folder) {
-			Actor->Destroy();
-		}
-	}
-}
-
-TArray<AActor*> FOpenDRIVEEditorMode::OutlinerFolder_GetAll(FString folder) {
-	TArray<AActor*> actorList;
-	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-		AActor* Actor = *ActorItr;
-		if (Actor && Actor->GetFolderPath().ToString() == folder) {
-			actorList.Add(Actor);
-		}
-	}
-	return actorList;
-}
+#undef LOCTEXT_NAMESPACE

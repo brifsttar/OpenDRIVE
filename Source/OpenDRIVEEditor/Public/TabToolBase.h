@@ -13,7 +13,7 @@ public :
 		Initialize();
 
 		FGlobalTabmanager::Get()->RegisterNomadTabSpawner(TabName, FOnSpawnTab::CreateRaw(this, &FTabToolBase::SpawnTab))
-			.SetGroup(FOpenDRIVEEditorModule::Get().GetMenuRoot())
+			.SetGroup(FOpenDriveEditorModule::Get().GetMenuRoot())
 			.SetDisplayName(TabDisplayName)
 			.SetTooltipText(ToolTipText);
 	}
