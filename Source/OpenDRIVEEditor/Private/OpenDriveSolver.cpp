@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "OpenDriveSolver.h"
 
 UOpenDriveSolver::UOpenDriveSolver(){
@@ -19,14 +16,6 @@ UOpenDriveSolver::UOpenDriveSolver(LaneRef currentLane, int lineType){
 	Initialize(currentLane, lineType);
 }
  
-
-
-
-/**
-* 
-*
-*
-*/
 void UOpenDriveSolver::Initialize(LaneRef currentLane, int lineType){
 	_currentLane = currentLane;
 	_position.SetSnapLaneTypes(lineType);
@@ -56,7 +45,6 @@ TArray<FTransform> UOpenDriveSolver::MakeTransformArray(float step){
 	return TList;
 }
 
-
 /**
 * Will extract a transform from the opendrive at the requested offset
 * @param offset - The offset (S value in opendrive) from the begining of the line to read the point at
@@ -72,8 +60,6 @@ FTransform UOpenDriveSolver::MakeTransform(double offset){
 
 	return T;
 }
-
-
 
 void UOpenDriveSolver::MakeTransformArrayV2(RoadData& road){
 
@@ -94,7 +80,6 @@ void UOpenDriveSolver::MakeTransformArrayV2(RoadData& road){
 			lsIndex++;
 		}
 	}
-
 }
 
 void UOpenDriveSolver::updateTransform(roadmanager::Road* road,  LaneSectionData* LSData, double offset, double length){
@@ -109,7 +94,6 @@ void UOpenDriveSolver::updateTransform(roadmanager::Road* road,  LaneSectionData
 			1)/2;																			//HEIGHT
 		LSData->A_lane[i].A_transform.Add(FTransform(rot, sp, sc));
 	}
-	
 }
 
 void UOpenDriveSolver::SetRoad(roadmanager::Road* road){
@@ -262,7 +246,6 @@ TArray<UOpenDriveSolver::RoadData> UOpenDriveSolver::getAllRoad(roadmanager::Lan
 	return A_road;
 }
 
-
 /**
 * Used to extract the transform of the lane of all the road passed in argument
 * @param A_road - Array of road to evaluate
@@ -294,5 +277,3 @@ void UOpenDriveSolver::FindPoint(double offset, roadmanager::Road* road, roadman
 		_position.SetLanePos(road->GetId(), lane->GetId(), offset, 0.);
 	}
 }
-
-

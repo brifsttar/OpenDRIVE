@@ -118,6 +118,4 @@ private :
 	roadmanager::Road* _road;
 	roadmanager::LaneSection* _laneSection;
 	roadmanager::Lane* _lane;
-
-	
 };

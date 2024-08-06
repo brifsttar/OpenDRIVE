@@ -1,5 +1,4 @@
 #include "EditorMode/OpenDriveEditorModeToolkit.h"
-#include "EditorMode/SOpenDriveEditorModeWidget.h"
 #include "EditorMode/OpenDriveEditorModeStyle.h"
 
 #include "Engine/Selection.h"
@@ -10,13 +9,9 @@
 
 #define LOCTEXT_NAMESPACE "OpenDriveEditorModeToolkit"
 
-FOpenDriveEditorModeToolkit::FOpenDriveEditorModeToolkit()
-{
-	//Custom UI here ? 
-}
-
 void FOpenDriveEditorModeToolkit::Init(const TSharedPtr<IToolkitHost>& InitToolkitHost, TWeakObjectPtr<UEdMode> InOwningMode)
 {
+	/* Create tool widget */
 	TSharedPtr<SVerticalBox> ToolkitWidgetVBox = SNew(SVerticalBox);
 	SAssignNew(ToolkitWidget, SBorder)
 		.HAlign(HAlign_Fill)
@@ -25,9 +20,11 @@ void FOpenDriveEditorModeToolkit::Init(const TSharedPtr<IToolkitHost>& InitToolk
 			ToolkitWidgetVBox->AsShared()
 		];
 
-	FModeToolkit::Init(InitToolkitHost, InOwningMode);
+	/* Default init (for DetailsView creation) */
+	FModeToolkit::Init(InitToolkitHost, InOwningMode); //bar vertical button
 
-	ToolkitWidgetVBox->AddSlot().HAlign(HAlign_Fill).FillHeight(1.f)
+	/* Add DetailsView to toolkit widget */
+	ToolkitWidgetVBox->AddSlot().HAlign(HAlign_Fill).FillHeight(1.f) //properties set
 		[
 			DetailsView->AsShared()
 		];
@@ -43,17 +40,6 @@ TSharedPtr<SWidget> FOpenDriveEditorModeToolkit::GetInlineContent() const
 	return ToolkitWidget;
 }
 
-TSharedRef<SWidget> FOpenDriveEditorModeToolkit::CreatePaletteWidget(TSharedPtr<FUICommandList> InCommandList, FName InToolbarCustomizationName, FName InPaletteName)
-{
-	FUniformToolBarBuilder ModeToolbarBuilder(InCommandList, FMultiBoxCustomization(InToolbarCustomizationName));
-	//ModeToolbarBuilder.SetStyle(&FOpenDriveEditorModeStyleSet::Get(), "OpenDriveEditor.ToolbarButton");
-	ModeToolbarBuilder.SetStyle(&FAppStyle::Get(), "PaletteToolBar");
-
-	BuildToolPalette(InPaletteName, ModeToolbarBuilder);
-
-	return ModeToolbarBuilder.MakeWidget();
-}
-
 void FOpenDriveEditorModeToolkit::BuildToolPalette(FName PaletteName, FToolBarBuilder& ToolbarBuilder)
 {
 	if (!GetScriptableEditorMode().IsValid())
@@ -61,6 +47,7 @@ void FOpenDriveEditorModeToolkit::BuildToolPalette(FName PaletteName, FToolBarBu
 		return;
 	}
 
+	/* Add icons for each tools */
 	TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> CommandsList = GetScriptableEditorMode()->GetModeCommands();
 	TArray<TSharedPtr<FUICommandInfo>>* CurrentCommandListPtr = CommandsList.Find(PaletteName);
 
@@ -98,11 +85,6 @@ FName FOpenDriveEditorModeToolkit::GetToolkitFName() const
 FText FOpenDriveEditorModeToolkit::GetBaseToolkitName() const
 {
 	return LOCTEXT("DisplayName", "OpenDrive Editor Mode Toolkit");
-}
-
-void FOpenDriveEditorModeToolkit::OnToolStarted(UInteractiveToolManager* Manager, UInteractiveTool* Tool)
-{
-	FModeToolkit::OnToolStarted(Manager, Tool); // update details
 }
 
 #undef LOCTEXT_NAMESPACE

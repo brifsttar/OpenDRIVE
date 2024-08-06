@@ -14,7 +14,6 @@ void AOpenDriveEditorLane::Initialize(roadmanager::Road* road_, roadmanager::Lan
 	_road = road_;
 	_laneSection = laneSection_;
 	_lane = lane_;
-	
 	DrawLane(step_, offset_);
 }
 

@@ -30,7 +30,7 @@ public :
 
 	void SetEnableGizmo();
 
-	bool bEnabled = false;
+	bool bEnabled = true;
 
 	UPROPERTY(BlueprintAssignable)
 	FGizmoActorChanged OnGizmoActorChanged;

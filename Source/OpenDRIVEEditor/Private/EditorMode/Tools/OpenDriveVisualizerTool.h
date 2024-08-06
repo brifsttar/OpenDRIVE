@@ -13,10 +13,12 @@ class OPENDRIVEEDITOR_API UOpenDriveVisualizerToolBuilder : public UInteractiveT
 
 public:
 
+	/* InteractiveToolBuilder interface */
 	virtual bool CanBuildTool(const FToolBuilderState& SceneState) const override { return true; }
 	virtual UInteractiveTool* BuildTool(const FToolBuilderState& SceneState) const override;
 };
 
+/* Buttons' events */
 DECLARE_DELEGATE_TwoParams(FOnGenerateVisualization, float /* Offset */, float/* Step */)
 DECLARE_DELEGATE(FOnChangeLaneVisibility)
 
@@ -27,7 +29,7 @@ class OPENDRIVEEDITOR_API UOpenDriveVisualizerToolProperties : public UInteracti
 
 public:
 
-	UOpenDriveVisualizerToolProperties();
+	UOpenDriveVisualizerToolProperties() {}
 
 	/* OpenDriveVisualizer properties */
 	UPROPERTY(EditAnywhere, Category="Parameters", meta = (Tooltip = "Road's height above ground (useful if you have road meshes)", UIMin="0.0", UIMax="50.0"))
@@ -51,10 +53,10 @@ public:
 
 	/* Methods */
 	UFUNCTION(CallInEditor, Category="Functions")
-	void Generate();
+	void Generate(){ OnGenerateVisualization.Execute(RoadOffset, Step); }
 	UFUNCTION(CallInEditor, Category = "Functions")
-	void ChangeLaneVisibility();
-	
+	void ChangeLaneVisibility(){ OnChangeLaneVisibility.Execute(); }
+
 	/* Delegates */
 	FOnGenerateVisualization OnGenerateVisualization;
 	FOnChangeLaneVisibility OnChangeLaneVisibility;
@@ -67,21 +69,26 @@ class OPENDRIVEEDITOR_API UOpenDriveVisualizerTool : public UInteractiveTool
 
 public:
 
-	UOpenDriveVisualizerTool();
+	UOpenDriveVisualizerTool() {}
 
 	/* InteractiveTool interface */
-	virtual void SetWorld(UWorld* World);
 	virtual void Setup() override;
 	virtual void Shutdown(EToolShutdownType ShutdownType) override;
 
+	virtual void SetWorld(UWorld* World);
+
 protected:
 
+	/* Properties and world */
+	TObjectPtr<UOpenDriveVisualizerToolProperties> Properties;
+	UWorld* TargetWorld;
+
+	/* OpenDrive's visualizer base methods */
 	void Generate(float offset, float step);
 	void HideShowLanes();
 	void DeleteAllLanes();
-	void OnActorSelected(UObject* selectedActor);
 
-	TObjectPtr<UOpenDriveVisualizerToolProperties> Properties;
-	UWorld* TargetWorld;
+	/* Actor selection */
+	void OnActorSelected(UObject* selectedActor);
 	FDelegateHandle OnActorSelectedHandle;
 };

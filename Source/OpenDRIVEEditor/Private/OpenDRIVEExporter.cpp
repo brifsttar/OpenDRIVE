@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "OpenDRIVEExporter.h"
 #include "OpenDriveAsset.h"
 
@@ -15,10 +13,7 @@ UOpenDRIVEExporter::UOpenDRIVEExporter(const FObjectInitializer& ObjectInitiliaz
 bool UOpenDRIVEExporter::ExportText(const FExportObjectInnerContext* Context, UObject* Object, const TCHAR* Type, FOutputDevice& Ar, FFeedbackContext* Warn, uint32 PortFlags)
 {
 	UOpenDriveAsset* openDriveAsset = CastChecked<UOpenDriveAsset>(Object);
-
 	FString odr = openDriveAsset->XodrContent;
-
 	Ar.Log(odr);
-
 	return true;
 }

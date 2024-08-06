@@ -12,27 +12,16 @@
 
 #define LOCTEXT_NAMESPACE "OpenDriveVisualizerTool"
 
+#pragma region OpenDriveVisualizerToolBuilder
 UInteractiveTool* UOpenDriveVisualizerToolBuilder::BuildTool(const FToolBuilderState& SceneState) const
 {
 	UOpenDriveVisualizerTool* NewTool = NewObject<UOpenDriveVisualizerTool>(SceneState.ToolManager);
 	NewTool->SetWorld(SceneState.World);
 	return NewTool;
 }
+#pragma endregion
 
-UOpenDriveVisualizerToolProperties::UOpenDriveVisualizerToolProperties(){}
-
-void UOpenDriveVisualizerToolProperties::Generate()
-{
-	OnGenerateVisualization.Execute(RoadOffset, Step);
-}
-
-void UOpenDriveVisualizerToolProperties::ChangeLaneVisibility()
-{
-	OnChangeLaneVisibility.Execute();
-}
-
-UOpenDriveVisualizerTool::UOpenDriveVisualizerTool(){}
-
+#pragma region UOpenDriveVisualizerTool
 void UOpenDriveVisualizerTool::SetWorld(UWorld* World)
 {
 	TargetWorld = World;
@@ -128,5 +117,6 @@ void UOpenDriveVisualizerTool::OnActorSelected(UObject* selectedActor)
 		Properties.Get()->PredecessorId = selectedRoad->GetPredecessorId();
 	}
 }
+#pragma endregion
 
 #undef LOCTEXT_NAMESPACE

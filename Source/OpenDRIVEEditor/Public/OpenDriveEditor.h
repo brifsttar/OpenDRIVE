@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 #include "CoreMinimal.h"
 #include "UnrealEd.h"
@@ -7,7 +5,6 @@
 #include "SlateExtras.h"
 #include "Editor/LevelEditor/Public/LevelEditor.h"
 #include "Editor/PropertyEditor/Public/PropertyEditing.h"
-#include "IAssetTypeActions.h"
 #include "IOpenDriveModuleInterface.h"
 
 class FOpenDriveEditorModule : public IOpenDRIVEModuleInterface
@@ -35,10 +32,5 @@ protected:
 
 	TSharedPtr<FExtensibilityManager> LevelEditorMenuExtensibilityManager;
 	TSharedPtr<FExtender> MenuExtender;
-
 	static TSharedRef<FWorkspaceItem> MenuRoot;
-
-private:
-
-	TSharedPtr<IAssetTypeActions> OpenDRIVEAssetTypeActions;
 };

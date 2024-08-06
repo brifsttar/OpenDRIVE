@@ -19,11 +19,11 @@ public :
 
 	static TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> GetCommands();
 
+	/* Each command corresponds to one tool */
 	TSharedPtr<FUICommandInfo> OpenDriveVisualizerTool;
 	TSharedPtr<FUICommandInfo> OpenDriveUtilsTool;
 
 protected :
 
 	TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> Commands;
-
 };

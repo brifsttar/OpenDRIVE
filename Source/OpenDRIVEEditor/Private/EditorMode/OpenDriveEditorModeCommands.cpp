@@ -4,12 +4,12 @@
 #define LOCTEXT_NAMESPACE "OpenDriveEditorModeCommands"
 
 FOpenDriveEditorModeCommands::FOpenDriveEditorModeCommands() 
-	: TCommands<FOpenDriveEditorModeCommands>("OpenDriveEditorMode",
-		NSLOCTEXT("OpenDriveEditorMode", "OpenDriveEditorModeCommands", "OpenDrive Editor Mode"),
-		NAME_None,
-		FEditorStyle::GetStyleSetName()
-	)
-{}
+	: TCommands<FOpenDriveEditorModeCommands>
+	("OpenDriveEditorMode",
+	NSLOCTEXT("OpenDriveEditorMode", "OpenDriveEditorModeCommands", "OpenDrive Editor Mode"),
+	NAME_None,
+	FEditorStyle::GetStyleSetName()
+	){}
 
 void FOpenDriveEditorModeCommands::OnStartupModule()
 {
@@ -25,9 +25,9 @@ void FOpenDriveEditorModeCommands::RegisterCommands()
 {
 	TArray<TSharedPtr<FUICommandInfo>>& ToolCommands = Commands.FindOrAdd(NAME_Default);
 
+	/* Register our tool commands here */
 	UI_COMMAND(OpenDriveVisualizerTool, "Viewer", "Draws your currently used xodr file into the level", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveVisualizerTool);
-
 	UI_COMMAND(OpenDriveUtilsTool, "Utilities", "404", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveUtilsTool);
 }

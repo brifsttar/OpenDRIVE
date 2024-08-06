@@ -1,26 +1,38 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "OpenDRIVEAssetActions.h"
 #include "EditorReimportHandler.h"
 
+void FOpenDriveAssetActions::OnStartupModule()
+{
+	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+	AssetTools.RegisterAssetTypeActions(this->AsShared());
+}
 
-FText FOpenDRIVEAssetActions::GetName() const {
+void FOpenDriveAssetActions::OnShutdownModule()
+{
+	if (FModuleManager::Get().IsModuleLoaded("AssetTools")) 
+	{
+		IAssetTools& AssetTools = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools").Get();
+		AssetTools.UnregisterAssetTypeActions(this->AsShared());
+	}
+}
+
+FText FOpenDriveAssetActions::GetName() const {
 	return FText::FromString("OpenDRIVE");
 }
 
-FColor FOpenDRIVEAssetActions::GetTypeColor() const {
+FColor FOpenDriveAssetActions::GetTypeColor() const {
 	return FColor::Blue;
 }
 
-UClass* FOpenDRIVEAssetActions::GetSupportedClass() const {
+UClass* FOpenDriveAssetActions::GetSupportedClass() const {
 	return UOpenDriveAsset::StaticClass();
 }
 
-uint32 FOpenDRIVEAssetActions::GetCategories() {
+uint32 FOpenDriveAssetActions::GetCategories() {
 	return EAssetTypeCategories::Misc;
 }
 
-void FOpenDRIVEAssetActions::GetActions(
+void FOpenDriveAssetActions::GetActions(
 	const TArray<UObject*>& InObjects,
 	FMenuBuilder& MenuBuilder
 ) {
@@ -31,7 +43,7 @@ void FOpenDRIVEAssetActions::GetActions(
 
 	auto TDelegateExecuteAction = FExecuteAction::CreateSP(
 		this,
-		&FOpenDRIVEAssetActions::ReimportOdrAsset,
+		&FOpenDriveAssetActions::ReimportOdrAsset,
 		OdrAssets
 	);
 
@@ -40,7 +52,7 @@ void FOpenDRIVEAssetActions::GetActions(
 	MenuBuilder.AddMenuEntry(ButtonLabel, ButtonToolTip, FSlateIcon(), UIAction);
 }
 
-void FOpenDRIVEAssetActions::ReimportOdrAsset(TArray<TWeakObjectPtr<UOpenDriveAsset>> OdrAssets) {
+void FOpenDriveAssetActions::ReimportOdrAsset(TArray<TWeakObjectPtr<UOpenDriveAsset>> OdrAssets) {
 	for (auto OdrAssetWeak : OdrAssets) {
 		UOpenDriveAsset* OdrAsset = OdrAssetWeak.Get();
 
@@ -49,4 +61,3 @@ void FOpenDRIVEAssetActions::ReimportOdrAsset(TArray<TWeakObjectPtr<UOpenDriveAs
 		}
 	}
 }
-
