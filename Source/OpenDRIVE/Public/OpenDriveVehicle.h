@@ -21,7 +21,6 @@ public:
 	virtual void PostLoad() override;
 
 private:
-	class AWheeledVehiclePawn* _Car;
 	class UChaosWheeledVehicleMovementComponent* _MovComp;
 	mutable double _PrevSpeed = 0.;
 	mutable double _PrevTime = 0.;
@@ -30,6 +29,7 @@ private:
 	int PrevRoadId = -1;
 
 protected:
+	class AWheeledVehiclePawn* _Car;
 	double _SpeedOverride = 0.;
 	double _AccOverride = 0.;
 	double LengthFront() const;
