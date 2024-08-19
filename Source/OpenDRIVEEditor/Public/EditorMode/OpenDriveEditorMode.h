@@ -2,6 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "Tools/UEdMode.h"
+#include "EdModeInteractiveToolsContext.h"
+#include "InteractiveToolManager.h"
+#include "EditorModeManager.h"
+#include "OpenDrivePosition.h"
+#include "Selection.h"
+
 #include "OpenDriveEditorMode.generated.h"
 
 UCLASS()
@@ -25,6 +31,22 @@ public :
 	virtual void Exit() override;
 	virtual void CreateToolkit() override;
 	virtual TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> GetModeCommands() const override;
+
+	void CreateGizmo(FTransform InitialTransform, USceneComponent* AttachedComponent);
+	void DestroyGizmo();
+
+	void OnActorSelected(UObject* selectedObject);
 	
-	inline UInteractiveToolManager* GetToolkitManager() { return GetToolManager(); };
+	inline UInteractiveToolManager* GetToolkitManager() { return GetToolManager(); }
+
+	static FString GizmoIdentifier;
+	static FString GizmoBuilderIdentifier;
+	static FString GizmoAxisBuilderIdentifier;
+
+	FDelegateHandle OnActorSelectedHandle;
+
+private :
+
+	void RegisterGizmoBuilder();
+	void UnregisterGizmoBuilder();
 };
