@@ -27,6 +27,12 @@ public :
 	virtual void OnTerminateDragSequence() override;
 };
 
+enum OpenDriveAxisType
+{
+	S,
+	T,
+};
+
 UCLASS()
 class UOpenDriveGizmoAxisTranslationParameterSource : public UGizmoAxisTranslationParameterSource
 {
@@ -39,11 +45,19 @@ public :
 	static UOpenDriveGizmoAxisTranslationParameterSource* Construct(
 		IGizmoAxisSource* AxisSourceIn,
 		IGizmoTransformSource* TransformSourceIn,
-		UObject* Outer = (UObject*)GetTransientPackage())
+		UObject* Outer = (UObject*)GetTransientPackage(),
+		OpenDriveAxisType OpenDriveAxisType = OpenDriveAxisType::S)
 	{
 		UOpenDriveGizmoAxisTranslationParameterSource* NewSource = NewObject<UOpenDriveGizmoAxisTranslationParameterSource>(Outer);
 		NewSource->AxisSource = Cast<UObject>(AxisSourceIn);
 		NewSource->TransformSource = Cast<UObject>(TransformSourceIn);
+		NewSource->AxisType = OpenDriveAxisType;
 		return NewSource;
 	}
+
+	OpenDriveAxisType AxisType;
+
+private : 
+
+	void SetParameterAlongS(float NewValue);
 };

@@ -27,12 +27,14 @@ public :
 
 	static UOpenDriveGizmo* CreateGizmo(UInteractiveGizmoManager* Manager, const FString& GizmoBuilderIdentifier, const FString& GizmoIdentifier);
 
+	virtual void SetActiveTarget(UTransformProxy* Target, IToolContextTransactionProvider* TransactionProvider = nullptr) override;
+
 protected:
 
-	virtual UInteractiveGizmo* AddAxisTranslationGizmo(UPrimitiveComponent* AxisComponent, USceneComponent* RootComponent,
+	UInteractiveGizmo* AddOpenDriveAxisTranslationGizmo(UPrimitiveComponent* AxisComponent, USceneComponent* RootComponent,
 		IGizmoAxisSource* AxisSource,
 		IGizmoTransformSource* TransformSource,
 		IGizmoStateTarget* StateTargetIn,
-		int AxisIndex) override;
-
+		int AxisIndex,
+		OpenDriveAxisType AxisType);
 };

@@ -1,5 +1,7 @@
 #include "OpenDriveGizmo.h"
 
+#define LOCTEXT_NAMESPACE "OpenDriveGizmo"
+
 UOpenDriveGizmo* UOpenDriveGizmo::CreateGizmo(UInteractiveGizmoManager* Manager, const FString& GizmoBuilderIdentifier, const FString& GizmoIdentifier)
 {
 	UInteractiveGizmo* Gizmo = Manager->CreateGizmo(GizmoBuilderIdentifier, *GizmoIdentifier);
@@ -21,7 +23,62 @@ UOpenDriveGizmo* UOpenDriveGizmo::CreateGizmo(UInteractiveGizmoManager* Manager,
 	}
 }
 
-UInteractiveGizmo* UOpenDriveGizmo::AddAxisTranslationGizmo(UPrimitiveComponent* AxisComponent, USceneComponent* RootComponent, IGizmoAxisSource* AxisSource, IGizmoTransformSource* TransformSource, IGizmoStateTarget* StateTargetIn, int AxisIndex)
+void UOpenDriveGizmo::SetActiveTarget(UTransformProxy* Target, IToolContextTransactionProvider* TransactionProvider)
+{
+	if (ActiveTarget != nullptr)
+	{
+		ClearActiveTarget();
+	}
+
+	ActiveTarget = Target;
+
+	// move gizmo to target location
+	USceneComponent* GizmoComponent = GizmoActor->GetRootComponent();
+
+	FTransform TargetTransform = Target->GetTransform();
+	FTransform GizmoTransform = TargetTransform;
+	GizmoTransform.SetScale3D(FVector(1, 1, 1));
+	GizmoComponent->SetWorldTransform(GizmoTransform);
+
+	UGizmoScaledAndUnscaledTransformSources* TransformSource = UGizmoScaledAndUnscaledTransformSources::Construct(
+		UGizmoTransformProxyTransformSource::Construct(ActiveTarget, this),
+		GizmoComponent, this);
+
+	// This state target emits an explicit FChange that moves the GizmoActor root component during undo/redo.
+	// It also opens/closes the Transaction that saves/restores the target object locations.
+	if (TransactionProvider == nullptr)
+	{
+		TransactionProvider = GetGizmoManager();
+	}
+
+	StateTarget = UGizmoTransformChangeStateTarget::Construct(GizmoComponent,
+		LOCTEXT("UCombinedTransformGizmoTransaction", "Transform"), TransactionProvider, this);
+	StateTarget->DependentChangeSources.Add(MakeUnique<FTransformProxyChangeSource>(Target));
+
+	CameraAxisSource = NewObject<UGizmoConstantFrameAxisSource>(this);
+
+	// root component provides local X/Y/Z axis, identified by AxisIndex
+	AxisXSource = UGizmoComponentAxisSource::Construct(GizmoComponent, 0, true, this);
+	AxisYSource = UGizmoComponentAxisSource::Construct(GizmoComponent, 1, true, this);
+	AxisZSource = UGizmoComponentAxisSource::Construct(GizmoComponent, 2, true, this);
+
+	if (GizmoActor->TranslateX != nullptr)
+	{
+		UInteractiveGizmo* NewGizmo = AddOpenDriveAxisTranslationGizmo(GizmoActor->TranslateX, GizmoComponent, AxisXSource, TransformSource, StateTarget, 0, OpenDriveAxisType::S);
+		ActiveComponents.Add(GizmoActor->TranslateX);
+		TranslationSubGizmos.Add(FSubGizmoInfo{ GizmoActor->TranslateX, NewGizmo });
+	}
+	if (GizmoActor->TranslateY != nullptr)
+	{
+		UInteractiveGizmo* NewGizmo = AddOpenDriveAxisTranslationGizmo(GizmoActor->TranslateY, GizmoComponent, AxisYSource, TransformSource, StateTarget, 0, OpenDriveAxisType::T);
+		ActiveComponents.Add(GizmoActor->TranslateY);
+		TranslationSubGizmos.Add(FSubGizmoInfo{ GizmoActor->TranslateY, NewGizmo });
+	}
+
+	OnSetActiveTarget.Broadcast(this, ActiveTarget);
+}
+
+UInteractiveGizmo* UOpenDriveGizmo::AddOpenDriveAxisTranslationGizmo(UPrimitiveComponent* AxisComponent, USceneComponent* RootComponent, IGizmoAxisSource* AxisSource, IGizmoTransformSource* TransformSource, IGizmoStateTarget* StateTargetIn, int AxisIndex, OpenDriveAxisType AxisType)
 {
 	// create axis-position gizmo, axis-position parameter will drive translation
 	UAxisPositionGizmo* TranslateGizmo = Cast<UAxisPositionGizmo>(GetGizmoManager()->CreateGizmo(AxisPositionBuilderIdentifier));
@@ -31,7 +88,7 @@ UInteractiveGizmo* UOpenDriveGizmo::AddAxisTranslationGizmo(UPrimitiveComponent*
 	TranslateGizmo->AxisSource = Cast<UObject>(AxisSource);
 
 	// parameter source maps axis-parameter-change to translation of TransformSource's transform
-	UOpenDriveGizmoAxisTranslationParameterSource* ParamSource = UOpenDriveGizmoAxisTranslationParameterSource::Construct(AxisSource, TransformSource, this);
+	UOpenDriveGizmoAxisTranslationParameterSource* ParamSource = UOpenDriveGizmoAxisTranslationParameterSource::Construct(AxisSource, TransformSource, this, AxisType);
 	ParamSource->PositionConstraintFunction = [this](const FVector& Pos, FVector& Snapped) { return PositionSnapFunction(Pos, Snapped); };
 	ParamSource->AxisDeltaConstraintFunction = [this, AxisIndex](double AxisDelta, double& SnappedAxisDelta) { return PositionAxisDeltaSnapFunction(AxisDelta, SnappedAxisDelta, AxisIndex); };
 	TranslateGizmo->ParameterSource = ParamSource;
@@ -90,7 +147,9 @@ void UOpenDriveGizmoBuilder::RegisterGizmoBuilder(UInteractiveGizmoManager* Mana
 	CustomGizmoBuilder->PlanePositionBuilderIdentifier = UInteractiveGizmoManager::DefaultPlanePositionBuilderIdentifier;
 	CustomGizmoBuilder->AxisAngleBuilderIdentifier = UInteractiveGizmoManager::DefaultAxisAngleBuilderIdentifier;
 	TSharedPtr<FCombinedTransformGizmoActorFactory> GizmoActorBuilder = MakeShared<FCombinedTransformGizmoActorFactory>(GizmoViewContext);
-	GizmoActorBuilder->EnableElements = ETransformGizmoSubElements::TranslateAxisX;
+	GizmoActorBuilder->EnableElements = ETransformGizmoSubElements::TranslateAxisX | ETransformGizmoSubElements::TranslateAxisY;
 	CustomGizmoBuilder->GizmoActorBuilder = GizmoActorBuilder;
 	Manager->RegisterGizmoType(*GizmoBuilderIdentifier, CustomGizmoBuilder);
 }
+
+#undef LOCTEXT_NAMESPACE

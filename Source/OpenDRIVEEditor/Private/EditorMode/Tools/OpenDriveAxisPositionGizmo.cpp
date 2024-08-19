@@ -143,46 +143,22 @@ void UOpenDriveAxisPositionGizmo::OnTerminateDragSequence()
 void UOpenDriveGizmoAxisTranslationParameterSource::SetParameter(float NewValue)
 {
 	UGizmoComponentAxisSource* source = Cast<UGizmoComponentAxisSource>(AxisSource->_getUObject());
-	if (source->bLocalAxes)
+	if (source->bLocalAxes && AxisType == OpenDriveAxisType::S)
 	{
-		UOpenDrivePosition* OpenDrivePosition = NewObject<UOpenDrivePosition>();
-		OpenDrivePosition->SetTransform(InitialTransform);
-		OpenDrivePosition->MoveAlongS(NewValue, 0);
-
-		TransformSource->SetTransform(OpenDrivePosition->GetTransform());
-		OnParameterChanged.Broadcast(this, LastChange);
+		SetParameterAlongS(NewValue);
 	}
 	else
 	{
-		Parameter = NewValue;
-		LastChange.CurrentValue = NewValue;
-
-		double UseDelta = LastChange.GetChangeDelta();
-
-		// check for any constraints on the delta value
-		double SnappedDelta = 0;
-		if (AxisDeltaConstraintFunction(UseDelta, SnappedDelta))
-		{
-			UseDelta = SnappedDelta;
-		}
-
-		// construct translation as delta from initial position
-		FVector Translation = UseDelta * CurTranslationAxis;
-
-		// translate the initial transform
-		FTransform NewTransform = InitialTransform;
-		NewTransform.AddToTranslation(Translation);
-
-		// apply position constraint
-		FVector SnappedPos;
-		if (PositionConstraintFunction(NewTransform.GetTranslation(), SnappedPos))
-		{
-			FVector SnappedLinePos = GizmoMath::ProjectPointOntoLine(SnappedPos, CurTranslationOrigin, CurTranslationAxis);
-			NewTransform.SetTranslation(SnappedLinePos);
-		}
-
-		TransformSource->SetTransform(NewTransform);
-
-		OnParameterChanged.Broadcast(this, LastChange);
+		UGizmoAxisTranslationParameterSource::SetParameter(NewValue);
 	}
+}
+
+void UOpenDriveGizmoAxisTranslationParameterSource::SetParameterAlongS(float NewValue)
+{
+	UOpenDrivePosition* OpenDrivePosition = NewObject<UOpenDrivePosition>();
+	OpenDrivePosition->SetTransform(InitialTransform);
+	OpenDrivePosition->MoveAlongS(NewValue, 0);
+
+	TransformSource->SetTransform(OpenDrivePosition->GetTransform());
+	OnParameterChanged.Broadcast(this, LastChange);
 }
