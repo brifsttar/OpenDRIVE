@@ -94,14 +94,8 @@ double UOpenDriveVehicle::OdrWheelbase() const {
 		int backIdx = _MovComp->WheelSetups.Num() > 2 ? 3 : 1;
 		FName wFrontName = _MovComp->WheelSetups[frontIdx].BoneName;
 		FName wBackName = _MovComp->WheelSetups[backIdx].BoneName;
-		float wFrontPos = NAN, wBackPos = NAN;
-		for (auto& c : _Car->GetMesh()->Constraints) {
-			//todo That probably doesn't work for all cars...
-			if (c->ConstraintBone1 == wFrontName) wFrontPos = c->Pos2.X;
-			if (c->ConstraintBone2 == wFrontName) wFrontPos = c->Pos2.X;
-			if (c->ConstraintBone1 == wBackName) wBackPos = c->Pos2.X;
-			if (c->ConstraintBone2 == wBackName) wBackPos = c->Pos2.X;
-		}
+		float wFrontPos = _Car->GetMesh()->GetBoneLocation(wFrontName, EBoneSpaces::ComponentSpace).X;
+		float wBackPos  = _Car->GetMesh()->GetBoneLocation(wBackName , EBoneSpaces::ComponentSpace).X;
 		_Wheelbase = CoordTranslate::UuToMeters(std::abs(wFrontPos - wBackPos));
 	}
 	return _Wheelbase;

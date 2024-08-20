@@ -23,14 +23,13 @@ void UOpenDrivePosition::SetTransform(const FTransform& T) {
 	_InertialPosCache = T;
 	FVector p = CoordTranslate::UeToOdr::Location(T.GetLocation());
 	FVector r = CoordTranslate::UeToOdr::Rotation(T.Rotator().Euler());
-	_TrackPos.SetX(p.X);
-	_TrackPos.SetY(p.Y);
-	//_TrackPos.SetZ(p.Z);
-	_TrackPos.XYZH2TrackPos(p.X, p.Y, p.Z, _TrackPos.GetH(), false, -1, false, _HintRoad);
-	_TrackPos.SetHeading(r.X);
-	_TrackPos.SetPitch(r.Y);
-	_TrackPos.SetRoll(r.Z);
-	_TrackPos.EvaluateOrientation();
+	_TrackPos.SetHintRoad(_HintRoad);
+	_TrackPos.SetInertiaPosMode(p.X, p.Y, p.Z, r.X, r.Y, r.Z,
+		roadmanager::Position::PosMode::Z_ABS |
+		roadmanager::Position::PosMode::H_ABS |
+		roadmanager::Position::PosMode::P_ABS |
+		roadmanager::Position::PosMode::R_ABS
+	);
 }
 
 FTransform UOpenDrivePosition::GetTransform() const {
@@ -43,12 +42,55 @@ void UOpenDrivePosition::SetTrackPosition(int TrackId, int LaneId, float S, floa
 	SetTrackPosition(p);
 }
 
+
 bool UOpenDrivePosition::MoveAlongS(float S, int Strategy) {
 	roadmanager::Position p = OdrPosition();
+	p.SetMode(
+		roadmanager::Position::PosModeType::UPDATE,
+		roadmanager::Position::PosMode::Z_REL |
+		roadmanager::Position::PosMode::H_REL |
+		roadmanager::Position::PosMode::P_REL |
+		roadmanager::Position::PosMode::R_REL
+	);
 	roadmanager::Position::ReturnCode ret;
-	ret = p.MoveAlongS(UuToMeters(S), 0., roadmanager::Junction::JunctionStrategyType(Strategy));
+	ret = p.MoveAlongS(
+		UuToMeters(S),
+		0.,
+		roadmanager::Junction::JunctionStrategyType(Strategy),
+		false,
+		roadmanager::Position::MoveDirectionMode::HEADING_DIRECTION,
+		true
+	);
 	SetTrackPosition(p);
 	return ret >= roadmanager::Position::ReturnCode::OK;
+}
+
+bool UOpenDrivePosition::MoveAlongLanes(int LaneOffset, LaneType LaneFilter) {
+	if (LaneOffset == 0) return false;
+	roadmanager::Position p = OdrPosition();
+	roadmanager::LaneSection* ls = p.GetRoad()->GetLaneSectionByS(p.GetS());
+	roadmanager::Lane* targetLane = nullptr;
+	int laneId = p.GetLaneId();
+	int currentLaneOffset = 0;
+	int laneOffsetUnit = LaneOffset / abs(LaneOffset);
+
+	roadmanager::Lane::LaneType laneTypeFilter = (roadmanager::Lane::LaneType)LaneFilter;
+	for (
+		int i = laneId + laneOffsetUnit;
+		currentLaneOffset != LaneOffset;
+		i += laneOffsetUnit
+	) {
+		targetLane = ls->GetLaneById(i);
+		if (targetLane == nullptr) break;
+		if (targetLane->GetLaneType() == laneTypeFilter) {
+			currentLaneOffset += laneOffsetUnit;
+		}
+	}
+	if (targetLane == nullptr) return false;
+	p.SetLanePos(p.GetTrackId(), targetLane->GetId(), p.GetS(), p.GetOffset());
+	p.SetHeading(p.GetDrivingDirection());
+	SetTrackPosition(p);
+	return true;
 }
 
 void UOpenDrivePosition::ResetPosition() {
@@ -150,39 +192,7 @@ void UOpenDrivePosition::AlignWithLaneCenter() {
 }
 
 LaneType UOpenDrivePosition::GetLaneType() const {
-	roadmanager::LaneSection* laneSec = OdrPosition().GetRoad()->GetLaneSectionByS(GetS());
-	roadmanager::Lane* lane = laneSec->GetLaneById(GetLaneId());
-
-	LaneType laneType;
-
-	switch (lane->GetLaneType())
-	{
-	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
-		laneType = DrivingRoad;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
-		laneType = ParkingSlot;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_BORDER):
-		laneType = Border;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
-		laneType = Shoulder;
-		break;
-
-	case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
-		laneType = SidewalkLane;
-		break;
-
-	default:
-		laneType = Any;
-		break;
-	}
-
-	return laneType;
+	return (LaneType)OdrPosition().GetLane()->GetLaneType();
 }
 
 float UOpenDrivePosition::GetRoadCurvatureAngle(float LookaheadDist) const {
