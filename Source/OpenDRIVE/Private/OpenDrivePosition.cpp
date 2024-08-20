@@ -109,6 +109,13 @@ float UOpenDrivePosition::GetS() const {
 	return MetersToUu(OdrPosition().GetS());
 }
 
+void UOpenDrivePosition::SetS(float S) {
+	roadmanager::Position p = OdrPosition();
+	p.SetS(S);
+	p.MoveAlongS(0.);
+	SetTrackPosition(p);
+}
+
 float UOpenDrivePosition::GetT() const {
 	return MetersToUu(OdrPosition().GetOffset());
 }

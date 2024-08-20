@@ -139,6 +139,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetS() const;
 
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetS(float S);
+
 	/**
 	* Returns the current lateral offset (cm) from the lane center
 	*/
