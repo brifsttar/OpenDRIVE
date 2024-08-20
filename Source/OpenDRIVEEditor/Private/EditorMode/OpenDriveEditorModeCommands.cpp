@@ -28,7 +28,7 @@ void FOpenDriveEditorModeCommands::RegisterCommands()
 	/* Register our tool commands here */
 	UI_COMMAND(OpenDriveVisualizerTool, "Viewer", "Draws your currently used xodr file into the level", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveVisualizerTool);
-	UI_COMMAND(OpenDriveUtilsTool, "Utilities", "404", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(OpenDriveUtilsTool, "Actors", "OpenDrive's actors methods", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveUtilsTool);
 }
 

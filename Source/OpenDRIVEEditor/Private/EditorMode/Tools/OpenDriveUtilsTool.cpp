@@ -1,13 +1,12 @@
 #include "EditorMode/Tools/OpenDriveUtilsTool.h"
 #include "EditorMode/OpenDriveEditorLane.h"
-
 #include "OpenDrivePosition.h"
-
 #include "InteractiveToolManager.h"
 #include "ToolBuilderUtil.h"
 #include "CollisionQueryParams.h"
 #include "Engine/World.h"
 #include "Engine/DecalActor.h"
+#include "EditorMode/OpenDriveEditorMode.h"
 
 #define LOCTEXT_NAMESPACE "OpenDriveUtilsTool"
 
@@ -42,11 +41,8 @@ void UOpenDriveUtilsTool::Setup()
 void UOpenDriveUtilsTool::Shutdown(EToolShutdownType ShutdownType)
 {
 	/* Unbind all events */
-	Properties.Get()->OnAlignActorWithLane.Unbind();
+	Properties->OnAlignActorWithLane.Unbind();
 	USelection::SelectObjectEvent.Remove(OnActorSelectedHandle);
-
-	//DestroyGizmo();
-
 	UInteractiveTool::Shutdown(ShutdownType);
 }
 
@@ -56,13 +52,15 @@ void UOpenDriveUtilsTool::OnActorSelected(UObject* selectedObject)
 
 	if (IsValid(selectedActor))
 	{
+		if (Properties->SelectedActor != nullptr)
+		{
+			Properties->SelectedActor->GetRootComponent()->TransformUpdated.Remove(Properties->ActorTransformInfoHandle);
+		}
 		Properties->SelectedActor = selectedActor;
-
-		//USceneComponent* Root = selectedActor->GetRootComponent();
-		//if (IsValid(Root))
-		//{
-		//	CreateGizmo(Root->GetComponentTransform(), Root);
-		//}
+		Properties->ActorTransformInfoHandle = selectedActor->GetRootComponent()->TransformUpdated.AddUObject(Properties, &UOpenDriveUtilsToolProperties::UpdateActorInfo);
+		roadmanager::Position position = CoordTranslate::UeToOdr::FromTransfrom(selectedActor->GetActorTransform());
+		Properties->S = position.GetS();
+		Properties->T = position.GetT();
 	}
 }
 
@@ -85,51 +83,39 @@ void UOpenDriveUtilsTool::AlignActorWithLane()
 	Properties->SelectedActor->SetActorTransform(newTransform);
 }
 
-void UOpenDriveUtilsTool::CreateGizmo(FTransform InitialTransform, USceneComponent* AttachedComponent)
-{
-	ETransformGizmoSubElements SubElements = ETransformGizmoSubElements::TranslateAxisX | ETransformGizmoSubElements::TranslateAxisY;
-
-	UCombinedTransformGizmo* NewGizmo = UE::TransformGizmoUtil::CreateCustomTransformGizmo(GetToolManager(), SubElements, this, *GizmoIdentifier);
-
-	NewGizmo->bUseContextGizmoMode = false;
-	NewGizmo->ActiveGizmoMode = EToolContextTransformGizmoMode::Translation;
-	NewGizmo->bUseContextCoordinateSystem = false;
-	NewGizmo->CurrentCoordinateSystem = EToolContextCoordinateSystem::Local;
-	NewGizmo->bSnapToWorldGrid = false;
-	NewGizmo->SetUpdateCoordSystemFunction([this, NewGizmo](UPrimitiveComponent* Component, EToolContextCoordinateSystem CoordinateSystem)
-		{
-			SetCustomCoordinateSystem(Component, CoordinateSystem);
-		});
-
-	UTransformProxy* GizmoProxy = NewObject<UTransformProxy>(this);
-	GizmoProxy->SetTransform(InitialTransform);
-	GizmoProxy->AddComponent(AttachedComponent);
-
-	NewGizmo->SetActiveTarget(GizmoProxy, GetToolManager());
-
-	Gizmo = NewGizmo;
-}
-
-void UOpenDriveUtilsTool::DestroyGizmo()
-{
-	if (Gizmo != nullptr)
-	{
-		GetToolManager()->GetPairedGizmoManager()->DestroyGizmo(Gizmo);
-	}
-}
-
-void UOpenDriveUtilsTool::SetCustomCoordinateSystem(UPrimitiveComponent* Component, EToolContextCoordinateSystem TranCoordinateSystemsform)
-{
-	if (Component != nullptr)
-	{
-		UOpenDrivePosition* openDrivePosition = NewObject<UOpenDrivePosition>();
-		openDrivePosition->SetTransform(Component->GetComponentTransform());
-		openDrivePosition->AlignWithLaneCenter();
-		FQuat rotation = openDrivePosition->GetTransform().GetRotation();
-		Component->SetWorldRotation(rotation);
-		Gizmo->ActiveTarget->SetTransform(Component->GetComponentTransform());
-	}
-}
 #pragma endregion
 
+void UOpenDriveUtilsToolProperties::PostEditChangeProperty(FPropertyChangedEvent& e)
+{
+	Super::PostEditChangeProperty(e);
+	FName PropertyName = (e.MemberProperty != NULL) ? e.MemberProperty->GetFName() : NAME_None;
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S) || PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, T))
+	{
+		if (SelectedActor != nullptr)
+		{
+			UpdateActorTransform();
+		}
+	}
+}
+
+void UOpenDriveUtilsToolProperties::UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport)
+{
+	if (SelectedActor != nullptr)
+	{
+		roadmanager::Position position = CoordTranslate::UeToOdr::FromTransfrom(SceneComponent->GetComponentTransform());
+		S = position.GetS();
+		T = position.GetT();
+	}
+}
+
+void UOpenDriveUtilsToolProperties::UpdateActorTransform()
+{
+	UOpenDrivePosition* Position = NewObject<UOpenDrivePosition>();
+	Position->SetTransform(SelectedActor->GetActorTransform());
+	Position->SetT(T);
+	Position->SetS(S);
+	SelectedActor->SetActorTransform(Position->GetTransform());
+}
+
 #undef LOCTEXT_NAMESPACE
+

@@ -1,15 +1,11 @@
 #pragma once 
 
 #include "CoreMinimal.h"
-
 #include "UObject/NoExportTypes.h"
-
 #include "InteractiveToolBuilder.h"
 #include "BaseTools/SingleClickTool.h"
-
 #include "BaseGizmos/CombinedTransformGizmo.h"
 #include "BaseGizmos/TransformGizmoUtil.h"
-
 #include "OpenDriveUtilsTool.generated.h"
 
 UCLASS()
@@ -37,15 +33,27 @@ public :
 	UOpenDriveUtilsToolProperties() {}
 
 	/* Methods */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Selected Actor")
 	AActor* SelectedActor;
 
+	UPROPERTY(EditAnywhere, Category = "Selected Actor")
+	float S = 0.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Selected Actor")
+	float T = 0.0f;
+
 	/* Functions */
-	UFUNCTION(CallInEditor)
+	UFUNCTION(CallInEditor, Category="Methods")
 	void AlignWithLane() { OnAlignActorWithLane.Execute(); }
+
+	void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
+	void UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport);
+	void UpdateActorTransform();
 
 	/* Delegates */
 	FOnAlignActorWithLane OnAlignActorWithLane;
+
+	FDelegateHandle ActorTransformInfoHandle;
 };
 
 UCLASS()
@@ -69,15 +77,6 @@ protected:
 	TObjectPtr<UOpenDriveUtilsToolProperties> Properties;
 	UWorld* TargetWorld;
 
-	/* Gizmo variables */
-	TObjectPtr<UCombinedTransformGizmo> Gizmo;
-	FString GizmoIdentifier = "OpenDriveGizmo";
-	
-	/* Gizmo functions */
-	void CreateGizmo(FTransform InitialTransform, USceneComponent* AttachedComponent);
-	void DestroyGizmo();
-	void SetCustomCoordinateSystem(UPrimitiveComponent* Component, EToolContextCoordinateSystem TranCoordinateSystemsform);
-	
 	/* Actor selection */
 	void OnActorSelected(UObject* selectedObject);
 	FDelegateHandle OnActorSelectedHandle;

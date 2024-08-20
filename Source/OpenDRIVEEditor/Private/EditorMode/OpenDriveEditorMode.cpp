@@ -10,6 +10,7 @@
 #include "EditorMode/Tools/OpenDriveGizmo.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Selection.h"
 
 #define LOCTEXT_NAMESPACE "OpenDriveEditorMode"
 
@@ -48,15 +49,11 @@ void UOpenDriveEditorMode::Enter()
 	/* Set the default active tool (currently visualizer) */
 	GetToolManager()->SelectActiveToolType(EToolSide::Left, OpenDriveVisualizerToolName);
 	GetToolManager()->ActivateTool(EToolSide::Left);
-
-	OnActorSelectedHandle = USelection::SelectObjectEvent.AddUObject(this, &UOpenDriveEditorMode::OnActorSelected);
 }
 
 void UOpenDriveEditorMode::Exit()
 {
 	UnregisterGizmoBuilder();
-
-	USelection::SelectObjectEvent.Remove(OnActorSelectedHandle);
 	DestroyGizmo();
 	UEdMode::Exit();
 }
@@ -70,6 +67,23 @@ void UOpenDriveEditorMode::CreateToolkit()
 TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> UOpenDriveEditorMode::GetModeCommands() const
 {
 	return FOpenDriveEditorModeCommands::Get().GetCommands();
+}
+
+void UOpenDriveEditorMode::ActorSelectionChangeNotify()
+{
+	USelection* SelectedActors = GEditor->GetSelectedActors();
+	TArray<AActor*> SelectedActorArray;
+	
+	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
+	{
+		AActor* SelectedActor = Cast<AActor>(*It);
+		if (IsValid(SelectedActor))
+		{
+			DestroyGizmo();
+			CreateGizmo(SelectedActor->GetActorTransform(), SelectedActor->GetRootComponent());
+			return;
+		}
+	}
 }
 
 void UOpenDriveEditorMode::RegisterGizmoBuilder()

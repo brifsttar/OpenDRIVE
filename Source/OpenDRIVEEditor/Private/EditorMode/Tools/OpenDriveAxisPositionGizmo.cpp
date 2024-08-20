@@ -143,7 +143,7 @@ void UOpenDriveAxisPositionGizmo::OnTerminateDragSequence()
 void UOpenDriveGizmoAxisTranslationParameterSource::SetParameter(float NewValue)
 {
 	UGizmoComponentAxisSource* source = Cast<UGizmoComponentAxisSource>(AxisSource->_getUObject());
-	if (source->bLocalAxes && AxisType == OpenDriveAxisType::S)
+	if (AxisType == OpenDriveAxisType::S)
 	{
 		SetParameterAlongS(NewValue);
 	}
