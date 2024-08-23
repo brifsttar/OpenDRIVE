@@ -8,6 +8,8 @@
 #include "OpenDrivePosition.h"
 #include "OpenDriveEditorMode.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogOpenDriveEditorMode, Log, All);
+
 UCLASS()
 class UOpenDriveEditorMode : public UEdMode
 {
@@ -34,8 +36,6 @@ public :
 	void CreateGizmo(FTransform InitialTransform, USceneComponent* AttachedComponent);
 	
 	void DestroyGizmo();
-
-	void OnActorSelected(UObject* selectedObject);
 	
 	inline UInteractiveToolManager* GetToolkitManager() { return GetToolManager(); }
 
