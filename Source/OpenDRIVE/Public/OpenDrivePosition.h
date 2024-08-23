@@ -133,6 +133,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	int GetLaneId() const;
 
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetLaneById(int NewLaneId);
+
 	/**
 	* Returns the current S-coordinate (cm)
 	*/

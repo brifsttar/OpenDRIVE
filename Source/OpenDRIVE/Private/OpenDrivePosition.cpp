@@ -105,6 +105,14 @@ int UOpenDrivePosition::GetLaneId() const {
 	return OdrPosition().GetLaneId();
 }
 
+void UOpenDrivePosition::SetLaneById(int NewLaneId)
+{
+	roadmanager::Position p = OdrPosition();
+	p.SetLaneId(NewLaneId);
+	p.MoveAlongS(0.);
+	SetTrackPosition(p);
+}
+
 float UOpenDrivePosition::GetS() const {
 	return MetersToUu(OdrPosition().GetS());
 }
