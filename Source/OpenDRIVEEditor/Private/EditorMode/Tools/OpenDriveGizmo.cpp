@@ -14,6 +14,11 @@ UOpenDriveGizmo* UOpenDriveGizmo::CreateGizmo(UInteractiveGizmoManager* Manager,
 		NewGizmo->bUseContextCoordinateSystem = true;
 		NewGizmo->CurrentCoordinateSystem = EToolContextCoordinateSystem::Local;
 		NewGizmo->bSnapToWorldGrid = true;
+		NewGizmo->SetUpdateCoordSystemFunction(
+			[](UPrimitiveComponent* Component, EToolContextCoordinateSystem CoordSystem)
+			{ return EToolContextCoordinateSystem::Local; }
+		);
+
 		return NewGizmo;
 	}
 	else

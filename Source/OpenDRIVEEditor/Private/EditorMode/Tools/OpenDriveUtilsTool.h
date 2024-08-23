@@ -20,9 +20,6 @@ public:
 	virtual UInteractiveTool* BuildTool(const FToolBuilderState& SceneState) const override;
 };
 
-/* Buttons' events */
-DECLARE_DELEGATE(FOnAlignActorWithLane)
-
 UCLASS()
 class OPENDRIVEEDITOR_API UOpenDriveUtilsToolProperties : public UInteractiveToolPropertySet
 {
@@ -42,16 +39,32 @@ public :
 	UPROPERTY(EditAnywhere, Category = "Selected Actor")
 	float T = 0.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Selected Actor | Lane")
+	int32 LaneId = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Selected Actor | Repeat Along Road", meta=(Units = "cm"))
+	float Step = 200.0f;
+
 	/* Functions */
-	UFUNCTION(CallInEditor, Category="Methods")
-	void AlignWithLane() { OnAlignActorWithLane.Execute(); }
+	UFUNCTION(CallInEditor, Category = "Selected Actor | Lane")
+	void AlignWithLane() { if (IsValid(SelectedActor)) OnAlignActorWithLane.Execute(); }
+
+	UFUNCTION(CallInEditor, Category = "Selected Actor | Repeat Along Road")
+	void RepeatAlongRoad() { if (IsValid(SelectedActor)) OnRepeatAlongRoad.Execute(Step); }
 
 	void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
 	void UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport);
-	void UpdateActorTransform();
+	void UpdateLaneInfo(USceneComponent* SceneComponent);
 
 	/* Delegates */
+	DECLARE_DELEGATE(FOnAlignActorWithLane)
 	FOnAlignActorWithLane OnAlignActorWithLane;
+	DECLARE_DELEGATE(FOnUpdateActorTransform)
+	FOnUpdateActorTransform OnUpdateActorTransform;
+	DECLARE_DELEGATE_OneParam(FOnLaneChange, int32 /*Direction*/)
+	FOnLaneChange OnLaneChange;
+	DECLARE_DELEGATE_OneParam(FOnRepeatAlongRoad, float /*Step*/)
+	FOnRepeatAlongRoad OnRepeatAlongRoad;
 
 	FDelegateHandle ActorTransformInfoHandle;
 };
@@ -83,4 +96,13 @@ protected:
 
 	/* OpenDRIVE functions */
 	void AlignActorWithLane();
+	void UpdateActorTransform();
+	void ChangeActorLane(int32 Direction);
+	void RepeatAlongRoad(float step);
+
+	UOpenDriveEditorMode* GetEditorMode() const;
+
+private : 
+
+	void ResetGizmoTransform();
 };
