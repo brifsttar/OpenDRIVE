@@ -4,6 +4,7 @@
 #include "OpenDriveAssetActions.h"
 #include "AssetToolsModule.h"
 #include "Public/EditorMode/OpenDriveEdModeTool.h"
+#include "OpenDriveActorCustomDetails.h"
 
 IMPLEMENT_MODULE(FOpenDRIVEEditorModule, OpenDRIVEEditor)
 
@@ -20,6 +21,11 @@ void FOpenDRIVEEditorModule::StartupModule() {
 
 		OpenDRIVEAssetTypeActions = MakeShareable(new FOpenDRIVEAssetActions);
 		AssetTools.RegisterAssetTypeActions(OpenDRIVEAssetTypeActions.ToSharedRef());
+
+		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+		PropertyModule.RegisterCustomClassLayout("OpenDRIVEActor", FOnGetDetailCustomizationInstance::CreateStatic(&FOpenDriveActorCustomDetails::MakeInstance));
+		PropertyModule.NotifyCustomizationModuleChanged();
 	}
 
 	IOpenDRIVEModuleInterface::StartupModule();
@@ -31,6 +37,11 @@ void FOpenDRIVEEditorModule::ShutdownModule() {
 		if (OpenDRIVEAssetTypeActions.IsValid()) {
 			AssetTools.UnregisterAssetTypeActions(OpenDRIVEAssetTypeActions.ToSharedRef());
 		}
+	}
+
+	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor")) {
+		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		PropertyModule.UnregisterCustomClassLayout("OpenDRIVEActor");
 	}
 
 	IOpenDRIVEModuleInterface::ShutdownModule();
