@@ -140,11 +140,11 @@ void FOpenDRIVEEditorMode::SetRoadsVisibilityInEditor(bool bIsVisible)
 		}
 	}
 }
-
+/*
 TSubclassOf<UNavArea> FOpenDRIVEEditorMode::getNavArea(roadmanager::Lane::LaneType laneType){
 	return LoadClass<UNavArea>(nullptr, TEXT("//D:/git/vhcd/Content/VHCD/Test/Forbidden"));
 }
-
+*/
 void FOpenDRIVEEditorMode::SetRoadsArrowsVisibilityInEditor(bool bIsVisible)
 {
 	if (roadsArray.IsEmpty() == false)

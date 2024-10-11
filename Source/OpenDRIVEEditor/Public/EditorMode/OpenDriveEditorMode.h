@@ -85,8 +85,8 @@ public :
 	*/
 	void SetRoadsVisibilityInEditor(bool bIsVisible);
 
-
-	TSubclassOf<UNavArea> getNavArea(roadmanager::Lane::LaneType laneType);
+	//TODO FIX FOR 5.4
+	//TSubclassOf<UNavArea> getNavArea(roadmanager::Lane::LaneType laneType);
 
 
 protected :
