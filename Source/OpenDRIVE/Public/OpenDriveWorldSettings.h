@@ -29,6 +29,12 @@ protected:
 
 	void LoadOpenDrive();
 
+	/**
+	* Checks if there's an OpenDRIVEActor in the current scene 
+	* @return true if there's an actor, false else 
+	*/
+	bool HasOpenDriveActor();
+
 #if WITH_EDITOR
 	void OnObjectReimported(UObject* InObject);
 #endif
