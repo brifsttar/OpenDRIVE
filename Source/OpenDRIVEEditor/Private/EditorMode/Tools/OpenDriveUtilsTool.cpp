@@ -1,9 +1,9 @@
 #include "EditorMode/Tools/OpenDriveUtilsTool.h"
-#include "EditorMode/OpenDriveEditorLane.h"
 #include "OpenDrivePosition.h"
 #include "InteractiveToolManager.h"
 #include "ToolBuilderUtil.h"
 #include "CollisionQueryParams.h"
+#include "EditorModeManager.h"
 #include "Engine/World.h"
 #include "Engine/DecalActor.h"
 #include "EditorMode/OpenDriveEditorMode.h"
@@ -11,16 +11,13 @@
 
 #define LOCTEXT_NAMESPACE "OpenDriveUtilsTool"
 
-#pragma region OpenDriveUtilsToolBuilder
 UInteractiveTool* UOpenDriveUtilsToolBuilder::BuildTool(const FToolBuilderState& SceneState) const
 {
 	UOpenDriveUtilsTool* NewTool = NewObject<UOpenDriveUtilsTool>(SceneState.ToolManager);
 	NewTool->SetWorld(SceneState.World);
 	return NewTool;
 }
-#pragma endregion 
 
-#pragma region UOpenDriveUtilsTool
 void UOpenDriveUtilsTool::SetWorld(UWorld* World)
 {
 	TargetWorld = World;
@@ -103,17 +100,18 @@ void UOpenDriveUtilsTool::AlignActorWithLane()
 		newTransform.SetRotation(newTransform.GetRotation() * FRotator(90, 180, 90).Quaternion());
 	}
 	Properties->SelectedActor->SetActorTransform(newTransform);
-	ResetGizmoTransform();
 }
-
+														
 void UOpenDriveUtilsTool::UpdateActorTransform()
-{
+{		
 	UOpenDrivePosition* Position = NewObject<UOpenDrivePosition>();
 	Position->SetTransform(Properties->SelectedActor->GetActorTransform());
 	Position->SetT(Properties->T);
 	Position->SetS(Properties->S);
 	Properties->SelectedActor->SetActorTransform(Position->GetTransform());
-	ResetGizmoTransform();
+
+	FEditorViewportClient* ViewportClient = (FEditorViewportClient*)GEditor->GetActiveViewport()->GetClient();
+	ViewportClient->Viewport->Invalidate();
 }
 
 void UOpenDriveUtilsTool::ChangeActorLane(int32 Direction)
@@ -124,7 +122,6 @@ void UOpenDriveUtilsTool::ChangeActorLane(int32 Direction)
 		Position->SetTransform(Properties->SelectedActor->GetActorTransform());
 		Position->SetLaneById(Direction);
 		Properties->SelectedActor->SetActorTransform(Position->GetTransform());
-		ResetGizmoTransform();
 		AlignActorWithLane();
 	}
 }
@@ -178,21 +175,10 @@ UOpenDriveEditorMode* UOpenDriveUtilsTool::GetEditorMode() const
 {
 	if (GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId))
 	{
-		return (UOpenDriveEditorMode*)GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId);
+		return static_cast<UOpenDriveEditorMode*>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId));
 	}
 	return nullptr;
 }
-
-void UOpenDriveUtilsTool::ResetGizmoTransform()
-{
-	if (UOpenDriveEditorMode* EditorMode = GetEditorMode())
-	{
-		EditorMode->DestroyGizmo();
-		EditorMode->CreateGizmo(Properties->SelectedActor->GetActorTransform(), Properties->SelectedActor->GetRootComponent());
-	}
-}
-
-#pragma endregion
 
 void UOpenDriveUtilsToolProperties::PostEditChangeProperty(FPropertyChangedEvent& e)
 {

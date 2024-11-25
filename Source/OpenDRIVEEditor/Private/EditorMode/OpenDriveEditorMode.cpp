@@ -1,16 +1,10 @@
-/* Editor mode, tookit, commands and style */
 #include "EditorMode/OpenDriveEditorMode.h"
+#include "EdModeInteractiveToolsContext.h"
 #include "EditorMode/OpenDriveEditorModeToolkit.h"
 #include "EditorMode/OpenDriveEditorModeCommands.h"
 #include "EditorMode/OpenDriveEditorModeStyle.h"
-
-/* Tools */
 #include "EditorMode/Tools/OpenDriveVisualizerTool.h"
 #include "EditorMode/Tools/OpenDriveUtilsTool.h"
-#include "EditorMode/Tools/OpenDriveGizmo.h"
-
-#include "Kismet/GameplayStatics.h"
-#include "Selection.h"
 
 DEFINE_LOG_CATEGORY(LogOpenDriveEditorMode);
 
@@ -21,10 +15,6 @@ const FEditorModeID UOpenDriveEditorMode::EM_OpenDriveEditorModeId = TEXT("EM_Op
 FString UOpenDriveEditorMode::OpenDriveVisualizerToolName = TEXT("Odr_VisualizationTool");
 FString UOpenDriveEditorMode::OpenDriveUtilsToolName = TEXT("Odr_UtilsTool");
 
-FString UOpenDriveEditorMode::GizmoIdentifier = TEXT("OpenDriveGizmo");
-FString UOpenDriveEditorMode::GizmoBuilderIdentifier = TEXT("OpenDriveGizmoBuilder");
-FString UOpenDriveEditorMode::GizmoAxisBuilderIdentifier = TEXT("OpenDriveAxisGizmoBuilder");
-
 UOpenDriveEditorMode::UOpenDriveEditorMode()
 {
 	Info = FEditorModeInfo(
@@ -34,14 +24,10 @@ UOpenDriveEditorMode::UOpenDriveEditorMode()
 		true);
 }
 
-UOpenDriveEditorMode::~UOpenDriveEditorMode() {}
-
 void UOpenDriveEditorMode::Enter()
 {
 	UEdMode::Enter();
-
-	RegisterGizmoBuilder();
-
+	
 	const FOpenDriveEditorModeCommands& ToolCommands = FOpenDriveEditorModeCommands::Get();
 
 	/* Register tools */
@@ -51,16 +37,12 @@ void UOpenDriveEditorMode::Enter()
 	/* Set the default active tool (currently visualizer) */
 	GetToolManager()->SelectActiveToolType(EToolSide::Left, OpenDriveVisualizerToolName);
 	GetToolManager()->ActivateTool(EToolSide::Left);
-
-	ActorSelectionChangeNotify();
-
+	
 	UE_LOG(LogOpenDriveEditorMode, Log, TEXT("OpenDriveEditorMode entered."));
 }
 
 void UOpenDriveEditorMode::Exit()
 {
-	UnregisterGizmoBuilder();
-	DestroyGizmo();
 	UE_LOG(LogOpenDriveEditorMode, Log, TEXT("OpenDriveEditorMode exited."));
 	UEdMode::Exit();
 }
@@ -78,74 +60,7 @@ TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> UOpenDriveEditorMode::GetModeCom
 
 void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 {
-	UE_LOG(LogOpenDriveEditorMode, Log, TEXT("Actor selection changed."));
-	USelection* SelectedActors = GEditor->GetSelectedActors();
-	TArray<AActor*> SelectedActorArray;
-
-	if (SelectedActors)
-	{
-		SelectedActors->GetSelectedObjects<AActor>(SelectedActorArray);
-	}	
 	
-	if (SelectedActorArray.Num() == 0)
-	{
-		UE_LOG(LogOpenDriveEditorMode, Log, TEXT("No actor selected."));
-		DestroyGizmo();
-	}
-	else
-	{
-		UE_LOG(LogOpenDriveEditorMode, Log, TEXT("Actor(s) selected."));
-		DestroyGizmo();
-		CreateGizmo(SelectedActorArray[0]->GetActorTransform(), SelectedActorArray[0]->GetRootComponent());
-	}
-}
-
-void UOpenDriveEditorMode::RegisterGizmoBuilder()
-{
-	UE::TransformGizmoUtil::RegisterTransformGizmoContextObject(GetInteractiveToolsContext());
-
-	UGizmoViewContext* GizmoViewContext = GetToolManager()->GetContextObjectStore()->FindContext<UGizmoViewContext>();
-	if (!GizmoViewContext)
-	{
-		GizmoViewContext = NewObject<UGizmoViewContext>();
-		GetToolManager()->GetContextObjectStore()->AddContextObject(GizmoViewContext);
-	}
-
-	UOpenDriveAxisGizmoBuilder* CustomAxisGizmoBuilder = NewObject<UOpenDriveAxisGizmoBuilder>();
-	GetToolManager()->GetPairedGizmoManager()->RegisterGizmoType(*GizmoAxisBuilderIdentifier, CustomAxisGizmoBuilder);
-	UOpenDriveGizmoBuilder::RegisterGizmoBuilder(GetToolManager()->GetPairedGizmoManager(), GizmoViewContext, GizmoAxisBuilderIdentifier, GizmoBuilderIdentifier);
-	UE_LOG(LogOpenDriveEditorMode, Log, TEXT("Gizmo builder registered."));
-}
-
-void UOpenDriveEditorMode::UnregisterGizmoBuilder()
-{
-	GetToolManager()->GetPairedGizmoManager()->DeregisterGizmoType(*GizmoBuilderIdentifier);
-	UE::TransformGizmoUtil::DeregisterTransformGizmoContextObject(GetInteractiveToolsContext());
-	UE_LOG(LogOpenDriveEditorMode, Log, TEXT("Gizmo builder unregistered."));	
-}
-
-void UOpenDriveEditorMode::CreateGizmo(FTransform InitialTransform, USceneComponent* AttachedComponent)
-{
-	UOpenDriveGizmo* NewGizmo = UOpenDriveGizmo::CreateGizmo(GetToolManager()->GetPairedGizmoManager(), GizmoBuilderIdentifier, GizmoIdentifier);
-	UTransformProxy* GizmoProxy = NewObject<UTransformProxy>(this);
-	GizmoProxy->bRotatePerObject = true;
-	GizmoProxy->SetTransform(InitialTransform);
-	GizmoProxy->AddComponent(AttachedComponent);
-	NewGizmo->SetActiveTarget(GizmoProxy, GetToolManager());
-}
-
-void UOpenDriveEditorMode::DestroyGizmo()
-{
-	UInteractiveGizmo* Gizmo = GetToolManager()->GetPairedGizmoManager()->FindGizmoByInstanceIdentifier(GizmoIdentifier);
-
-	if (Gizmo)
-	{
-		GetToolManager()->GetPairedGizmoManager()->DestroyGizmo(Gizmo);
-	}
-	else
-	{
-		UE_LOG(LogOpenDriveEditorMode, Warning, TEXT("Gizmo not found."));
-	}
 }
 
 #undef LOCTEXT_NAMESPACE

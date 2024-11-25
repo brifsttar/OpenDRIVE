@@ -1,7 +1,5 @@
 #pragma once 
-
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "InteractiveToolBuilder.h"
 #include "BaseTools/SingleClickTool.h"
 #include "OpenDriveVisualizerTool.generated.h"
@@ -53,9 +51,9 @@ public:
 
 	/* Methods */
 	UFUNCTION(CallInEditor, Category="Functions")
-	void Generate(){ OnGenerateVisualization.Execute(RoadOffset, Step); }
+	FORCEINLINE void Generate() const { OnGenerateVisualization.Execute(RoadOffset, Step); }
 	UFUNCTION(CallInEditor, Category = "Functions")
-	void ChangeLaneVisibility(){ OnChangeLaneVisibility.Execute(); }
+	FORCEINLINE void ChangeLaneVisibility() const { OnChangeLaneVisibility.Execute(); }
 
 	/* Delegates */
 	FOnGenerateVisualization OnGenerateVisualization;
@@ -69,7 +67,9 @@ class OPENDRIVEEDITOR_API UOpenDriveVisualizerTool : public UInteractiveTool
 
 public:
 
-	UOpenDriveVisualizerTool() {}
+	UOpenDriveVisualizerTool(): TargetWorld(nullptr)
+	{
+	}
 
 	/* InteractiveTool interface */
 	virtual void Setup() override;
@@ -80,7 +80,10 @@ public:
 protected:
 
 	/* Properties and world */
+	UPROPERTY()
 	TObjectPtr<UOpenDriveVisualizerToolProperties> Properties;
+
+	UPROPERTY()
 	UWorld* TargetWorld;
 
 	/* OpenDrive's visualizer base methods */

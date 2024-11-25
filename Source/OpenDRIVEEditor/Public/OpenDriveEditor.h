@@ -1,19 +1,16 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "UnrealEd.h"
-#include "SlateBasics.h"
-#include "SlateExtras.h"
-#include "Editor/LevelEditor/Public/LevelEditor.h"
-#include "Editor/PropertyEditor/Public/PropertyEditing.h"
 #include "IOpenDriveModuleInterface.h"
 
-class FOpenDriveEditorModule : public IOpenDRIVEModuleInterface
+class FOpenDriveEditorModule : public IOpenDriveModuleInterface
 {
 public:
-	/** IModuleInterface implementation **/
+	// IModuleInterface implementation start
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+	// IModuleInterface implementation end
 
+	// IOpenDriveModuleInterface implementation
 	virtual void AddModuleListeners() override;
 
 	static inline FOpenDriveEditorModule& Get()
@@ -26,11 +23,12 @@ public:
 		return FModuleManager::Get().IsModuleLoaded("OpenDriveEditor");
 	}
 
-	TSharedRef<FWorkspaceItem> GetMenuRoot() { return MenuRoot; };
-
 protected:
+	
+	void RegisterMenuExtensions();
+	void AddToolbarExtension(FToolBarBuilder& builder);
+	bool bOpenDriveGizmoOn = false;
+	void Toggle();
 
-	TSharedPtr<FExtensibilityManager> LevelEditorMenuExtensibilityManager;
-	TSharedPtr<FExtender> MenuExtender;
-	static TSharedRef<FWorkspaceItem> MenuRoot;
+	TSharedPtr<FUICommandList> CommandList;
 };

@@ -14,6 +14,6 @@ class OPENDRIVEEDITOR_API UOpenDRIVEExporter : public UExporter
 	
 	UOpenDRIVEExporter(const FObjectInitializer& ObjectInitiliazer);
 
-	/* UExporter interface */
+	// UExporter interface 
 	virtual bool ExportText(const FExportObjectInnerContext* Context, UObject* Object, const TCHAR* Type, FOutputDevice& Ar, FFeedbackContext* Warn, uint32 PortFlags) override;
 };

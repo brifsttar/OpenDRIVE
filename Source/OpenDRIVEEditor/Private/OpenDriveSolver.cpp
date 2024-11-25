@@ -1,4 +1,5 @@
 #include "OpenDriveSolver.h"
+#include "CoordTranslate.h"
 
 UOpenDriveSolver::UOpenDriveSolver(){
 
@@ -19,7 +20,7 @@ UOpenDriveSolver::UOpenDriveSolver(LaneRef currentLane, int lineType){
 void UOpenDriveSolver::Initialize(LaneRef currentLane, int lineType){
 	_currentLane = currentLane;
 	_position.SetSnapLaneTypes(lineType);
-	_laneLength = _currentLane.laneSection->GetLength();
+	_laneLength = _currentLane.LaneSection->GetLength();
 }
 
 /**
@@ -32,9 +33,9 @@ TArray<FTransform> UOpenDriveSolver::MakeTransformArray(float step){
 	_blockSize = _laneLength / (float)_blockCount;
 
 	//get the starting point of the lane
-	double s = _currentLane.laneSection->GetS();
+	double s = _currentLane.LaneSection->GetS();
 
-	double middleOfLane = _currentLane.laneSection->GetLength() / 2 + s; //TODO CHECK LINE TYPE
+	double middleOfLane = _currentLane.LaneSection->GetLength() / 2 + s; //TODO CHECK LINE TYPE
 
 	TArray<FTransform> TList;
 
@@ -66,50 +67,50 @@ void UOpenDriveSolver::MakeTransformArrayV2(RoadData& road){
 	//TODO HANDLE ARC GEOMETRY
 	int lsIndex = 0, geoIndex = 0, SNow = 0;
 
-	while (SNow <= road.roadRef->GetLength() && geoIndex < road.A_geometry.Num() && lsIndex< road.A_laneSection.Num()) {
-		if (road.A_geometry[geoIndex]->GetS() + road.A_geometry[geoIndex]->GetLength() <
-		road.A_laneSection[lsIndex].sectionRef->GetS() + road.A_laneSection[lsIndex].sectionRef->GetLength()) {
+	while (SNow <= road.RoadRef->GetLength() && geoIndex < road.A_Geometry.Num() && lsIndex< road.A_LaneSection.Num()) {
+		if (road.A_Geometry[geoIndex]->GetS() + road.A_Geometry[geoIndex]->GetLength() <
+		road.A_LaneSection[lsIndex].SectionRef->GetS() + road.A_LaneSection[lsIndex].SectionRef->GetLength()) {
 			//remaining geo is shorter
-			updateTransform(road.roadRef, &(road.A_laneSection[lsIndex]), SNow, road.A_geometry[geoIndex]->GetS() + road.A_geometry[geoIndex]->GetLength() - SNow);
-			SNow = road.A_geometry[geoIndex]->GetS() + road.A_geometry[geoIndex]->GetLength();
+			UpdateTransform(road.RoadRef, &(road.A_LaneSection[lsIndex]), SNow, road.A_Geometry[geoIndex]->GetS() + road.A_Geometry[geoIndex]->GetLength() - SNow);
+			SNow = road.A_Geometry[geoIndex]->GetS() + road.A_Geometry[geoIndex]->GetLength();
 			geoIndex++;
 		}else {
 			//remaining lanesection  is shorter
-			updateTransform(road.roadRef, &(road.A_laneSection[lsIndex]), SNow, road.A_laneSection[lsIndex].sectionRef->GetS() + road.A_laneSection[lsIndex].sectionRef->GetLength() - SNow);
-			SNow = road.A_laneSection[lsIndex].sectionRef->GetS() + road.A_laneSection[lsIndex].sectionRef->GetLength();
+			UpdateTransform(road.RoadRef, &(road.A_LaneSection[lsIndex]), SNow, road.A_LaneSection[lsIndex].SectionRef->GetS() + road.A_LaneSection[lsIndex].SectionRef->GetLength() - SNow);
+			SNow = road.A_LaneSection[lsIndex].SectionRef->GetS() + road.A_LaneSection[lsIndex].SectionRef->GetLength();
 			lsIndex++;
 		}
 	}
 }
 
-void UOpenDriveSolver::updateTransform(roadmanager::Road* road,  LaneSectionData* LSData, double offset, double length){
+void UOpenDriveSolver::UpdateTransform(roadmanager::Road* road,  LaneSectionData* LSData, double offset, double length){
 	float middleOfSection = offset + length / 2;
-	for (int i = 0; i < LSData->A_lane.Num(); i++) {
-		FindPoint(middleOfSection, road, LSData->A_lane[i].laneRef);
+	for (int i = 0; i < LSData->A_Lane.Num(); i++) {
+		FindPoint(middleOfSection, road, LSData->A_Lane[i].LaneRef);
 		FVector sp = CoordTranslate::OdrToUe::ToLocation(_position);
 		FRotator rot = CoordTranslate::OdrToUe::ToRotation(_position);
 		FVector sc = FVector(
 			length,																		//LENGHT
-			LSData->sectionRef->GetWidth(offset, LSData->A_lane[i].laneRef->GetId()),		//WIDTH
+			LSData->SectionRef->GetWidth(offset, LSData->A_Lane[i].LaneRef->GetId()),		//WIDTH
 			1)/2;																			//HEIGHT
-		LSData->A_lane[i].A_transform.Add(FTransform(rot, sp, sc));
+		LSData->A_Lane[i].A_Transform.Add(FTransform(rot, sp, sc));
 	}
 }
 
 void UOpenDriveSolver::SetRoad(roadmanager::Road* road){
-	_currentLane.road = road;
+	_currentLane.Road = road;
 }
 
 void UOpenDriveSolver::SetRoad(int id){
-	_currentLane.road = _odr->GetRoadByIdx(id);
+	_currentLane.Road = _odr->GetRoadByIdx(id);
 }
 
 void UOpenDriveSolver::SetLane(roadmanager::Lane* lane){
-	_currentLane.lane = lane;
+	_currentLane.Lane = lane;
 }
 
 void UOpenDriveSolver::SetLane(int id){
-	_currentLane.lane = _currentLane.laneSection->GetLaneByIdx(id);
+	_currentLane.Lane = _currentLane.LaneSection->GetLaneByIdx(id);
 }
 
 /**
@@ -159,7 +160,7 @@ TArray<UOpenDriveSolver::LaneRef> UOpenDriveSolver::GetAllLanesOfType(roadmanage
 * @param 
 *
 */
-TArray<UOpenDriveSolver::LaneData> UOpenDriveSolver::getLane(roadmanager::Road* roadRef, roadmanager::LaneSection* sectionRef, roadmanager::Lane::LaneType laneTypeMask){
+TArray<UOpenDriveSolver::LaneData> UOpenDriveSolver::GetLane(roadmanager::Road* roadRef, roadmanager::LaneSection* sectionRef, roadmanager::Lane::LaneType laneTypeMask){
 	TArray<LaneData> A_lane;
 	roadmanager::Lane* lane = 0;
 	int nbLane = sectionRef->GetNumberOfLanes();
@@ -178,14 +179,14 @@ TArray<UOpenDriveSolver::LaneData> UOpenDriveSolver::getLane(roadmanager::Road* 
 * @param roadRef - reference of the road
 * @param laneTypeMask - bitMask for the type of lane to extract from the file (all of them if left empty)
 */
-TArray<UOpenDriveSolver::LaneSectionData> UOpenDriveSolver::getLaneSection(roadmanager::Road* roadRef, roadmanager::Lane::LaneType laneTypeMask){
+TArray<UOpenDriveSolver::LaneSectionData> UOpenDriveSolver::GetLaneSection(roadmanager::Road* roadRef, roadmanager::Lane::LaneType laneTypeMask){
 	TArray<LaneSectionData> A_ls;
 	roadmanager::LaneSection* section;
 	int nbLaneSection = roadRef->GetNumberOfLaneSections();
 	for (int i = 0; i < nbLaneSection; i++) {
 		section = roadRef->GetLaneSectionByIdx(i);
 		if (!section) continue;
-		A_ls.Add(LaneSectionData{ section, getLane(roadRef, section, laneTypeMask) });
+		A_ls.Add(LaneSectionData{ section, GetLane(roadRef, section, laneTypeMask) });
 	}
 	return A_ls;
 }
@@ -195,7 +196,7 @@ TArray<UOpenDriveSolver::LaneSectionData> UOpenDriveSolver::getLaneSection(roadm
 * @param roadRef - referencce to the road
 * @return An array of geometry
 */
-TArray<roadmanager::Geometry*> UOpenDriveSolver::getGeometries(roadmanager::Road* roadRef){
+TArray<roadmanager::Geometry*> UOpenDriveSolver::GetGeometries(roadmanager::Road* roadRef){
 	TArray<roadmanager::Geometry*> A_geo;
 	roadmanager::Geometry* geo = 0;
 
@@ -213,13 +214,13 @@ TArray<roadmanager::Geometry*> UOpenDriveSolver::getGeometries(roadmanager::Road
 * @param roadId - id of the road to read
 * @param laneTypeMask - bitMask for the type of lane to extract from the file (all of them if left empty)
 */
-UOpenDriveSolver::RoadData UOpenDriveSolver::getRoad(int roadId, roadmanager::Lane::LaneType laneTypeMask ){
+UOpenDriveSolver::RoadData UOpenDriveSolver::GetRoad(int roadId, roadmanager::Lane::LaneType laneTypeMask ){
 	RoadData road;
 
-	road.roadRef = _odr->GetRoadByIdx(roadId);
-	if (!road.roadRef) return road;
-	road.A_laneSection = getLaneSection(road.roadRef, laneTypeMask);
-	road.A_geometry = getGeometries(road.roadRef);
+	road.RoadRef = _odr->GetRoadByIdx(roadId);
+	if (!road.RoadRef) return road;
+	road.A_LaneSection = GetLaneSection(road.RoadRef, laneTypeMask);
+	road.A_Geometry = GetGeometries(road.RoadRef);
 
 	MakeTransformArrayV2(road);
 
@@ -238,8 +239,8 @@ TArray<UOpenDriveSolver::RoadData> UOpenDriveSolver::getAllRoad(roadmanager::Lan
 
 	int nbRoad = _odr->GetNumOfRoads();
 	for (int i = 0; i < nbRoad; i++) {
-		road = getRoad(i, laneTypeMask);
-		if (!road.roadRef) continue;
+		road = GetRoad(i, laneTypeMask);
+		if (!road.RoadRef) continue;
 		A_road.Add(road);
 	}
 
@@ -254,9 +255,9 @@ TArray<UOpenDriveSolver::RoadData> UOpenDriveSolver::getAllRoad(roadmanager::Lan
 TArray<FTransform> UOpenDriveSolver::extractRoadTransform(TArray<RoadData>& A_road){
 	 TArray<FTransform> A_transform;
 	 for (RoadData road : A_road) {
-		 for (LaneSectionData ls : road.A_laneSection) {
-			 for (LaneData lane : ls.A_lane) {
-				 A_transform.Append(lane.A_transform);
+		 for (LaneSectionData ls : road.A_LaneSection) {
+			 for (LaneData lane : ls.A_Lane) {
+				 A_transform.Append(lane.A_Transform);
 			 } 
 		 }
 	 }
@@ -272,7 +273,7 @@ TArray<FTransform> UOpenDriveSolver::extractRoadTransform(TArray<RoadData>& A_ro
 */
 void UOpenDriveSolver::FindPoint(double offset, roadmanager::Road* road, roadmanager::Lane* lane) {
 	if (lane == nullptr || road == nullptr) {
-		_position.SetLanePos(_currentLane.road->GetId(), _currentLane.lane->GetId(), offset, 0.);
+		_position.SetLanePos(_currentLane.Road->GetId(), _currentLane.Lane->GetId(), offset, 0.);
 	} else {
 		_position.SetLanePos(road->GetId(), lane->GetId(), offset, 0.);
 	}

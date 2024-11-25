@@ -1,15 +1,15 @@
 #include "EditorMode/OpenDriveEditorModeCommands.h"
-#include "EditorStyleSet.h"
 
 #define LOCTEXT_NAMESPACE "OpenDriveEditorModeCommands"
 
-FOpenDriveEditorModeCommands::FOpenDriveEditorModeCommands() 
-	: TCommands<FOpenDriveEditorModeCommands>
+FOpenDriveEditorModeCommands::FOpenDriveEditorModeCommands() :
+	TCommands<FOpenDriveEditorModeCommands>
 	("OpenDriveEditorMode",
 	NSLOCTEXT("OpenDriveEditorMode", "OpenDriveEditorModeCommands", "OpenDrive Editor Mode"),
 	NAME_None,
-	FEditorStyle::GetStyleSetName()
-	){}
+	FAppStyle::GetAppStyleSetName()
+	)
+{}
 
 void FOpenDriveEditorModeCommands::OnStartupModule()
 {
@@ -26,10 +26,12 @@ void FOpenDriveEditorModeCommands::RegisterCommands()
 	TArray<TSharedPtr<FUICommandInfo>>& ToolCommands = Commands.FindOrAdd(NAME_Default);
 
 	/* Register our tool commands here */
-	UI_COMMAND(OpenDriveVisualizerTool, "Viewer", "Draws your currently used xodr file into the level", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(OpenDriveVisualizerTool, "Viewer", "Draws your currently used .xodr file into the level", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveVisualizerTool);
-	UI_COMMAND(OpenDriveUtilsTool, "Actors", "OpenDrive's actors methods", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(OpenDriveUtilsTool, "Actors", "OpenDrive's actors utility functions", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveUtilsTool);
+	UI_COMMAND(OpenDriveGizmoTool, "Gizmo", "OpenDrive's gizmo", EUserInterfaceActionType::ToggleButton, FInputChord(EKeys::G, false, true, true, false));
+	ToolCommands.Add(OpenDriveGizmoTool);
 }
 
 TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> FOpenDriveEditorModeCommands::GetCommands()

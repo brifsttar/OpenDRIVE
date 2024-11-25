@@ -1,7 +1,5 @@
 #include "EditorMode/OpenDriveEditorModeToolkit.h"
 #include "EditorMode/OpenDriveEditorModeStyle.h"
-
-#include "Engine/Selection.h"
 #include "Modules/ModuleManager.h"
 #include "PropertyEditorModule.h"
 #include "IDetailsView.h"
@@ -49,9 +47,8 @@ void FOpenDriveEditorModeToolkit::BuildToolPalette(FName PaletteName, FToolBarBu
 
 	/* Add icons for each tools */
 	TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> CommandsList = GetScriptableEditorMode()->GetModeCommands();
-	TArray<TSharedPtr<FUICommandInfo>>* CurrentCommandListPtr = CommandsList.Find(PaletteName);
 
-	if (CurrentCommandListPtr)
+	if (TArray<TSharedPtr<FUICommandInfo>>* CurrentCommandListPtr = CommandsList.Find(PaletteName))
 	{
 		TArray<TSharedPtr<FUICommandInfo>> CurrentCommandList = *CurrentCommandListPtr;
 		for (TSharedPtr<FUICommandInfo> Command : CurrentCommandList)

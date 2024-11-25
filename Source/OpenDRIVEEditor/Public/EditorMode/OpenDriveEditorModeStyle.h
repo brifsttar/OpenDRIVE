@@ -1,22 +1,20 @@
 #pragma once 
-
 #include "CoreMinimal.h"
 #include "IOpenDriveModuleInterface.h"
 #include "Styling/SlateStyle.h"
-#include "Styling/SlateStyleRegistry.h"
 
-/* This class is used to register a custom OpenDRIVE slate style for later uses */
-class FOpenDriveEditorModeStyleSet : public IOpenDRIVEModuleListenerInterface
+/**
+ * A Custom OpenDriveEditor Slate Style Set to load OpenDrive's related icons and more
+ */
+class FOpenDriveEditorModeStyleSet : public IOpenDriveModuleListenerInterface
 {
 public : 
 
-	/** IOpenDriveModuleListener Interface */
+	// IOpenDriveModuleListener interface implementation start 
 	virtual void OnStartupModule() override;
 	virtual void OnShutdownModule() override;
-
-	void Initialize();
-	void Shutdown();
-
+	// IOpenDriveModuleListener interface implementation end
+	
 	static const class ISlateStyle& Get(); 
 	static FName GetStyleSetName();
 

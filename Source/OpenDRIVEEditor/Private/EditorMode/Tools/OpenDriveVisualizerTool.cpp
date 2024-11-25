@@ -1,10 +1,7 @@
 #include "EditorMode/Tools/OpenDriveVisualizerTool.h"
 #include "EditorMode/OpenDriveEditorLane.h"
-#include "EditorMode/OpenDriveEditorLane.h"
 #include "OpenDriveSolver.h"
-
 #include "InteractiveToolManager.h"
-#include "ToolBuilderUtil.h"
 #include "CollisionQueryParams.h"
 #include "Engine/World.h"
 #include "Engine.h"
@@ -12,16 +9,13 @@
 
 #define LOCTEXT_NAMESPACE "OpenDriveVisualizerTool"
 
-#pragma region OpenDriveVisualizerToolBuilder
 UInteractiveTool* UOpenDriveVisualizerToolBuilder::BuildTool(const FToolBuilderState& SceneState) const
 {
 	UOpenDriveVisualizerTool* NewTool = NewObject<UOpenDriveVisualizerTool>(SceneState.ToolManager);
 	NewTool->SetWorld(SceneState.World);
 	return NewTool;
 }
-#pragma endregion
 
-#pragma region UOpenDriveVisualizerTool
 void UOpenDriveVisualizerTool::SetWorld(UWorld* World)
 {
 	TargetWorld = World;
@@ -77,7 +71,7 @@ void UOpenDriveVisualizerTool::Generate(float offset, float step)
 	for (auto lane : laneList)
 	{
 		AOpenDriveEditorLane* newLane = TargetWorld->SpawnActor<AOpenDriveEditorLane>(spawnParam);
-		newLane->Initialize(lane.road, lane.laneSection, lane.lane, offset, step);
+		newLane->Initialize(lane.Road, lane.LaneSection, lane.Lane, offset, step);
 	}
 }
 
@@ -101,6 +95,8 @@ void UOpenDriveVisualizerTool::DeleteAllLanes()
 	{
 		actor->Destroy();
 	}
+
+	actors.SetNum(0);
 }
 
 void UOpenDriveVisualizerTool::OnActorSelected(UObject* selectedActor)
@@ -117,6 +113,5 @@ void UOpenDriveVisualizerTool::OnActorSelected(UObject* selectedActor)
 		Properties.Get()->PredecessorId = selectedRoad->GetPredecessorId();
 	}
 }
-#pragma endregion
 
 #undef LOCTEXT_NAMESPACE

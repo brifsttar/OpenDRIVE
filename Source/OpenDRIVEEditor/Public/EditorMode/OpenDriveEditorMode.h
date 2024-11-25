@@ -1,11 +1,6 @@
 #pragma once 
-
 #include "CoreMinimal.h"
 #include "Tools/UEdMode.h"
-#include "EdModeInteractiveToolsContext.h"
-#include "InteractiveToolManager.h"
-#include "EditorModeManager.h"
-#include "OpenDrivePosition.h"
 #include "OpenDriveEditorMode.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogOpenDriveEditorMode, Log, All);
@@ -24,27 +19,15 @@ public :
 	static FString OpenDriveUtilsToolName;
 
 	UOpenDriveEditorMode();
-	virtual ~UOpenDriveEditorMode();
+	virtual ~UOpenDriveEditorMode() override {}
 
-	/** UEdMode interface */
+	// UEdMode interface implementation start
 	virtual void Enter() override;
 	virtual void Exit() override;
 	virtual void CreateToolkit() override;
 	virtual TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> GetModeCommands() const override;
-	virtual void ActorSelectionChangeNotify() override;	
-
-	void CreateGizmo(FTransform InitialTransform, USceneComponent* AttachedComponent);
+	virtual void ActorSelectionChangeNotify() override;
+	// UEdMode interface implementation end
 	
-	void DestroyGizmo();
-	
-	inline UInteractiveToolManager* GetToolkitManager() { return GetToolManager(); }
-
-	static FString GizmoIdentifier;
-	static FString GizmoBuilderIdentifier;
-	static FString GizmoAxisBuilderIdentifier;
-
-private :
-
-	void RegisterGizmoBuilder();
-	void UnregisterGizmoBuilder();
+	FORCEINLINE UInteractiveToolManager* GetToolkitManager() const { return GetToolManager(); }
 };

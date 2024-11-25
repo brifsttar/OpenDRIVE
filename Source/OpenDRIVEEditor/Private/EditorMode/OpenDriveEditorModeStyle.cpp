@@ -1,20 +1,11 @@
 #include "EditorMode/OpenDriveEditorModeStyle.h"
+#include "Styling/SlateStyleRegistry.h"
 
 #define IMAGE_BRUSH(RelativePath, ...)FSlateImageBrush(OpenDriveStyleInstance->RootToContentDir(RelativePath, TEXT(".png")), __VA_ARGS__)
 
 TSharedPtr<FSlateStyleSet> FOpenDriveEditorModeStyleSet::OpenDriveStyleInstance = NULL;
 
 void FOpenDriveEditorModeStyleSet::OnStartupModule()
-{
-	Initialize();
-}
-
-void FOpenDriveEditorModeStyleSet::OnShutdownModule()
-{
-	Shutdown();
-}
-
-void FOpenDriveEditorModeStyleSet::Initialize()
 {
 	if (!OpenDriveStyleInstance.IsValid())
 	{
@@ -23,7 +14,7 @@ void FOpenDriveEditorModeStyleSet::Initialize()
 	}
 }
 
-void FOpenDriveEditorModeStyleSet::Shutdown()
+void FOpenDriveEditorModeStyleSet::OnShutdownModule()
 {
 	if (OpenDriveStyleInstance.IsValid())
 	{
@@ -49,7 +40,6 @@ void FOpenDriveEditorModeStyleSet::Create()
 	OpenDriveStyleInstance = MakeShareable(new FSlateStyleSet("OpenDriveStyle"));
 	OpenDriveStyleInstance->SetContentRoot(FPaths::ProjectPluginsDir() / TEXT("OpenDRIVE/Content/EditorRessources"));
 	OpenDriveStyleInstance->SetCoreContentRoot(FPaths::ProjectPluginsDir() / TEXT("OpenDRIVE/Content/EditorRessources"));
-
 	CreateIcons();
 	CreateButtonsStyle();
 }

@@ -1,27 +1,27 @@
 #pragma once 
-
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
 #include "IOpenDriveModuleInterface.h"
 
-class FOpenDriveEditorModeCommands : public IOpenDRIVEModuleListenerInterface , public TCommands<FOpenDriveEditorModeCommands>
+class FOpenDriveEditorModeCommands : public IOpenDriveModuleListenerInterface , public TCommands<FOpenDriveEditorModeCommands>
 {
 public : 
 
 	FOpenDriveEditorModeCommands();
 
-	/** IOpenDriveModuleListener Interface */
+	// IOpenDriveModuleListener interface implementation start
 	virtual void OnStartupModule() override;
 	virtual void OnShutdownModule() override;
+	// IOpenDriveModuleListener interface implementation end
 
 	/** TCommands interface */
 	virtual void RegisterCommands() override;
 
 	static TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> GetCommands();
-
-	/* Each command corresponds to one tool */
+	
 	TSharedPtr<FUICommandInfo> OpenDriveVisualizerTool;
 	TSharedPtr<FUICommandInfo> OpenDriveUtilsTool;
+	TSharedPtr<FUICommandInfo> OpenDriveGizmoTool;
 
 protected :
 

@@ -58,6 +58,7 @@ public class OpenDRIVEEditor : ModuleRules
 				"AppFramework",
 				"Slate",
 				"SlateCore",
+				"ToolMenus",
 				"EditorFramework",
 				"EditorStyle",
 				"AnimGraph",

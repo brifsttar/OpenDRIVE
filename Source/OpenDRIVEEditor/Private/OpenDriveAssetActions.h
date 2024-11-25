@@ -4,7 +4,7 @@
 #include "OpenDriveAsset.h"
 #include "IOpenDriveModuleInterface.h"
 
-class FOpenDriveAssetActions : public FAssetTypeActions_Base, public IOpenDRIVEModuleListenerInterface
+class FOpenDriveAssetActions : public FAssetTypeActions_Base, public IOpenDriveModuleListenerInterface
 {
 public :
 

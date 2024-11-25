@@ -27,7 +27,9 @@ class OPENDRIVEEDITOR_API UOpenDriveUtilsToolProperties : public UInteractiveToo
 
 public :
 
-	UOpenDriveUtilsToolProperties() {}
+	UOpenDriveUtilsToolProperties(): SelectedActor(nullptr)
+	{
+	}
 
 	/* Methods */
 	UPROPERTY(EditAnywhere, Category="Selected Actor")
@@ -39,20 +41,20 @@ public :
 	UPROPERTY(EditAnywhere, Category = "Selected Actor")
 	float T = 0.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Selected Actor | Lane")
+	UPROPERTY(EditAnywhere, Category = "Selected Actor")
 	int32 LaneId = 0;
 
-	UPROPERTY(EditAnywhere, Category = "Selected Actor | Repeat Along Road", meta=(Units = "cm"))
+	UPROPERTY(EditAnywhere, Category = "Repeat Along Road", meta=(Units = "cm"))
 	float Step = 200.0f;
 
 	/* Functions */
-	UFUNCTION(CallInEditor, Category = "Selected Actor | Lane")
-	void AlignWithLane() { if (IsValid(SelectedActor)) OnAlignActorWithLane.Execute(); }
+	UFUNCTION(CallInEditor, Category = "Align with lane")
+	FORCEINLINE void AlignWithLane() const { if (IsValid(SelectedActor)) OnAlignActorWithLane.Execute(); }
 
-	UFUNCTION(CallInEditor, Category = "Selected Actor | Repeat Along Road")
-	void RepeatAlongRoad() { if (IsValid(SelectedActor)) OnRepeatAlongRoad.Execute(Step); }
+	UFUNCTION(CallInEditor, Category = "Repeat Along Road")
+	FORCEINLINE void RepeatAlongRoad() const { if (IsValid(SelectedActor)) OnRepeatAlongRoad.Execute(Step); }
 
-	void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
 	void UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport);
 	void UpdateLaneInfo(USceneComponent* SceneComponent);
 
@@ -76,7 +78,9 @@ class OPENDRIVEEDITOR_API UOpenDriveUtilsTool : public UInteractiveTool
 
 public:
 
-	UOpenDriveUtilsTool() {}
+	UOpenDriveUtilsTool(): TargetWorld(nullptr)
+	{
+	}
 
 	/* Interactive tool interface */
 	virtual void Setup() override;
@@ -87,7 +91,10 @@ public:
 protected:
 
 	/* Properties and world */
+	UPROPERTY()
 	TObjectPtr<UOpenDriveUtilsToolProperties> Properties;
+
+	UPROPERTY()
 	UWorld* TargetWorld;
 
 	/* Actor selection */
@@ -101,8 +108,4 @@ protected:
 	void RepeatAlongRoad(float step);
 
 	UOpenDriveEditorMode* GetEditorMode() const;
-
-private : 
-
-	void ResetGizmoTransform();
 };

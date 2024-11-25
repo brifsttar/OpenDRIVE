@@ -1,7 +1,9 @@
 #include "EditorMode/OpenDriveEditorLane.h"
+#include "CoordTranslate.h"
+#include "Components/SplineMeshComponent.h"
 
 // Sets default values
-AOpenDriveEditorLane::AOpenDriveEditorLane()
+AOpenDriveEditorLane::AOpenDriveEditorLane(): _road(nullptr), _laneSection(nullptr), _lane(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bEditable = true;
@@ -61,13 +63,14 @@ void AOpenDriveEditorLane::DrawLane(double step, float offset)
 	case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
 		mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/Warning"));
 		break;
-
 	case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
 		mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/Bike"));
 		break;
-
 	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
 		mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/BetterArrow"));
+		break;
+	default:
+		mesh = nullptr;
 		break;
 	}
 	if (mesh != nullptr)
@@ -88,19 +91,20 @@ void AOpenDriveEditorLane::DrawLane(double step, float offset)
 		case (roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
 			laneSpline->EditorUnselectedSplineSegmentColor = _lane->GetId() > 0 ? FLinearColor::Red : FLinearColor::Green;
 			break;
-
 		case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
 			laneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(1, 0.5, 0);
 			break;
-
 		case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
 			laneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(0, 0, 1);
+			break;
+		default:
+			laneSpline->EditorUnselectedSplineSegmentColor = FLinearColor(0.25, 0.25, 0.25);
 			break;
 		}
 	}
 }
 
-FString AOpenDriveEditorLane::GetLaneType()
+FString AOpenDriveEditorLane::GetLaneType() const
 {
 	FString type;
 
@@ -144,13 +148,13 @@ FString AOpenDriveEditorLane::GetLaneType()
 	return type;
 }
 
-int AOpenDriveEditorLane::GetSuccessorId()
+int AOpenDriveEditorLane::GetSuccessorId() const
 {
 	roadmanager::RoadLink* link = _road->GetLink(roadmanager::LinkType::SUCCESSOR);
 	return  link != nullptr ? link->GetElementId() :  0;
 }
 
-int AOpenDriveEditorLane::GetPredecessorId()
+int AOpenDriveEditorLane::GetPredecessorId() const
 {
 	roadmanager::RoadLink* link = _road->GetLink(roadmanager::LinkType::PREDECESSOR);
 	return  link != nullptr ? link->GetElementId() : 0;
