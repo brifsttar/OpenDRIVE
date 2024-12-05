@@ -43,6 +43,12 @@ ATrafficLightController::ATrafficLightController()
 void ATrafficLightController::BeginPlay()
 {
 	Super::BeginPlay();
+	for (auto& g : TrafficLightGroups) {
+		for (auto& tl : g.TrafficLights) {
+			if (!IsValid(tl)) continue;
+			tl->Controller = this;
+		}
+	}
 	UpdateLights();
 }
 

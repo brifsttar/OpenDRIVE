@@ -38,6 +38,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "TrafficLight", meta = (AllowPrivateAccess = "true"))
 	class UOpenDriveComponent* OpenDrive;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "TrafficLight")
+	TObjectPtr<class ATrafficLightController> Controller;
+
 	UPROPERTY(BlueprintAssignable);
 	FOnTrafficLightStateChanged OnTrafficLightStateChanged;
 
