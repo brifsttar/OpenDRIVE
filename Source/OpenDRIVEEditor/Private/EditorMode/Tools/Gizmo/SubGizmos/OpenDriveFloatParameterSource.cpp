@@ -33,8 +33,20 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 
 	LaneId = OpenDrivePosition->GetLaneId();
 	InitialS = OpenDrivePosition->GetS();
+
+	OpenDrivePosition->SetTransform(TransformSource->GetTransform());
+
+	if (OpenDrivePosition->OdrPosition().IsOffRoad())
+	{
+		return;
+	}
 	
-	OpenDrivePosition->SetTransform(NewTransform); 
+	OpenDrivePosition->SetTransform(NewTransform);
+
+	if (OpenDrivePosition->OdrPosition().IsInJunction())
+	{
+		return;
+	}
 
 	switch(SourceType)
 	{
