@@ -39,7 +39,7 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	switch(SourceType)
 	{
 	case EOpenDriveSourceType::TranslateOnS :
-		OpenDrivePosition->SetLaneById(LaneId); 
+		OpenDrivePosition->SetLaneById(LaneId);
 		OpenDrivePosition->AlignWithLaneCenter(); 
 		OpenDrivePosition->SetT(InitialT); 
 		break;

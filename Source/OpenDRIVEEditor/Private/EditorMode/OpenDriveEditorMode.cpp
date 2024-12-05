@@ -90,15 +90,6 @@ void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 			TransformProxy->AddComponent(SelectedActors[0]->GetRootComponent());
 			OpenDriveGizmo->SetActiveTarget(TransformProxy, GetToolManager());
 			OpenDriveGizmo->SetVisibility(true);
-
-			OpenDrivePosition->SetTransform(SelectedActors[0]->GetRootComponent()->GetComponentTransform());
-
-			if (OpenDrivePosition->OdrPosition().IsOffRoad())
-			{
-				FMessageLog MessageLog("OpenDRIVE Editor Mode error");
-                    MessageLog.Error(FText::FromString("Selected Actor is off road, gizmo won't work. Please switch to Default Editor Mode to move it on a road"));
-                    MessageLog.Notify();
-			}
 		}
 		else
 		{
