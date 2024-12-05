@@ -1,5 +1,5 @@
 #include "EditorMode/Tools/OpenDriveVisualizerTool.h"
-#include "EditorMode/OpenDriveEditorLane.h"
+#include "OpenDriveEditorLane.h"
 #include "OpenDriveSolver.h"
 #include "InteractiveToolManager.h"
 #include "CollisionQueryParams.h"
@@ -53,64 +53,58 @@ void UOpenDriveVisualizerTool::Shutdown(EToolShutdownType ShutdownType)
 	UInteractiveTool::Shutdown(ShutdownType);
 }
 
-void UOpenDriveVisualizerTool::Generate(float offset, float step)
+void UOpenDriveVisualizerTool::Generate(const float Offset, const float Step) const
 {
 	DeleteAllLanes();
-
-	/* Actor Spawn Parameters */
-	FActorSpawnParameters spawnParam;
-	spawnParam.bHideFromSceneOutliner = true;
-	spawnParam.bTemporaryEditorActor = true;
-	spawnParam.ObjectFlags = EObjectFlags::RF_Transient;
-
+	
 	/* OpenDrive solver creation */
-	UOpenDriveSolver* solver = NewObject<UOpenDriveSolver>();
-	TArray<UOpenDriveSolver::LaneRef> laneList = solver->GetAllLanesOfType(/* All */);
+	UOpenDriveSolver* Solver = NewObject<UOpenDriveSolver>();
+	FActorSpawnParameters SpawnParam;
+	SpawnParam.bHideFromSceneOutliner = true;
 
 	/* Draw roads */
-	for (auto lane : laneList)
+	for (TArray<UOpenDriveSolver::LaneRef> LaneList = Solver->GetAllLanesOfType(/* All */);
+		const auto [Road, LaneSection, Lane] : LaneList)
 	{
-		AOpenDriveEditorLane* newLane = TargetWorld->SpawnActor<AOpenDriveEditorLane>(spawnParam);
-		newLane->Initialize(lane.Road, lane.LaneSection, lane.Lane, offset, step);
+		AOpenDriveEditorLane* NewLane = TargetWorld->SpawnActor<AOpenDriveEditorLane>(SpawnParam);
+		NewLane->Initialize(Road, LaneSection, Lane, Offset, Step);
 	}
 }
 
-void UOpenDriveVisualizerTool::HideShowLanes()
+void UOpenDriveVisualizerTool::HideShowLanes() const
 {
-	TArray<AActor*> actors;
-	UGameplayStatics::GetAllActorsOfClass(TargetWorld, AOpenDriveEditorLane::StaticClass(), actors);
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(TargetWorld, AOpenDriveEditorLane::StaticClass(), Actors);
 
-	for (AActor* actor : actors)
+	for (AActor* Actor : Actors)
 	{
-		actor->SetIsTemporarilyHiddenInEditor(!actor->IsHiddenEd());
+		Actor->SetIsTemporarilyHiddenInEditor(!Actor->IsHiddenEd());
 	}
 }
 
-void UOpenDriveVisualizerTool::DeleteAllLanes()
+void UOpenDriveVisualizerTool::DeleteAllLanes() const
 {
-	TArray<AActor*> actors;
-	UGameplayStatics::GetAllActorsOfClass(TargetWorld, AOpenDriveEditorLane::StaticClass(), actors);
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(TargetWorld, AOpenDriveEditorLane::StaticClass(), Actors);
 	
-	for (AActor* actor : actors)
+	for (AActor* Actor : Actors)
 	{
-		actor->Destroy();
+		Actor->Destroy();
 	}
 
-	actors.SetNum(0);
+	Actors.SetNum(0);
 }
 
-void UOpenDriveVisualizerTool::OnActorSelected(UObject* selectedActor)
+void UOpenDriveVisualizerTool::OnActorSelected(UObject* SelectedActor) const
 {
-	AOpenDriveEditorLane* selectedRoad = Cast<AOpenDriveEditorLane>(selectedActor);
-
-	if (IsValid(selectedRoad))
+	if (const AOpenDriveEditorLane* SelectedRoad = Cast<AOpenDriveEditorLane>(SelectedActor); IsValid(SelectedRoad))
 	{
-		Properties.Get()->RoadId = selectedRoad->GetRoadId();
-		Properties.Get()->JunctionId = selectedRoad->GetJunctionId();
-		Properties.Get()->LaneId = selectedRoad->GetLaneId();
-		Properties.Get()->LaneType = selectedRoad->GetLaneType();
-		Properties.Get()->SuccessorId = selectedRoad->GetSuccessorId();
-		Properties.Get()->PredecessorId = selectedRoad->GetPredecessorId();
+		Properties.Get()->RoadId = SelectedRoad->GetRoadId();
+		Properties.Get()->JunctionId = SelectedRoad->GetJunctionId();
+		Properties.Get()->LaneId = SelectedRoad->GetLaneId();
+		Properties.Get()->LaneType = SelectedRoad->GetLaneType();
+		Properties.Get()->SuccessorId = SelectedRoad->GetSuccessorId();
+		Properties.Get()->PredecessorId = SelectedRoad->GetPredecessorId();
 	}
 }
 

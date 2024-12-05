@@ -56,16 +56,16 @@ public :
 
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
 	void UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport);
-	void UpdateLaneInfo(USceneComponent* SceneComponent);
+	void UpdateLaneInfo(const USceneComponent* SceneComponent);
 
 	/* Delegates */
 	DECLARE_DELEGATE(FOnAlignActorWithLane)
 	FOnAlignActorWithLane OnAlignActorWithLane;
 	DECLARE_DELEGATE(FOnUpdateActorTransform)
 	FOnUpdateActorTransform OnUpdateActorTransform;
-	DECLARE_DELEGATE_OneParam(FOnLaneChange, int32 /*Direction*/)
+	DECLARE_DELEGATE_OneParam(FOnLaneChange, const int32 /*Direction*/)
 	FOnLaneChange OnLaneChange;
-	DECLARE_DELEGATE_OneParam(FOnRepeatAlongRoad, float /*Step*/)
+	DECLARE_DELEGATE_OneParam(FOnRepeatAlongRoad, const float /*Step*/)
 	FOnRepeatAlongRoad OnRepeatAlongRoad;
 
 	FDelegateHandle ActorTransformInfoHandle;
@@ -98,14 +98,16 @@ protected:
 	UWorld* TargetWorld;
 
 	/* Actor selection */
-	void OnActorSelected(UObject* selectedObject);
+	void OnActorSelected(UObject* SelectedObject);
 	FDelegateHandle OnActorSelectedHandle;
 
 	/* OpenDRIVE functions */
-	void AlignActorWithLane();
-	void UpdateActorTransform();
-	void ChangeActorLane(int32 Direction);
-	void RepeatAlongRoad(float step);
+	void AlignActorWithLane() const;
+	void UpdateActorTransform() const;
+	void ChangeActorLane(int32 Direction) const;
+	void RepeatAlongRoad(float Step) const;
 
 	UOpenDriveEditorMode* GetEditorMode() const;
+
+	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
 };

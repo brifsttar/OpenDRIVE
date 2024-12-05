@@ -1,9 +1,11 @@
-#include "OpenDRIVEEditor.h"
+#include "OpenDriveEditor.h"
+#include "EditorModes.h"
+#include "EditorModeManager.h"
 #include "LevelEditor.h"
 #include "EditorMode/OpenDriveEditorModeCommands.h"
 #include "EditorMode/OpenDriveEditorModeStyle.h"
 #include "OpenDriveAssetActions.h"
-#include "EditorMode/Tools/Gizmo/OpenDriveGizmoSubsystem.h"
+#include "EditorMode/OpenDriveEditorMode.h"
 
 #define LOCTEXT_NAMESPACE "FOpenDriveEditorModule"
 
@@ -16,6 +18,7 @@ void FOpenDriveEditorModule::StartupModule()
 void FOpenDriveEditorModule::ShutdownModule() 
 {
 	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveGizmoTool);
+	OpenDriveCommands.Reset();
 	IOpenDriveModuleInterface::ShutdownModule();
 }
 
@@ -28,35 +31,38 @@ void FOpenDriveEditorModule::AddModuleListeners()
 
 void FOpenDriveEditorModule::RegisterMenuExtensions()
 {
-	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
-	const TSharedPtr<FUICommandList> Commands = LevelEditorModule.GetGlobalLevelEditorActions();
-	Commands->MapAction(
+	OpenDriveCommands = MakeShareable(new FUICommandList());
+	OpenDriveCommands->MapAction(
 		FOpenDriveEditorModeCommands::Get().OpenDriveGizmoTool,
 		FExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::Toggle),
 		FCanExecuteAction()
 	);
 	
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+	const TSharedPtr<FUICommandList> Commands = LevelEditorModule.GetGlobalLevelEditorActions();
+	Commands->Append(OpenDriveCommands.ToSharedRef());
+
 	TSharedPtr<FExtender> NewExtender = MakeShareable(new FExtender());
 	NewExtender->AddToolBarExtension("Transform", EExtensionHook::After, Commands, FToolBarExtensionDelegate::CreateRaw(this, &FOpenDriveEditorModule::AddToolbarExtension));
 	LevelEditorModule.GetToolBarExtensibilityManager()->AddExtender(NewExtender);
 }
 
-void FOpenDriveEditorModule::AddToolbarExtension(FToolBarBuilder& builder)
+void FOpenDriveEditorModule::AddToolbarExtension(FToolBarBuilder& Builder)
 {
 	FUIAction ToggleButtonAction;
 	ToggleButtonAction.GetActionCheckState.BindLambda([&]
 	{
-		return bOpenDriveGizmoOn ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+		return GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 	});
 	ToggleButtonAction.ExecuteAction.BindRaw(this,&FOpenDriveEditorModule::Toggle);
 
-	builder.AddSeparator();
+	Builder.AddSeparator();
 
-	builder.AddToolBarButton(
+	Builder.AddToolBarButton(
 	ToggleButtonAction,
 	NAME_Default,
-	FText::FromString("Switch to OpenDRIVE translation mode"),
-	FText::FromString("Allows to move Actors following lanes described in Odr file (only works in Local Space)"),
+	FText::FromString("Switch to OpenDRIVE Editor Mode"),
+	FText::FromString("Shortcut to OpenDRIVE Editor Mode (visualization, Actors manipulation)"),
 	FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveEditorModeIcon", "OpenDriveEditorModeIcon.Small"),
 	EUserInterfaceActionType::ToggleButton
 	);
@@ -64,8 +70,14 @@ void FOpenDriveEditorModule::AddToolbarExtension(FToolBarBuilder& builder)
 
 void FOpenDriveEditorModule::Toggle()
 {
-	bOpenDriveGizmoOn = !bOpenDriveGizmoOn;
-	GEditor->GetEditorSubsystem<UOpenDriveGizmoSubsystem>()->ToggleOpenDriveGizmoMode(bOpenDriveGizmoOn);
+	if (GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId))
+	{
+		GLevelEditorModeTools().ActivateMode(FBuiltinEditorModes::EM_Default);
+	}
+	else
+	{
+		GLevelEditorModeTools().ActivateMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId);
+	}
 }
 
 IMPLEMENT_MODULE(FOpenDriveEditorModule, OpenDRIVEEditor)

@@ -1,7 +1,7 @@
-#include "OpenDRIVEExporter.h"
+#include "OpenDriveExporter.h"
 #include "OpenDriveAsset.h"
 
-UOpenDRIVEExporter::UOpenDRIVEExporter(const FObjectInitializer& ObjectInitiliazer) : Super(ObjectInitiliazer)
+UOpenDriveExporter::UOpenDriveExporter(const FObjectInitializer& ObjectInitiliazer) : Super(ObjectInitiliazer)
 {
 	SupportedClass = UOpenDriveAsset::StaticClass();
 	bText = true; 
@@ -10,10 +10,10 @@ UOpenDRIVEExporter::UOpenDRIVEExporter(const FObjectInitializer& ObjectInitiliaz
 	FormatDescription.Add(TEXT("XODR File"));
 }
 
-bool UOpenDRIVEExporter::ExportText(const FExportObjectInnerContext* Context, UObject* Object, const TCHAR* Type, FOutputDevice& Ar, FFeedbackContext* Warn, uint32 PortFlags)
+bool UOpenDriveExporter::ExportText(const FExportObjectInnerContext* Context, UObject* Object, const TCHAR* Type, FOutputDevice& Ar, FFeedbackContext* Warn, uint32 PortFlags)
 {
-	UOpenDriveAsset* openDriveAsset = CastChecked<UOpenDriveAsset>(Object);
-	FString odr = openDriveAsset->XodrContent;
-	Ar.Log(odr);
+	const UOpenDriveAsset* OpenDriveAsset = CastChecked<UOpenDriveAsset>(Object);
+	const FString Odr = OpenDriveAsset->XodrContent;
+	Ar.Log(Odr);
 	return true;
 }

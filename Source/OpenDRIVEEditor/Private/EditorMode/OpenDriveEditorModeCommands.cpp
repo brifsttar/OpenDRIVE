@@ -4,8 +4,8 @@
 
 FOpenDriveEditorModeCommands::FOpenDriveEditorModeCommands() :
 	TCommands<FOpenDriveEditorModeCommands>
-	("OpenDriveEditorMode",
-	NSLOCTEXT("OpenDriveEditorMode", "OpenDriveEditorModeCommands", "OpenDrive Editor Mode"),
+	("OpenDriveEditorModeCommands",
+	NSLOCTEXT("OpenDriveEditorModeCommands", "OpenDriveEditorModeCommands", "OpenDRIVE Editor Commands"),
 	NAME_None,
 	FAppStyle::GetAppStyleSetName()
 	)
@@ -30,7 +30,7 @@ void FOpenDriveEditorModeCommands::RegisterCommands()
 	ToolCommands.Add(OpenDriveVisualizerTool);
 	UI_COMMAND(OpenDriveUtilsTool, "Actors", "OpenDrive's actors utility functions", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveUtilsTool);
-	UI_COMMAND(OpenDriveGizmoTool, "Gizmo", "OpenDrive's gizmo", EUserInterfaceActionType::ToggleButton, FInputChord(EKeys::G, false, true, true, false));
+	UI_COMMAND(OpenDriveGizmoTool, "OpenDRIVE Editor Mode", "Shortcut to OpenDRIVE Editor Mode", EUserInterfaceActionType::ToggleButton, FInputChord(EKeys::G, false, true, true, false));
 	ToolCommands.Add(OpenDriveGizmoTool);
 }
 

@@ -67,9 +67,7 @@ class OPENDRIVEEDITOR_API UOpenDriveVisualizerTool : public UInteractiveTool
 
 public:
 
-	UOpenDriveVisualizerTool(): TargetWorld(nullptr)
-	{
-	}
+	UOpenDriveVisualizerTool(): TargetWorld(nullptr){}
 
 	/* InteractiveTool interface */
 	virtual void Setup() override;
@@ -87,11 +85,11 @@ protected:
 	UWorld* TargetWorld;
 
 	/* OpenDrive's visualizer base methods */
-	void Generate(float offset, float step);
-	void HideShowLanes();
-	void DeleteAllLanes();
+	void Generate(float Offset, float Step) const;
+	void HideShowLanes() const;
+	void DeleteAllLanes() const;
 
 	/* Actor selection */
-	void OnActorSelected(UObject* selectedActor);
+	void OnActorSelected(UObject* SelectedActor) const;
 	FDelegateHandle OnActorSelectedHandle;
 };

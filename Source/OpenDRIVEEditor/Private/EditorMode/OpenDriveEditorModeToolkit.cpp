@@ -38,7 +38,7 @@ TSharedPtr<SWidget> FOpenDriveEditorModeToolkit::GetInlineContent() const
 	return ToolkitWidget;
 }
 
-void FOpenDriveEditorModeToolkit::BuildToolPalette(FName PaletteName, FToolBarBuilder& ToolbarBuilder)
+void FOpenDriveEditorModeToolkit::BuildToolPalette(const FName PaletteName, FToolBarBuilder& ToolbarBuilder)
 {
 	if (!GetScriptableEditorMode().IsValid())
 	{
@@ -53,8 +53,8 @@ void FOpenDriveEditorModeToolkit::BuildToolPalette(FName PaletteName, FToolBarBu
 		TArray<TSharedPtr<FUICommandInfo>> CurrentCommandList = *CurrentCommandListPtr;
 		for (TSharedPtr<FUICommandInfo> Command : CurrentCommandList)
 		{
-			FString commandName = Command->GetCommandName().ToString();
-			FString commandIconName = commandName + FString("Icon.Small");
+			FString CommandName = Command->GetCommandName().ToString();
+			FString CommandIconName = CommandName + FString("Icon.Small");
 
 			ToolbarBuilder.AddToolBarButton(
 				Command,
@@ -65,7 +65,7 @@ void FOpenDriveEditorModeToolkit::BuildToolPalette(FName PaletteName, FToolBarBu
 				(
 					TAttribute<FSlateIcon>::FGetter::CreateLambda
 					(
-						[commandIconName]() { return FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), *commandIconName); }
+						[CommandIconName]() { return FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), *CommandIconName); }
 					)
 				),
 				NAME_None, 

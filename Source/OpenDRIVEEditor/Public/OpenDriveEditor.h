@@ -10,8 +10,9 @@ public:
 	virtual void ShutdownModule() override;
 	// IModuleInterface implementation end
 
-	// IOpenDriveModuleInterface implementation
+	// IOpenDriveModuleInterface implementation start
 	virtual void AddModuleListeners() override;
+	// IOpenDriveModuleInterface implementation end
 
 	static inline FOpenDriveEditorModule& Get()
 	{
@@ -26,9 +27,8 @@ public:
 protected:
 	
 	void RegisterMenuExtensions();
-	void AddToolbarExtension(FToolBarBuilder& builder);
-	bool bOpenDriveGizmoOn = false;
+	void AddToolbarExtension(FToolBarBuilder& Builder);
 	void Toggle();
 
-	TSharedPtr<FUICommandList> CommandList;
+	TSharedPtr<FUICommandList> OpenDriveCommands;
 };
