@@ -33,6 +33,9 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 	int LaneId;
 
 	UPROPERTY()
+	int RoadId;
+
+	UPROPERTY()
 	float InitialT;
 
 	UPROPERTY()
@@ -55,7 +58,7 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 
 	UPROPERTY()
 	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
-	
+
 	static UOpenDriveFloatParameterSource* Construct(
 		IGizmoAxisSource* AxisSourceIn,
 		IGizmoTransformSource* TransformSourceIn,

@@ -1,12 +1,12 @@
 #pragma once 
-
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "InteractiveToolBuilder.h"
 #include "BaseTools/SingleClickTool.h"
-#include "BaseGizmos/CombinedTransformGizmo.h"
 #include "BaseGizmos/TransformGizmoUtil.h"
 #include "OpenDriveUtilsTool.generated.h"
+
+class UOpenDrivePosition;
+class UOpenDriveEditorMode;
 
 UCLASS()
 class OPENDRIVEEDITOR_API UOpenDriveUtilsToolBuilder : public UInteractiveToolBuilder
@@ -35,16 +35,16 @@ public :
 	UPROPERTY(EditAnywhere, Category="Selected Actor")
 	AActor* SelectedActor;
 
-	UPROPERTY(EditAnywhere, Category = "Selected Actor")
-	float S = 0.0f;
+	UPROPERTY(EditAnywhere, Category="Selected Actor",  meta=(ForceUnits="m"))
+	float S;
+
+	UPROPERTY(VisibleAnywhere, Category = "Selected Actor", meta=(Units="cm"))
+	float T;
 
 	UPROPERTY(EditAnywhere, Category = "Selected Actor")
-	float T = 0.0f;
+	int32 LaneId;
 
-	UPROPERTY(EditAnywhere, Category = "Selected Actor")
-	int32 LaneId = 0;
-
-	UPROPERTY(EditAnywhere, Category = "Repeat Along Road", meta=(Units = "cm"))
+	UPROPERTY(EditAnywhere, Category = "Repeat Along Road")
 	float Step = 200.0f;
 
 	/* Functions */
@@ -109,5 +109,6 @@ protected:
 
 	UOpenDriveEditorMode* GetEditorMode() const;
 
+	UPROPERTY()
 	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
 };

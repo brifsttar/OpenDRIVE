@@ -2,9 +2,7 @@
 #include "OpenDrivePosition.h"
 #include "InteractiveToolManager.h"
 #include "ToolBuilderUtil.h"
-#include "CollisionQueryParams.h"
 #include "EditorModeManager.h"
-#include "Engine/World.h"
 #include "Engine/DecalActor.h"
 #include "EditorMode/OpenDriveEditorMode.h"
 #include "Subsystems/EditorActorSubsystem.h"
@@ -80,7 +78,6 @@ void UOpenDriveUtilsTool::OnActorSelected(UObject* SelectedObject)
 		Properties->SelectedActor = SelectedActorArray[0];
 		Properties->ActorTransformInfoHandle = Properties->SelectedActor->GetRootComponent()->TransformUpdated.AddUObject(Properties, &UOpenDriveUtilsToolProperties::UpdateActorInfo);
 		Properties->UpdateActorInfo(Properties->SelectedActor->GetRootComponent(), EUpdateTransformFlags::None, ETeleportType::None);
-		Properties->UpdateLaneInfo(Properties->SelectedActor->GetRootComponent());
 	}
 }
 
@@ -102,16 +99,6 @@ void UOpenDriveUtilsTool::AlignActorWithLane() const
 	Properties->SelectedActor->SetActorTransform(NewTransform);
 	GetEditorMode()->ActorSelectionChangeNotify();
 }
-														
-void UOpenDriveUtilsTool::UpdateActorTransform() const
-{		
-	OpenDrivePosition->SetTransform(Properties->SelectedActor->GetActorTransform());
-	OpenDrivePosition->SetT(Properties->T);
-	OpenDrivePosition->SetS(Properties->S);
-	Properties->SelectedActor->SetActorTransform(OpenDrivePosition->GetTransform());
-
-	GetEditorMode()->ActorSelectionChangeNotify();
-}
 
 void UOpenDriveUtilsTool::ChangeActorLane(const int32 Direction) const
 {
@@ -119,8 +106,11 @@ void UOpenDriveUtilsTool::ChangeActorLane(const int32 Direction) const
 	{
 		OpenDrivePosition->SetTransform(Properties->SelectedActor->GetActorTransform());
 		OpenDrivePosition->SetLaneById(Direction);
-		Properties->SelectedActor->SetActorTransform(OpenDrivePosition->GetTransform());
-		AlignActorWithLane();
+		if (FVector::Distance(OpenDrivePosition->GetTransform().GetLocation(), Properties->SelectedActor->GetActorLocation()) > 10)
+		{
+			Properties->SelectedActor->SetActorTransform(OpenDrivePosition->GetTransform());
+			AlignActorWithLane();
+		}
 	}
 }
 
@@ -182,18 +172,24 @@ void UOpenDriveUtilsToolProperties::PostEditChangeProperty(FPropertyChangedEvent
 {
 	Super::PostEditChangeProperty(e);
 	const FName PropertyName = (e.MemberProperty != nullptr) ? e.MemberProperty->GetFName() : NAME_None;
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S) || PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, T))
-	{
-		if (IsValid(SelectedActor))
-		{
-			OnUpdateActorTransform.Execute();
-		}
-	}
-
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, LaneId))
+	if ( PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, LaneId))
 	{
 		OnLaneChange.Execute(LaneId);
 	}
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S))
+	{
+		OnUpdateActorTransform.Execute();
+	}
+}
+
+void UOpenDriveUtilsTool::UpdateActorTransform() const
+{
+	UE_LOG(LogTemp, Display, TEXT("Updating ActorTransform %s"), *Properties->SelectedActor->GetActorTransform().ToString());
+	
+	OpenDrivePosition->SetTransform(Properties->SelectedActor->GetActorTransform());
+	OpenDrivePosition->SetS(Properties->S);
+	Properties->SelectedActor->SetActorTransform(OpenDrivePosition->GetTransform());
+	GetEditorMode()->ActorSelectionChangeNotify();
 }
 
 void UOpenDriveUtilsToolProperties::UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport)
@@ -202,25 +198,39 @@ void UOpenDriveUtilsToolProperties::UpdateActorInfo(USceneComponent* SceneCompon
 	{
 		UOpenDrivePosition* Position = NewObject<UOpenDrivePosition>();
 		Position->SetTransform(SelectedActor->GetActorTransform());
-		S = Position->GetS();
+		UpdateLaneInfo(SceneComponent);
 	}
 }
 
 void UOpenDriveUtilsToolProperties::UpdateLaneInfo(const USceneComponent* SceneComponent)
 {
-	const roadmanager::Position Position = CoordTranslate::UeToOdr::FromTransfrom(SceneComponent->GetComponentTransform());
-	if (const roadmanager::Road* Road = Position.GetRoad(); Road != nullptr)
+	UOpenDrivePosition* Position = NewObject<UOpenDrivePosition>();
+	Position->SetTransform(SelectedActor->GetActorTransform());
+	if (const roadmanager::Road* Road = Position->OdrPosition().GetRoad(); Road != nullptr)
 	{
-		FProperty* Property = FindFProperty<FProperty>(UOpenDriveUtilsToolProperties::StaticClass(), "LaneId");
 		const roadmanager::LaneSection* LaneSection = Road->GetLaneSectionByS(S);
-		const int Left = LaneSection->GetNUmberOfLanesLeft();
-		const int Right = -LaneSection->GetNUmberOfLanesRight();
-		Property->AppendMetaData(
+		
+		const int32 Left = LaneSection->GetNUmberOfLanesLeft();
+		const int32 Right = -LaneSection->GetNUmberOfLanesRight();
+		const float LaneLenght =  LaneSection->GetLength();
+
+		FProperty* LaneIdProperty = FindFProperty<FProperty>(StaticClass(), "LaneId");
+		LaneIdProperty->AppendMetaData(
 			TMap<FName, FString>{
-				{TEXT("ClampMin"), FString::FromInt(Right)},
-				{TEXT("ClampMax"), FString::FromInt(Left)}
+				{TEXT("UIMin"), FString::FromInt(Right)},
+				{TEXT("UIMax"), FString::FromInt(Left)}
 		});
-		LaneId = Position.GetLaneId();
+		
+		FProperty* SProperty = FindFProperty<FProperty>(StaticClass(), "S");
+		SProperty->AppendMetaData(
+			TMap<FName, FString>{
+				{TEXT("ClampMin"), FString::SanitizeFloat(0 + 5)},
+				{TEXT("ClampMax"), FString::SanitizeFloat(LaneLenght - 5)}
+		});
+		
+		LaneId = Position->GetLaneId();
+		S = UuToMeters(Position->GetS());
+		T = Position->GetT();
 	}
 }
 

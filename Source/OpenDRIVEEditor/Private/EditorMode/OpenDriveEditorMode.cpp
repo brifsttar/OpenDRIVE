@@ -49,7 +49,7 @@ void UOpenDriveEditorMode::Enter()
 	RegisterTool(ToolCommands.OpenDriveUtilsTool, OpenDriveUtilsToolName, NewObject<UOpenDriveUtilsToolBuilder>(this),EToolsContextScope::EdMode);
 
 	/* Set the default active tool (currently visualizer) */
-	GetToolManager()->SelectActiveToolType(EToolSide::Left, OpenDriveVisualizerToolName);
+	GetToolManager()->SelectActiveToolType(EToolSide::Left, OpenDriveUtilsToolName);
 	GetToolManager()->ActivateTool(EToolSide::Left);
 
 	InitializeOpenDriveGizmo();

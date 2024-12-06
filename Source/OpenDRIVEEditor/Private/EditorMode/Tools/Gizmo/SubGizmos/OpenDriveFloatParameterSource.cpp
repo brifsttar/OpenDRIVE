@@ -17,6 +17,7 @@ void UOpenDriveFloatParameterSource::BeginModify()
 	LaneId = OpenDrivePosition->GetLaneId();
 	InitialT = OpenDrivePosition->GetT();
 	InitialS = OpenDrivePosition->GetS();
+	RoadId = OpenDrivePosition->GetRoadId();
 	CurTranslationAxis = AxisSource->GetDirection();
 }
 
@@ -30,30 +31,23 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	const FVector Translation = Delta * CurTranslationAxis;
 	FTransform NewTransform = InitialTransform;
 	NewTransform.AddToTranslation(Translation); 
-
-	LaneId = OpenDrivePosition->GetLaneId();
-	InitialS = OpenDrivePosition->GetS();
-
+	
 	OpenDrivePosition->SetTransform(TransformSource->GetTransform());
 
-	if (OpenDrivePosition->OdrPosition().IsOffRoad())
-	{
-		return;
-	}
+	//if (OpenDrivePosition->OdrPosition().IsOffRoad()){return;} // Bug : always return true when on roads' edges
 	
 	OpenDrivePosition->SetTransform(NewTransform);
-
-	if (OpenDrivePosition->OdrPosition().IsInJunction())
-	{
-		return;
-	}
+	
+	if (OpenDrivePosition->OdrPosition().IsInJunction()){return;}
+	
+	if (OpenDrivePosition->GetRoadId() != RoadId){return;}
 
 	switch(SourceType)
 	{
 	case EOpenDriveSourceType::TranslateOnS :
 		OpenDrivePosition->SetLaneById(LaneId);
 		OpenDrivePosition->AlignWithLaneCenter(); 
-		OpenDrivePosition->SetT(InitialT); 
+		OpenDrivePosition->SetT(InitialT);
 		break;
 
 	case EOpenDriveSourceType::TranslateOnT :
@@ -73,8 +67,7 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	if (const float DotThreshold = FMath::Cos(45.0f); DotProduct < -DotThreshold)
 	{
 		const FQuat ModifiedRotation = OpenDriveTransform.GetRotation();
-		const FQuat RotateBy180 = FQuat(FVector::UpVector, PI);
-		const FQuat AdjustedRotation = RotateBy180 * ModifiedRotation;
+		const FQuat AdjustedRotation = FQuat(FVector::UpVector, PI) * ModifiedRotation;
 
 		NewTransform.SetRotation(AdjustedRotation);
 	}
@@ -86,9 +79,12 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	const FVector Location = OpenDriveTransform.GetLocation();
 	const FVector NewLocation = FVector(Location.X, Location.Y, NewTransform.GetLocation().Z);
 	NewTransform.SetLocation(NewLocation);
-	
-	TransformSource->SetTransform(NewTransform);
-	OnParameterChanged.Broadcast(this, LastChange);
+
+	if (FVector::Distance(NewTransform.GetLocation(), TransformSource->GetTransform().GetLocation()) > 5.f) //if location difference between NewTransform and current modified Actor does exceed threshold, apply NewTransform
+	{
+		TransformSource->SetTransform(NewTransform);
+		OnParameterChanged.Broadcast(this, LastChange);
+	}
 }
 
 void UOpenDriveFloatParameterSource::EndModify()

@@ -31,7 +31,6 @@ void FOpenDriveEditorModeCommands::RegisterCommands()
 	UI_COMMAND(OpenDriveUtilsTool, "Actors", "OpenDrive's actors utility functions", EUserInterfaceActionType::Button, FInputChord());
 	ToolCommands.Add(OpenDriveUtilsTool);
 	UI_COMMAND(OpenDriveGizmoTool, "OpenDRIVE Editor Mode", "Shortcut to OpenDRIVE Editor Mode", EUserInterfaceActionType::ToggleButton, FInputChord(EKeys::G, false, true, true, false));
-	ToolCommands.Add(OpenDriveGizmoTool);
 }
 
 TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> FOpenDriveEditorModeCommands::GetCommands()
