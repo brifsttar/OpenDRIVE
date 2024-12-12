@@ -136,6 +136,24 @@ void UOpenDrivePosition::SetT(float T) {
 	SetTrackPosition(p);
 }
 
+void UOpenDrivePosition::SetRealT(const float T)
+{
+	roadmanager::Position p = OdrPosition();
+	p.SetT(UuToMeters(T));
+	// Ugly trick to force refresh of internal T value
+	p.MoveAlongS(0.);
+	SetTrackPosition(p);
+}
+
+void UOpenDrivePosition::SetOffset(const float Offset)
+{
+	roadmanager::Position p = OdrPosition();
+	p.SetOffset(UuToMeters(Offset));
+	// Ugly trick to force refresh of internal T value
+	p.MoveAlongS(0.);
+	SetTrackPosition(p);
+}
+
 float UOpenDrivePosition::GetH() const {
 	return FMath::RadiansToDegrees(OdrPosition().GetHRelativeDrivingDirection());
 }
