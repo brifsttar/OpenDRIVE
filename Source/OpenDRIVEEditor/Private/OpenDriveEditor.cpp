@@ -5,7 +5,6 @@
 #include "EditorMode/OpenDriveEditorModeCommands.h"
 #include "EditorMode/OpenDriveEditorModeStyle.h"
 #include "OpenDriveAssetActions.h"
-#include "SViewportToolBarComboMenu.h"
 #include "EditorMode/OpenDriveEditorMode.h"
 
 #define LOCTEXT_NAMESPACE "FOpenDriveEditorModule"
@@ -67,14 +66,13 @@ void FOpenDriveEditorModule::AddToolbarExtension(FToolBarBuilder& Builder)
 		FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode,
 		NAME_Default,
 		FText::FromString("Open Drive Mode"),
-		FText::FromString("Toggles Open Drive Mode"),
-		FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveUtilsToolIcon", "OpenDriveUtilsToolIcon.Small")
+		FText::FromString("Toggles Open Drive Mode")
 	);
 	Builder.AddToolBarButton(
 		FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane,
 		NAME_Default,
 		FText::FromString("Auto align with lane"),
-		FText::FromString("Toggles auto lane alignement with OpenDrive gizmo S and T translation"),
+		FText::FromString("Toggles auto lane alignment with OpenDrive gizmo S and T translation"),
 		TAttribute<FSlateIcon>::CreateLambda([]() -> FSlateIcon
 		{
 			if (const UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))

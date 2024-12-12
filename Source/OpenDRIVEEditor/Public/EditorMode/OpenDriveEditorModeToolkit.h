@@ -12,8 +12,6 @@ public :
 	// FModeToolkit implementation start
 	virtual void Init(const TSharedPtr<IToolkitHost>& InitToolkitHost, TWeakObjectPtr<UEdMode> InOwningMode) override;
 	virtual void GetToolPaletteNames(TArray<FName>& PaletteNames) const override;
-	virtual TSharedPtr<SWidget> GetInlineContent() const override;
-	virtual void BuildToolPalette(FName PaletteName, class FToolBarBuilder& ToolbarBuilder) override;
 	// FModeToolkit implementation end
 
 	// IToolkit interface implementation start

@@ -32,7 +32,7 @@ UOpenDriveEditorMode::UOpenDriveEditorMode()
 	Info = FEditorModeInfo(
 		UOpenDriveEditorMode::EM_OpenDriveEditorModeId,
 		LOCTEXT("OpenDrive", "OpenDrive"),
-		FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveEditorModeIcon", "OpenDriveEditorModeIcon.Small"),
+		FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveEditorModeCommands.OpenDriveSwitchToEditorMode", "OpenDriveEditorModeCommands.OpenDriveSwitchToEditorMode.Small"),
 		true);
 }
 

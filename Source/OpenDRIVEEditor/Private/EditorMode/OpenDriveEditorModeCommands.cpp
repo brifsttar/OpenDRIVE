@@ -1,6 +1,7 @@
 #include "EditorMode/OpenDriveEditorModeCommands.h"
 
 #include "RoadManager.hpp"
+#include "EditorMode/OpenDriveEditorModeStyle.h"
 
 #define LOCTEXT_NAMESPACE "OpenDriveEditorModeCommands"
 
@@ -9,7 +10,7 @@ FOpenDriveEditorModeCommands::FOpenDriveEditorModeCommands() :
 	("OpenDriveEditorModeCommands",
 	NSLOCTEXT("OpenDriveEditorModeCommands", "OpenDriveEditorModeCommands", "OpenDRIVE Editor Commands"),
 	NAME_None,
-	FAppStyle::GetAppStyleSetName()
+	FOpenDriveEditorModeStyleSet::GetStyleSetName()
 	)
 {}
 
@@ -26,9 +27,8 @@ void FOpenDriveEditorModeCommands::OnShutdownModule()
 void FOpenDriveEditorModeCommands::RegisterCommands()
 {
 	TArray<TSharedPtr<FUICommandInfo>>& ToolCommands = Commands.FindOrAdd(NAME_Default);
-
 	/* Register our tool commands here */
-	UI_COMMAND(OpenDriveVisualizerTool, "Viewer", "Draws your currently used .xodr file into the level",
+	UI_COMMAND(OpenDriveVisualizerTool, "Viewer", "Draws the current level OpenDrive lanes in world",
 		EUserInterfaceActionType::Button,
 		FInputChord());
 	ToolCommands.Add(OpenDriveVisualizerTool);
