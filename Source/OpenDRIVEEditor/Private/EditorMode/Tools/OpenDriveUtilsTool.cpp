@@ -171,14 +171,17 @@ UOpenDriveEditorMode* UOpenDriveUtilsTool::GetEditorMode() const
 void UOpenDriveUtilsToolProperties::PostEditChangeProperty(FPropertyChangedEvent& e)
 {
 	Super::PostEditChangeProperty(e);
-	const FName PropertyName = (e.MemberProperty != nullptr) ? e.MemberProperty->GetFName() : NAME_None;
-	if ( PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, LaneId))
+	if (IsValid(SelectedActor))
 	{
-		OnLaneChange.Execute(LaneId);
-	}
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S) || PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, T))
-	{
-		OnUpdateActorTransform.Execute();
+		const FName PropertyName = (e.MemberProperty != nullptr) ? e.MemberProperty->GetFName() : NAME_None;
+		if ( PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, LaneId))
+		{
+			OnLaneChange.Execute(LaneId);
+		}
+		if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S) || PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, T))
+		{
+			OnUpdateActorTransform.Execute();
+		}
 	}
 }
 
