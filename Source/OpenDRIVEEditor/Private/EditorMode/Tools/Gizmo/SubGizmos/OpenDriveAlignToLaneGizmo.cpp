@@ -1,17 +1,16 @@
 ﻿#include "OpenDriveAlignToLaneGizmo.h"
-
-#include "DetailLayoutBuilder.h"
 #include "OpenDrivePosition.h"
 #include "BaseBehaviors/MouseHoverBehavior.h"
 #include "BaseGizmos/GizmoBaseComponent.h"
 #include "BaseGizmos/TransformSubGizmoUtil.h"
+#include "EditorMode/Tools/Gizmo/OpenDriveGizmo.h"
 
 UInteractiveGizmo* UOpenDriveAlignToLaneGizmoBuilder::BuildGizmo(const FToolBuilderState& SceneState) const
 {
 	return NewObject<UOpenDriveAlignToLaneGizmo>(SceneState.GizmoManager);
 }
 
-bool UOpenDriveAlignToLaneGizmo::Initialize(UPrimitiveComponent* ComponentIn,UTransformProxy* TransformProxyIn ,IToolContextTransactionProvider* TransactionProvider,  UE::GizmoUtil::FTransformSubGizmoSharedState* SharedStateIn)
+bool UOpenDriveAlignToLaneGizmo::Initialize(UPrimitiveComponent* ComponentIn,UTransformProxy* TransformProxyIn ,IToolContextTransactionProvider* TransactionProvider,  FGizmoSharedState* SharedStateIn)
 {
 	if (!ComponentIn)
 	{

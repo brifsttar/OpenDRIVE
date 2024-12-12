@@ -5,6 +5,7 @@
 #include "EditorMode/OpenDriveEditorModeCommands.h"
 #include "EditorMode/OpenDriveEditorModeStyle.h"
 #include "OpenDriveAssetActions.h"
+#include "SViewportToolBarComboMenu.h"
 #include "EditorMode/OpenDriveEditorMode.h"
 
 #define LOCTEXT_NAMESPACE "FOpenDriveEditorModule"
@@ -17,7 +18,8 @@ void FOpenDriveEditorModule::StartupModule()
 
 void FOpenDriveEditorModule::ShutdownModule() 
 {
-	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveGizmoTool);
+	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode);
+	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane);
 	OpenDriveCommands.Reset();
 	IOpenDriveModuleInterface::ShutdownModule();
 }
@@ -32,10 +34,19 @@ void FOpenDriveEditorModule::AddModuleListeners()
 void FOpenDriveEditorModule::RegisterMenuExtensions()
 {
 	OpenDriveCommands = MakeShareable(new FUICommandList());
+	
 	OpenDriveCommands->MapAction(
-		FOpenDriveEditorModeCommands::Get().OpenDriveGizmoTool,
-		FExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::Toggle),
-		FCanExecuteAction()
+		FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode,
+		FExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::ToggleEditorMode),
+		FCanExecuteAction(),
+		FGetActionCheckState::CreateRaw(this, &FOpenDriveEditorModule::GetOpenDriveModeStatus)
+	);
+
+	OpenDriveCommands->MapAction(
+		FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane,
+		FExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::ToggleAutoAlignWithLane),
+		FCanExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::CanToggleAutoAlignWithLane),
+		FGetActionCheckState::CreateRaw(this, &FOpenDriveEditorModule::GetActionCheckState)
 	);
 	
 	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
@@ -49,26 +60,37 @@ void FOpenDriveEditorModule::RegisterMenuExtensions()
 
 void FOpenDriveEditorModule::AddToolbarExtension(FToolBarBuilder& Builder)
 {
-	FUIAction ToggleButtonAction;
-	ToggleButtonAction.GetActionCheckState.BindLambda([&]
-	{
-		return GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
-	});
-	ToggleButtonAction.ExecuteAction.BindRaw(this,&FOpenDriveEditorModule::Toggle);
-
 	Builder.AddSeparator();
-
+	Builder.BeginSection("OpenDriveEditor");
+	Builder.BeginBlockGroup();
 	Builder.AddToolBarButton(
-	ToggleButtonAction,
-	NAME_Default,
-	FText::FromString("Switch to OpenDRIVE Editor Mode"),
-	FText::FromString("Shortcut to OpenDRIVE Editor Mode (visualization, Actors manipulation)"),
-	FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveEditorModeIcon", "OpenDriveEditorModeIcon.Small"),
-	EUserInterfaceActionType::ToggleButton
+		FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode,
+		NAME_Default,
+		FText::FromString("Open Drive Mode"),
+		FText::FromString("Toggles Open Drive Mode"),
+		FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveUtilsToolIcon", "OpenDriveUtilsToolIcon.Small")
 	);
-}
+	Builder.AddToolBarButton(
+		FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane,
+		NAME_Default,
+		FText::FromString("Auto align with lane"),
+		FText::FromString("Toggles auto lane alignement with OpenDrive gizmo S and T translation"),
+		TAttribute<FSlateIcon>::CreateLambda([]() -> FSlateIcon
+		{
+			if (const UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))
+			{
+				return CastEditorMode->bAutoAlignWithLane ?
+					FSlateIcon(FAppStyle::GetAppStyleSetName(), "Sequencer.LockSequence"):
+					FSlateIcon(FAppStyle::GetAppStyleSetName(), "Sequencer.UnlockSequence");
+			}
+			return FSlateIcon(FAppStyle::GetAppStyleSetName(), "Sequencer.UnlockSequence");
+		})
+	);
+	Builder.EndBlockGroup();
+	Builder.EndSection();
+}  
 
-void FOpenDriveEditorModule::Toggle()
+void FOpenDriveEditorModule::ToggleEditorMode()
 {
 	if (GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId))
 	{
@@ -78,6 +100,33 @@ void FOpenDriveEditorModule::Toggle()
 	{
 		GLevelEditorModeTools().ActivateMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId);
 	}
+}
+
+ECheckBoxState FOpenDriveEditorModule::GetOpenDriveModeStatus()
+{
+	return GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+}
+
+void FOpenDriveEditorModule::ToggleAutoAlignWithLane()
+{
+	if (UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))
+	{
+		CastEditorMode->ToggleAutoAlignWithLane();
+	}
+}
+
+bool FOpenDriveEditorModule::CanToggleAutoAlignWithLane()
+{
+	return GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId);
+}
+
+ECheckBoxState FOpenDriveEditorModule::GetActionCheckState()
+{
+	if (const UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))
+	{
+		return CastEditorMode->bAutoAlignWithLane ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+	}
+	return ECheckBoxState::Unchecked;
 }
 
 IMPLEMENT_MODULE(FOpenDriveEditorModule, OpenDRIVEEditor)

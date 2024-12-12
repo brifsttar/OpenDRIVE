@@ -10,8 +10,9 @@
 #include "BaseGizmos/TransformSources.h"
 #include "BaseGizmos/TransformSubGizmoUtil.h"
 #include "DrawDebugHelpers.h"
-#include "OpenDriveFloatParameterSource.h"
 #include "OpenDrivePosition.h"
+#include "EditorMode/Tools/Gizmo/OpenDriveGizmo.h"
+#include "EditorMode/Tools/Gizmo/Sources/OpenDriveFloatParameterSource.h"
 
 UInteractiveGizmo* UOpenDriveTranslationGizmoBuilder::BuildGizmo(const FToolBuilderState& SceneState) const
 {
@@ -19,17 +20,30 @@ UInteractiveGizmo* UOpenDriveTranslationGizmoBuilder::BuildGizmo(const FToolBuil
 }
 
 bool UOpenDriveTranslationGizmo::Initialize(UPrimitiveComponent* ComponentIn, UTransformProxy* TransformProxyIn,
-                                          IToolContextTransactionProvider* TransactionProvider, UE::GizmoUtil::FTransformSubGizmoSharedState* SharedStateIn,
-                                          int AxisIndex, EOpenDriveSourceType SourceType)
+                                          IToolContextTransactionProvider* TransactionProvider, FGizmoSharedState* SharedStateIn,
+                                          const int AxisIndex, const EOpenDriveSourceType SourceType)
 {
 	AActor* OwnerActor = ComponentIn->GetOwner();
 	
 	// Shared Axis Source
-	UGizmoComponentAxisSource* CastAxisSource = UGizmoComponentAxisSource::Construct(OwnerActor->GetRootComponent(), AxisIndex, true, GetTransientPackage());
+	UOpenDriveGizmoAxisSource* CastAxisSource = UOpenDriveGizmoAxisSource::Construct(OwnerActor->GetRootComponent(), AxisIndex, GetTransientPackage());
 	AxisSource = CastAxisSource;
 	if (SharedStateIn)
 	{
-		SharedStateIn->CardinalAxisSources[AxisIndex] = CastAxisSource;
+		switch (AxisIndex)
+		{
+		case 0:
+			SharedStateIn->AxisSSource = CastAxisSource;
+			break;
+		case 1:
+			SharedStateIn->AxisTSource = CastAxisSource;
+			break;
+		case 2 :
+			SharedStateIn->AxisChangeLaneSource = CastAxisSource;
+			break;
+		default:
+			break;
+		}
 	}
 
 	// Transform Source
@@ -90,6 +104,7 @@ bool UOpenDriveTranslationGizmo::Initialize(UPrimitiveComponent* ComponentIn, UT
 	// Parameter source
 	UOpenDriveFloatParameterSource* CastParameterSource = UOpenDriveFloatParameterSource::Construct(AxisSource.GetInterface(), CastTransformSource, GetTransientPackage());
 	CastParameterSource->SourceType = SourceType;
+	CastParameterSource->bAlignToLane = false;
 	ParameterSource = CastParameterSource;
 	
 	return true;
@@ -238,5 +253,13 @@ void UOpenDriveTranslationGizmo::OnTerminateDragSequence()
 	if (ensure(HitTarget))
 	{
 		HitTarget->UpdateInteractingState(bInInteraction);
+	}
+}
+
+void UOpenDriveTranslationGizmo::AutoAlignToLane(const bool bShouldAlign) const
+{
+	if (UOpenDriveFloatParameterSource* CastParameterSource = Cast<UOpenDriveFloatParameterSource>(ParameterSource.GetObject()))
+	{
+		CastParameterSource->AutoAlignToLane(bShouldAlign);
 	}
 }

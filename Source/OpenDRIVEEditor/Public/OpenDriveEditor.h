@@ -28,7 +28,15 @@ protected:
 	
 	void RegisterMenuExtensions();
 	void AddToolbarExtension(FToolBarBuilder& Builder);
-	void Toggle();
-
+	
 	TSharedPtr<FUICommandList> OpenDriveCommands;
+
+	// switch to EdMode
+	void ToggleEditorMode();
+	ECheckBoxState GetOpenDriveModeStatus();
+
+	// auto align with lane
+	void ToggleAutoAlignWithLane();
+	bool CanToggleAutoAlignWithLane();
+	ECheckBoxState GetActionCheckState();
 };

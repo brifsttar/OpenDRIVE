@@ -176,7 +176,7 @@ void UOpenDriveUtilsToolProperties::PostEditChangeProperty(FPropertyChangedEvent
 	{
 		OnLaneChange.Execute(LaneId);
 	}
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S))
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S) || PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, T))
 	{
 		OnUpdateActorTransform.Execute();
 	}
@@ -184,10 +184,7 @@ void UOpenDriveUtilsToolProperties::PostEditChangeProperty(FPropertyChangedEvent
 
 void UOpenDriveUtilsTool::UpdateActorTransform() const
 {
-	UE_LOG(LogTemp, Display, TEXT("Updating ActorTransform %s"), *Properties->SelectedActor->GetActorTransform().ToString());
-	
-	OpenDrivePosition->SetTransform(Properties->SelectedActor->GetActorTransform());
-	OpenDrivePosition->SetS(Properties->S);
+	OpenDrivePosition->SetTrackPosition(roadmanager::Position::Position(Properties->RoadId, Properties->S, Properties->T));
 	Properties->SelectedActor->SetActorTransform(OpenDrivePosition->GetTransform());
 	GetEditorMode()->ActorSelectionChangeNotify();
 }
@@ -213,24 +210,31 @@ void UOpenDriveUtilsToolProperties::UpdateLaneInfo(const USceneComponent* SceneC
 		const int32 Left = LaneSection->GetNUmberOfLanesLeft();
 		const int32 Right = -LaneSection->GetNUmberOfLanesRight();
 		const float LaneLenght =  LaneSection->GetLength();
+		const float RightWidth = Road->GetWidth(UuToMeters(Position->GetS()), -1);
+		const float LeftWidth = Road->GetWidth(UuToMeters(Position->GetS()), 1);
+		
+		FindFProperty<FProperty>(StaticClass(), "LaneId")->AppendMetaData(
+			TMap<FName, FString>{
+				{TEXT("ClampMin"), FString::FromInt(Right)},
+				{TEXT("ClampMax"), FString::FromInt(Left)}
+		});
+		
+		FindFProperty<FProperty>(StaticClass(), "S")->AppendMetaData(
+			TMap<FName, FString>{
+				{TEXT("ClampMin"), FString::SanitizeFloat(0+0.25)},
+				{TEXT("ClampMax"), FString::SanitizeFloat(LaneLenght-0.25)}
+		});
+		
+		FindFProperty<FProperty>(StaticClass(), "T")->AppendMetaData(
+			TMap<FName, FString>{
+				{TEXT("ClampMin"), FString::SanitizeFloat(-RightWidth)},
+				{TEXT("ClampMax"), FString::SanitizeFloat(LeftWidth)}
+		});
 
-		FProperty* LaneIdProperty = FindFProperty<FProperty>(StaticClass(), "LaneId");
-		LaneIdProperty->AppendMetaData(
-			TMap<FName, FString>{
-				{TEXT("UIMin"), FString::FromInt(Right)},
-				{TEXT("UIMax"), FString::FromInt(Left)}
-		});
-		
-		FProperty* SProperty = FindFProperty<FProperty>(StaticClass(), "S");
-		SProperty->AppendMetaData(
-			TMap<FName, FString>{
-				{TEXT("ClampMin"), FString::SanitizeFloat(0 + 5)},
-				{TEXT("ClampMax"), FString::SanitizeFloat(LaneLenght - 5)}
-		});
-		
+		RoadId = Position->GetRoadId();
 		LaneId = Position->GetLaneId();
 		S = UuToMeters(Position->GetS());
-		T = Position->GetT();
+		T = UuToMeters(Position->GetRealT());
 	}
 }
 

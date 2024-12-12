@@ -54,7 +54,7 @@ public:
 	virtual void GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const override
 	{
 		using namespace OpenDriveGizmoLocals;
-
+		
 		const FMatrix& LocalToWorldMatrix = GetLocalToWorld();
 		FVector Origin = LocalToWorldMatrix.TransformPosition(FVector::ZeroVector);
 
@@ -134,8 +134,6 @@ private:
 	float Length;
 	float Thickness;
 	float HoverThicknessMultiplier;
-
-	// set on Component for use in ::GetDynamicMeshElements()
 	bool* bExternalHoverState = nullptr;
 	bool* bExternalWorldLocalState = nullptr;
 	bool* bExternalIsViewDependent = nullptr;
@@ -157,9 +155,7 @@ bool UOpenDriveGizmoArrowComponent::LineTraceComponent(FHitResult& OutHit, const
 
 	const FTransform& Transform = this->GetComponentToWorld();
 	FVector UseOrigin = Transform.TransformPosition(FVector::ZeroVector);
-
-	// Copy what is done in the proxy object, but get data from the gizmo view context.
-	FVector StartPoint = FVector::ZeroVector, EndPoint = FVector::ZeroVector; // initialized to appease CIS
+	FVector StartPoint = FVector::ZeroVector, EndPoint = FVector::ZeroVector;
 	float PixelToWorldScale = 0;
 	bool bRenderVisibility = GetWorldEndpoints(bIsViewDependent, ToRawPtr(GizmoViewContext), UseOrigin, Direction, Gap, Length, bWorld,
 		[&Transform](const FVector& VectorIn) { return Transform.TransformVector(VectorIn); },

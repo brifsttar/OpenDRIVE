@@ -90,12 +90,22 @@ void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 			TransformProxy->AddComponent(SelectedActors[0]->GetRootComponent());
 			OpenDriveGizmo->SetActiveTarget(TransformProxy, GetToolManager());
 			OpenDriveGizmo->SetVisibility(true);
+			OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
 		}
 		else
 		{
 			OpenDriveGizmo->ClearActiveTarget();
 			OpenDriveGizmo->SetVisibility(false);
 		}
+	}
+}
+
+void UOpenDriveEditorMode::ToggleAutoAlignWithLane()
+{
+	bAutoAlignWithLane = !bAutoAlignWithLane;
+	if (IsValid(OpenDriveGizmo))
+	{
+		OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
 	}
 }
 

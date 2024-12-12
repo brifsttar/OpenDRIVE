@@ -27,7 +27,7 @@ class OPENDRIVEEDITOR_API UOpenDriveUtilsToolProperties : public UInteractiveToo
 
 public :
 
-	UOpenDriveUtilsToolProperties(): SelectedActor(nullptr)
+	UOpenDriveUtilsToolProperties(): SelectedActor(nullptr), S(0), T(0), LaneId(0)
 	{
 	}
 
@@ -38,8 +38,11 @@ public :
 	UPROPERTY(EditAnywhere, Category="Selected Actor",  meta=(ForceUnits="m"))
 	float S;
 
-	UPROPERTY(VisibleAnywhere, Category = "Selected Actor", meta=(Units="cm"))
+	UPROPERTY(EditAnywhere, Category = "Selected Actor", meta=(ForceUnits="m"))
 	float T;
+
+	UPROPERTY(VisibleAnywhere, Category = "Selected Actor")
+	int32 RoadId;
 
 	UPROPERTY(EditAnywhere, Category = "Selected Actor")
 	int32 LaneId;
@@ -54,6 +57,7 @@ public :
 	UFUNCTION(CallInEditor, Category = "Repeat Along Road")
 	FORCEINLINE void RepeatAlongRoad() const { if (IsValid(SelectedActor)) OnRepeatAlongRoad.Execute(Step); }
 
+	/* Update Actor info */
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
 	void UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport);
 	void UpdateLaneInfo(const USceneComponent* SceneComponent);

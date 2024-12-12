@@ -8,7 +8,7 @@ class FOpenDriveEditorModeToolkit : public FModeToolkit
 public : 
 
 	FOpenDriveEditorModeToolkit() {}
-
+	
 	// FModeToolkit implementation start
 	virtual void Init(const TSharedPtr<IToolkitHost>& InitToolkitHost, TWeakObjectPtr<UEdMode> InOwningMode) override;
 	virtual void GetToolPaletteNames(TArray<FName>& PaletteNames) const override;
@@ -21,7 +21,7 @@ public :
 	virtual FText GetBaseToolkitName() const override;
 	// IToolkit interface implementation end
 
-private : ;
+private : 
 
 	TSharedPtr<SWidget> ToolkitWidget;
 };

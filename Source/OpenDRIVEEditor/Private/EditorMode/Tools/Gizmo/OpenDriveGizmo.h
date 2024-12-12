@@ -8,6 +8,18 @@
 #include "OpenDrivePosition.h"
 #include "OpenDriveGizmo.generated.h"
 
+class UOpenDriveTranslationGizmo;
+class UOpenDriveGizmoAxisSource;
+
+struct FGizmoSharedState
+{
+	UOpenDriveGizmoAxisSource *AxisSSource = nullptr;
+	UOpenDriveGizmoAxisSource *AxisTSource = nullptr;
+	UOpenDriveGizmoAxisSource *AxisChangeLaneSource = nullptr;
+	UGizmoTransformChangeStateTarget* StateTarget = nullptr;
+	UGizmoScaledAndUnscaledTransformSources* TransformSource = nullptr;
+};
+
 UCLASS()
 class UOpenDriveGizmoBuilder : public UInteractiveGizmoBuilder
 {
@@ -35,11 +47,16 @@ public :
 	// InteractiveGizmo implementation
 	virtual void Setup() override;
 	virtual void Shutdown() override;
+	virtual void Tick(float DeltaTime) override;
 
 	void SetActiveTarget(UTransformProxy* Target, IToolContextTransactionProvider* TransactionProvider);
 	void ClearActiveTarget();
 
 	void SetVisibility(bool bVisible) const;
+
+	void AutoAlignWithLane(const bool bAutoAlignWithLane) const;
+
+	FORCEINLINE bool GetShouldAlignWithLane() const {return bAlignWithLane;}
 
 	UPROPERTY()
 	FString LaneChangeGizmoBuilderIdentifier;
@@ -55,6 +72,15 @@ public :
 
 	UPROPERTY()
 	TArray<TObjectPtr<UInteractiveGizmo>> ActiveGizmos;
+
+	UPROPERTY()
+	TObjectPtr<UOpenDriveTranslationGizmo> TranslationSGizmo;
+
+	UPROPERTY()
+	TObjectPtr<UOpenDriveTranslationGizmo> TranslationTGizmo;
+
+	UPROPERTY()
+	TObjectPtr<UOpenDriveTranslationGizmo> ChangeLaneGizmo;
 	
 	UPROPERTY()
 	UGizmoViewContext* GizmoViewContext;
@@ -64,17 +90,25 @@ public :
 
 	UPROPERTY()
 	UOpenDrivePosition* OpenDrivePosition;
-
+	
 protected :
 
-	TUniquePtr<UE::GizmoUtil::FTransformSubGizmoSharedState> TransformSubGizmoSharedState;
+	TUniquePtr<FGizmoSharedState> TransformSubGizmoSharedState;
 
 	UPROPERTY()
 	TObjectPtr<UGizmoTransformChangeStateTarget> StateTarget;
 
 	UPROPERTY()
-	TObjectPtr<UGizmoComponentAxisSource> AxisXSource;
+	TObjectPtr<UOpenDriveGizmoAxisSource> AxisSSource;
 	
 	UPROPERTY()
-	TObjectPtr<UGizmoComponentAxisSource> AxisYSource;
+	TObjectPtr<UOpenDriveGizmoAxisSource> AxisTSource;
+
+	UPROPERTY()
+	TObjectPtr<UOpenDriveGizmoAxisSource> AxisChangeLaneSource;
+
+	UPROPERTY()
+	bool bAlignWithLane;
 };
+
+

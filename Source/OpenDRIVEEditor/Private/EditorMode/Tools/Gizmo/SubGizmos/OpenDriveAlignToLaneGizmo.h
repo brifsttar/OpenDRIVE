@@ -4,6 +4,7 @@
 #include "BaseGizmos/AxisAngleGizmo.h"
 #include "OpenDriveAlignToLaneGizmo.generated.h"
 
+struct FGizmoSharedState;
 class UOpenDrivePosition;
 
 UCLASS()
@@ -25,7 +26,7 @@ class OPENDRIVEEDITOR_API UOpenDriveAlignToLaneGizmo : public UInteractiveGizmo,
 public :
 
 	bool Initialize(UPrimitiveComponent* ComponentIn, UTransformProxy* TransformProxyIn, IToolContextTransactionProvider*
-	                TransactionProvider, UE::GizmoUtil::FTransformSubGizmoSharedState* SharedStateIn);
+	                TransactionProvider, FGizmoSharedState* SharedStateIn);
 	
 	// UInteractiveGizmo implementation
 	virtual void Setup() override;

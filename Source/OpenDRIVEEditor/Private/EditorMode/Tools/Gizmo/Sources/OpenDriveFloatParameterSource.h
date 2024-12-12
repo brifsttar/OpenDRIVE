@@ -7,9 +7,9 @@
 UENUM()
 enum class EOpenDriveSourceType : uint8
 {
-	TranslateOnS,
-	TranslateOnT,
-	ChangeLane
+	TranslateOnS = 0,
+	TranslateOnT = 1,
+	ChangeLane = 2
 };
 
 UCLASS()
@@ -22,6 +22,8 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 	virtual void BeginModify() override;
 	virtual void SetParameter(float NewValue) override;
 	virtual void EndModify() override;
+
+	FORCEINLINE void AutoAlignToLane(const bool bShouldAlign) { bAlignToLane = bShouldAlign; }
 
 	UPROPERTY()
 	float Parameter = 0.0f;
@@ -42,6 +44,9 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 	float InitialS;
 
 	UPROPERTY()
+	bool bAlignToLane;
+
+	UPROPERTY()
 	FGizmoFloatParameterChange LastChange;
 
 	UPROPERTY()
@@ -58,6 +63,7 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 
 	UPROPERTY()
 	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
+	
 
 	static UOpenDriveFloatParameterSource* Construct(
 		IGizmoAxisSource* AxisSourceIn,

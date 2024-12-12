@@ -21,7 +21,6 @@ AOpenDriveGizmoActor* AOpenDriveGizmoActor::ConstructOpenDriveGizmoActor(UWorld*
 		Component->Gap = Gap;
 		Component->Thickness = GizmoThickness;
 		Component->NotifyExternalPropertyUpdates();
-		
 		return Component;
 	};
 	

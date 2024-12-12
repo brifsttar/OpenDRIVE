@@ -9,10 +9,13 @@
 
 void FOpenDriveEditorModeToolkit::Init(const TSharedPtr<IToolkitHost>& InitToolkitHost, TWeakObjectPtr<UEdMode> InOwningMode)
 {
+	TSharedPtr<FSlateFontInfo> FontInfo = MakeShareable(new FSlateFontInfo(FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Medium.ttf"), 9));
+	
 	/* Create tool widget */
 	TSharedPtr<SVerticalBox> ToolkitWidgetVBox = SNew(SVerticalBox);
 	SAssignNew(ToolkitWidget, SBorder)
 		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Fill)
 		.Padding(4)
 		[
 			ToolkitWidgetVBox->AsShared()
@@ -20,9 +23,9 @@ void FOpenDriveEditorModeToolkit::Init(const TSharedPtr<IToolkitHost>& InitToolk
 
 	/* Default init (for DetailsView creation) */
 	FModeToolkit::Init(InitToolkitHost, InOwningMode); //bar vertical button
-
+	
 	/* Add DetailsView to toolkit widget */
-	ToolkitWidgetVBox->AddSlot().HAlign(HAlign_Fill).FillHeight(1.f) //properties set
+	ToolkitWidgetVBox->AddSlot().HAlign(HAlign_Fill).AutoHeight() //properties set
 		[
 			DetailsView->AsShared()
 		];

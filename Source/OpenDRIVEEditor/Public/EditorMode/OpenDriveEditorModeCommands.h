@@ -21,8 +21,10 @@ public :
 	
 	TSharedPtr<FUICommandInfo> OpenDriveVisualizerTool;
 	TSharedPtr<FUICommandInfo> OpenDriveUtilsTool;
-	TSharedPtr<FUICommandInfo> OpenDriveGizmoTool;
-
+	
+	TSharedPtr<FUICommandInfo> OpenDriveSwitchToEditorMode;
+	TSharedPtr<FUICommandInfo> OpenDriveAutoAlignToLane;
+	
 protected :
 
 	TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> Commands;

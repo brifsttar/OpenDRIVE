@@ -9,6 +9,7 @@
 #include "BaseGizmos/GizmoInterfaces.h"
 #include "BaseGizmos/ParameterSourcesFloat.h"
 #include "BaseGizmos/TransformSubGizmoUtil.h"
+#include "EditorMode/Tools/Gizmo/Sources/OpenDriveGizmoAxisSource.h"
 #include "OpenDriveTranslationGizmo.generated.h"
 
 class UTransformProxy;
@@ -32,7 +33,7 @@ class OPENDRIVEEDITOR_API UOpenDriveTranslationGizmo : public UInteractiveGizmo,
 	public :
 
 	bool Initialize(UPrimitiveComponent* ComponentIn, UTransformProxy* TransformProxyIn, IToolContextTransactionProvider*
-	                TransactionProvider, UE::GizmoUtil::FTransformSubGizmoSharedState* SharedStateIn, int AxisIndex, EOpenDriveSourceType
+	                TransactionProvider, FGizmoSharedState* SharedStateIn, int AxisIndex, EOpenDriveSourceType
 	                SourceType);
 
 	// UInteractiveGizmo implementation
@@ -50,6 +51,8 @@ class OPENDRIVEEDITOR_API UOpenDriveTranslationGizmo : public UInteractiveGizmo,
 	virtual void OnClickDrag(const FInputDeviceRay& DragPos) override;
 	virtual void OnClickRelease(const FInputDeviceRay& ReleasePos) override;
 	virtual void OnTerminateDragSequence() override;
+	
+	void AutoAlignToLane(const bool bShouldAlign) const;
 
 public :
 

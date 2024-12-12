@@ -38,13 +38,16 @@ public :
 	const static FString OpenDriveMoveAlongLaneBuilderIdentifier;
 	const static FString OpenDriveGizmoBuilderIdentifier;
 
-	// Gizmo name
+	// Gizmo
 	const static FString OpenDriveGizmoIdentifier;
-	
-protected :
-	
 	UPROPERTY()
 	TObjectPtr<UOpenDriveGizmo> OpenDriveGizmo;
+	UPROPERTY()
+	bool bAutoAlignWithLane;
+
+	void ToggleAutoAlignWithLane();
+	
+protected :
 	
 	UPROPERTY()
 	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
