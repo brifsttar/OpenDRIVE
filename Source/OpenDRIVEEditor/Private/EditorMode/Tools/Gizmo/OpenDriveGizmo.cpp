@@ -8,6 +8,7 @@
 #include "BaseGizmos/GizmoViewContext.h"
 #include "Components/OpenDriveGizmoArrowComponent.h"
 #include "Sources/OpenDriveFloatParameterSource.h"
+#include "Sources/OpenDriveGizmoAxisSource.h"
 
 UInteractiveGizmo* UOpenDriveGizmoBuilder::BuildGizmo(const FToolBuilderState& SceneState) const
 {
@@ -45,28 +46,7 @@ void UOpenDriveGizmo::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (GizmoActor->MoveAlongT != nullptr && GizmoActor->ChangeLane != nullptr && GizmoActor->MoveAlongS != nullptr && ActiveTarget != nullptr)
-	{
-		OpenDrivePosition->SetTransform(ActiveTarget->GetTransform());
-		OpenDrivePosition->SetH(0.);
-		FTransform TargetTransform = ActiveTarget->GetTransform();
-		TargetTransform.SetScale3D(FVector::OneVector);
-		if (UOpenDriveGizmoArrowComponent* CastComponent = Cast<UOpenDriveGizmoArrowComponent>(GizmoActor->MoveAlongS))
-		{
-			CastComponent->Direction = TargetTransform.InverseTransformVector(AxisSSource->GetDirection());
-			CastComponent->MarkRenderStateDirty();
-		}
-		if (UOpenDriveGizmoArrowComponent* CastComponent = Cast<UOpenDriveGizmoArrowComponent>(GizmoActor->MoveAlongT))
-		{
-			CastComponent->Direction = TargetTransform.InverseTransformVector(AxisTSource->GetDirection());
-			CastComponent->MarkRenderStateDirty();
-		}
-		if (UOpenDriveGizmoArrowComponent* CastComponent = Cast<UOpenDriveGizmoArrowComponent>(GizmoActor->ChangeLane))
-		{
-			CastComponent->Direction = TargetTransform.InverseTransformVector(AxisChangeLaneSource->GetDirection());
-			CastComponent->MarkRenderStateDirty();
-		}
-	} 
+	UpdateSubGizmosAxesDirections(); 
 }
 
 void UOpenDriveGizmo::SetActiveTarget(UTransformProxy* Target, IToolContextTransactionProvider* TransactionProvider)
@@ -77,11 +57,7 @@ void UOpenDriveGizmo::SetActiveTarget(UTransformProxy* Target, IToolContextTrans
 	}
 	
 	ActiveTarget = Target;
-	USceneComponent* GizmoComponent = GizmoActor->GetRootComponent();
-	const FTransform TargetTransform = Target->GetTransform();
-	FTransform GizmoTransform = TargetTransform;
-	GizmoTransform.SetScale3D(FVector::OneVector);
-	GizmoComponent->SetWorldTransform(GizmoTransform);
+	SetGizmoLocation();
 
 	TransformSubGizmoSharedState = MakeUnique<FGizmoSharedState>();
 	
@@ -105,7 +81,7 @@ void UOpenDriveGizmo::SetActiveTarget(UTransformProxy* Target, IToolContextTrans
 	}
 	if (UOpenDriveAlignToLaneGizmo* AlignToLaneGizmo = Cast<UOpenDriveAlignToLaneGizmo>(GetGizmoManager()->CreateGizmo(LaneChangeGizmoBuilderIdentifier)))
 	{
-		AlignToLaneGizmo->Initialize(GizmoActor->AlignWithLane, Target, TransactionProvider, TransformSubGizmoSharedState.Get());
+		AlignToLaneGizmo->Initialize(GizmoActor->AlignWithLane);
 		ActiveGizmos.Add(AlignToLaneGizmo);
 	}
 
@@ -124,6 +100,7 @@ void UOpenDriveGizmo::ClearActiveTarget()
 	ActiveGizmos.SetNum(0);
 	AxisSSource = nullptr;
 	AxisTSource = nullptr;
+	AxisChangeLaneSource = nullptr;
 	StateTarget = nullptr;
 	ActiveTarget = nullptr;
 	TranslationSGizmo = nullptr;
@@ -146,5 +123,59 @@ void UOpenDriveGizmo::AutoAlignWithLane(const bool bAutoAlignWithLane) const
 		TranslationTGizmo->AutoAlignToLane(bAutoAlignWithLane);
 		TranslationSGizmo->AutoAlignToLane(bAutoAlignWithLane);
 		ChangeLaneGizmo->AutoAlignToLane(bAutoAlignWithLane);
+	}
+}
+
+void UOpenDriveGizmo::SetOverrideHeight(bool bOverrideHeight) const
+{
+	if (TranslationTGizmo != nullptr && TranslationSGizmo != nullptr && ChangeLaneGizmo != nullptr)
+	{
+		TranslationTGizmo->OverrideHeight(bOverrideHeight);
+		TranslationSGizmo->OverrideHeight(bOverrideHeight);
+		ChangeLaneGizmo->OverrideHeight(bOverrideHeight);
+	}
+}
+
+void UOpenDriveGizmo::SetGizmoLocation() const
+{
+	USceneComponent* GizmoComponent = GizmoActor->GetRootComponent();
+	const FTransform TargetTransform = ActiveTarget->GetTransform();
+	FTransform GizmoTransform = TargetTransform;
+	GizmoTransform.SetScale3D(FVector::OneVector);
+	GizmoComponent->SetWorldTransform(GizmoTransform);
+}
+
+void UOpenDriveGizmo::ResetGizmo(const FTransform& ActorTransform) const
+{
+	if (ActiveTarget != nullptr)
+	{
+		ActiveTarget->SetTransform(ActorTransform);
+	}
+	SetGizmoLocation();
+}
+
+void UOpenDriveGizmo::UpdateSubGizmosAxesDirections() const
+{
+	if (GizmoActor->MoveAlongT != nullptr && GizmoActor->ChangeLane != nullptr && GizmoActor->MoveAlongS != nullptr && ActiveTarget != nullptr)
+	{
+		const FTransform TargetTransform = ActiveTarget->GetTransform();
+		const FVector TargetLocationNoZ(TargetTransform.GetLocation().X, TargetTransform.GetLocation().Y, 0);
+		const FTransform SimplifiedTransform(TargetTransform.GetRotation(), TargetLocationNoZ, FVector::OneVector);
+		
+		if (UOpenDriveGizmoArrowComponent* CastComponent = Cast<UOpenDriveGizmoArrowComponent>(GizmoActor->MoveAlongS))
+		{
+			CastComponent->Direction = SimplifiedTransform.InverseTransformVector(AxisSSource->GetDirection());
+			CastComponent->MarkRenderStateDirty();
+		}
+		if (UOpenDriveGizmoArrowComponent* CastComponent = Cast<UOpenDriveGizmoArrowComponent>(GizmoActor->MoveAlongT))
+		{
+			CastComponent->Direction = SimplifiedTransform.InverseTransformVector(AxisTSource->GetDirection());
+			CastComponent->MarkRenderStateDirty();
+		}
+		if (UOpenDriveGizmoArrowComponent* CastComponent = Cast<UOpenDriveGizmoArrowComponent>(GizmoActor->ChangeLane))
+		{
+			CastComponent->Direction = SimplifiedTransform.InverseTransformVector(AxisChangeLaneSource->GetDirection());
+			CastComponent->MarkRenderStateDirty();
+		}
 	}
 }

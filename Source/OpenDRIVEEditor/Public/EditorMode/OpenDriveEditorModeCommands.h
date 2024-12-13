@@ -24,7 +24,8 @@ public :
 	
 	TSharedPtr<FUICommandInfo> OpenDriveSwitchToEditorMode;
 	TSharedPtr<FUICommandInfo> OpenDriveAutoAlignToLane;
-	
+	TSharedPtr<FUICommandInfo> OpenDriveOverrideActorHeight;
+
 protected :
 
 	TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> Commands;

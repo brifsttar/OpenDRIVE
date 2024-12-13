@@ -63,13 +63,13 @@ void AOpenDriveEditorLane::DrawLane(double Step, float Offset)
 	switch (Lane->GetLaneType())
 	{
 	case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
-		Mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/Warning"));
+		Mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorResources/Meshes/Warning"));
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
-		Mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/Bike"));
+		Mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorResources/Meshes/Bike"));
 		break;
 	case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
-		Mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Meshes/BetterArrow"));
+		Mesh = LoadObject<UStaticMesh>(nullptr, TEXT("/OpenDRIVE/EditorResources/Meshes/BetterArrow"));
 		break;
 	default:
 		Mesh = nullptr;
@@ -226,31 +226,31 @@ void AOpenDriveEditorLane::SetColoredLaneMeshes(USplineComponent* LaneSpline)
 		switch (Lane->GetLaneType())
 		{
 		case(roadmanager::Lane::LaneType::LANE_TYPE_DRIVING):
-			NewSplineMesh->SetMaterial(0, Lane->GetId() > 0 ? LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_LeftRoad")) : LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_RightRoad")));
+			NewSplineMesh->SetMaterial(0, Lane->GetId() > 0 ? LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/MI_LeftRoad")) : LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/MI_RightRoad")));
 			break;
 
 		case(roadmanager::Lane::LaneType::LANE_TYPE_SIDEWALK):
-			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_Sidewalk")));
+			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/MI_Sidewalk")));
 			break;
 
 		case(roadmanager::Lane::LaneType::LANE_TYPE_SHOULDER):
-			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_Shoulder")));
+			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/MI_Shoulder")));
 			break;
 		
 		case(roadmanager::Lane::LaneType::LANE_TYPE_PARKING):
-			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_Parking")));
+			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/MI_Parking")));
 			break;
 			
 		case(roadmanager::Lane::LaneType::LANE_TYPE_BIKING):
-			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_Biking")));
+			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/MI_Biking")));
 			break;
 
 		case(roadmanager::Lane::LaneType::LANE_TYPE_RESTRICTED):
-			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/MI_RestrictedRoad")));
+			NewSplineMesh->SetMaterial(0, LoadObject<UMaterialInstance>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/MI_RestrictedRoad")));
 			break;
 
 		default:
-			NewSplineMesh->SetMaterial(0, LoadObject<UMaterial>(nullptr, TEXT("/OpenDRIVE/EditorRessources/Materials/M_LaneSplineEd")));
+			NewSplineMesh->SetMaterial(0, LoadObject<UMaterial>(nullptr, TEXT("/OpenDRIVE/EditorResources/Materials/M_LaneSplineEd")));
 			break;
 		}
 

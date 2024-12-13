@@ -23,17 +23,15 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 	virtual void SetParameter(float NewValue) override;
 	virtual void EndModify() override;
 
-	FORCEINLINE void AutoAlignToLane(const bool bShouldAlign) { bAlignToLane = bShouldAlign; }
+	void AutoAlignToLane(const bool bShouldAlign) { bAlignToLane = bShouldAlign; }
+	void OverrideHeight(const bool bNewOverrideHeight) { bOverrideHeight = bNewOverrideHeight; }
 
 	UPROPERTY()
 	float Parameter = 0.0f;
 
 	UPROPERTY()
 	EOpenDriveSourceType SourceType = EOpenDriveSourceType::TranslateOnS;
-
-	UPROPERTY()
-	int LaneId;
-
+	
 	UPROPERTY()
 	int RoadId;
 
@@ -45,6 +43,9 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 
 	UPROPERTY()
 	bool bAlignToLane;
+
+	UPROPERTY()
+	bool bOverrideHeight;
 
 	UPROPERTY()
 	FGizmoFloatParameterChange LastChange;
@@ -64,11 +65,10 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 	UPROPERTY()
 	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
 	
-
 	static UOpenDriveFloatParameterSource* Construct(
 		IGizmoAxisSource* AxisSourceIn,
 		IGizmoTransformSource* TransformSourceIn,
-		UObject* Outer = (UObject*)GetTransientPackage())
+		UObject* Outer = GetTransientPackage())
 	{
 		UOpenDriveFloatParameterSource* NewSource = NewObject<UOpenDriveFloatParameterSource>(Outer);
 		NewSource->AxisSource = Cast<UObject>(AxisSourceIn);

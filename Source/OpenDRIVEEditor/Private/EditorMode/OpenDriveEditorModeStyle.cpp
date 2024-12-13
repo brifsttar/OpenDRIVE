@@ -38,10 +38,9 @@ const ISlateStyle& FOpenDriveEditorModeStyleSet::Get()
 void FOpenDriveEditorModeStyleSet::Create()
 {
 	OpenDriveStyleInstance = MakeShareable(new FSlateStyleSet("OpenDriveStyle"));
-	OpenDriveStyleInstance->SetContentRoot(FPaths::ProjectPluginsDir() / TEXT("OpenDRIVE/Content/EditorRessources"));
-	OpenDriveStyleInstance->SetCoreContentRoot(FPaths::ProjectPluginsDir() / TEXT("OpenDRIVE/Content/EditorRessources"));
+	OpenDriveStyleInstance->SetContentRoot(FPaths::ProjectPluginsDir() / TEXT("OpenDRIVE/Content/EditorResources"));
+	OpenDriveStyleInstance->SetCoreContentRoot(FPaths::ProjectPluginsDir() / TEXT("OpenDRIVE/Content/EditorResources"));
 	CreateIcons();
-	//CreateButtonsStyle();
 }
 
 void FOpenDriveEditorModeStyleSet::CreateIcons()
@@ -60,10 +59,4 @@ void FOpenDriveEditorModeStyleSet::CreateIcons()
 	OpenDriveStyleInstance->Set("OpenDriveEditorModeCommands.OpenDriveUtilsTool.Small", new IMAGE_BRUSH(TEXT("ASAMIcon"), Icon16X16));
 }
 
-void FOpenDriveEditorModeStyleSet::CreateButtonsStyle()
-{
-	const FButtonStyle ButtonStyle = FAppStyle::Get().GetWidgetStyle<FButtonStyle>("ToolbarButton");
-	const FButtonStyle OpenDriveEditorModeButtonStyle = ButtonStyle;	
-	OpenDriveStyleInstance->Set("OpenDriveEditor.ToolbarButton", OpenDriveEditorModeButtonStyle);
-}
 

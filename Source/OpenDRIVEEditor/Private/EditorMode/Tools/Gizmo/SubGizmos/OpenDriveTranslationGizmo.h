@@ -7,11 +7,11 @@
 #include "BaseBehaviors/BehaviorTargetInterfaces.h"
 #include "BaseBehaviors/ClickDragBehavior.h"
 #include "BaseGizmos/GizmoInterfaces.h"
-#include "BaseGizmos/ParameterSourcesFloat.h"
 #include "BaseGizmos/TransformSubGizmoUtil.h"
-#include "EditorMode/Tools/Gizmo/Sources/OpenDriveGizmoAxisSource.h"
 #include "OpenDriveTranslationGizmo.generated.h"
 
+enum class EOpenDriveSourceType : uint8;
+struct FGizmoSharedState;
 class UTransformProxy;
 
 UCLASS()
@@ -53,26 +53,27 @@ class OPENDRIVEEDITOR_API UOpenDriveTranslationGizmo : public UInteractiveGizmo,
 	virtual void OnTerminateDragSequence() override;
 	
 	void AutoAlignToLane(const bool bShouldAlign) const;
+	void OverrideHeight(bool bOverrideHeight);
 
 public :
 
 	UPROPERTY()
-	TScriptInterface<IGizmoAxisSource> AxisSource;
+	TScriptInterface<IGizmoAxisSource> AxisSource; // The axis on which translation is made 
 
 	UPROPERTY()
-	TScriptInterface<IGizmoFloatParameterSource> ParameterSource;
+	TScriptInterface<IGizmoFloatParameterSource> ParameterSource; //Compute the new TransformSource's Transform
 
 	UPROPERTY()
-	TScriptInterface<IGizmoTransformSource> TransformSource;
+	TScriptInterface<IGizmoTransformSource> TransformSource; //The transform source linked to the currently selected actor
 	
 	UPROPERTY()
-	TScriptInterface<IGizmoClickTarget> HitTarget;
+	TScriptInterface<IGizmoClickTarget> HitTarget; //Hit test with components
 
 	UPROPERTY()
-	TScriptInterface<IGizmoStateTarget> StateTarget;
+	TScriptInterface<IGizmoStateTarget> StateTarget; //Used to pass updates 
 	
 	UPROPERTY()
-	TObjectPtr<UClickDragInputBehavior> ClickDragBehavior;
+	TObjectPtr<UClickDragInputBehavior> ClickDragBehavior; //Click and drag behavior
 
 	UPROPERTY()
 	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;

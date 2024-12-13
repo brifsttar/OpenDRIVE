@@ -16,12 +16,12 @@ FOpenDriveEditorModeCommands::FOpenDriveEditorModeCommands() :
 
 void FOpenDriveEditorModeCommands::OnStartupModule()
 {
-	FOpenDriveEditorModeCommands::Register();
+	Register();
 }
 
 void FOpenDriveEditorModeCommands::OnShutdownModule()
 {
-	FOpenDriveEditorModeCommands::Unregister();
+	Unregister();
 }
 
 void FOpenDriveEditorModeCommands::RegisterCommands()
@@ -45,11 +45,15 @@ void FOpenDriveEditorModeCommands::RegisterCommands()
 	UI_COMMAND(OpenDriveAutoAlignToLane, "Gizmo auto align to lane", "Enables/Disables auto align with lane for OpenDrive gizmo",
 		EUserInterfaceActionType::ToggleButton,
 		FInputChord());
+
+	UI_COMMAND(OpenDriveOverrideActorHeight, "Override Actor height", "Enables this to override Actor's height with OpenDrive's height while translating with Gizmo",
+	EUserInterfaceActionType::ToggleButton,
+	FInputChord());
 }
 
 TMap<FName, TArray<TSharedPtr<FUICommandInfo>>> FOpenDriveEditorModeCommands::GetCommands()
 {
-	return FOpenDriveEditorModeCommands::Get().Commands;
+	return Get().Commands;
 }
 
 #undef LOCTEXT_NAMESPACE

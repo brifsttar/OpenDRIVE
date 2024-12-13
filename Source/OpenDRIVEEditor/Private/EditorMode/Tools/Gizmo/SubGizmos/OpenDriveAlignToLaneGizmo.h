@@ -4,7 +4,6 @@
 #include "BaseGizmos/AxisAngleGizmo.h"
 #include "OpenDriveAlignToLaneGizmo.generated.h"
 
-struct FGizmoSharedState;
 class UOpenDrivePosition;
 
 UCLASS()
@@ -25,8 +24,7 @@ class OPENDRIVEEDITOR_API UOpenDriveAlignToLaneGizmo : public UInteractiveGizmo,
 
 public :
 
-	bool Initialize(UPrimitiveComponent* ComponentIn, UTransformProxy* TransformProxyIn, IToolContextTransactionProvider*
-	                TransactionProvider, FGizmoSharedState* SharedStateIn);
+	bool Initialize(UPrimitiveComponent* ComponentIn);
 	
 	// UInteractiveGizmo implementation
 	virtual void Setup() override;
@@ -44,19 +42,10 @@ public :
 public:
 	
 	UPROPERTY()
-	TScriptInterface<IGizmoClickTarget> HitTarget;
-
+	TScriptInterface<IGizmoClickTarget> HitTarget; //Hit test with UPrimitiveComponent
+	
 	UPROPERTY()
-	TScriptInterface<IGizmoStateTarget> StateTarget;
-
-	UPROPERTY()
-	TObjectPtr<USingleClickInputBehavior> ClickBehavior;
-
-	UPROPERTY()
-	TScriptInterface<IGizmoTransformSource> TransformSource;
-
-	UPROPERTY()
-	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
+	TObjectPtr<USingleClickInputBehavior> ClickBehavior; //Button click input behavior
 
 	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnClick, UOpenDriveAlignToLaneGizmo&, const FInputDeviceRay&);
 	FOnClick OnClick;

@@ -27,7 +27,7 @@ class OPENDRIVEEDITOR_API UOpenDriveUtilsToolProperties : public UInteractiveToo
 
 public :
 
-	UOpenDriveUtilsToolProperties(): SelectedActor(nullptr), S(0), T(0), LaneId(0)
+	UOpenDriveUtilsToolProperties(): SelectedActor(nullptr), S(0), T(0), RoadId(0), LaneId(0)
 	{
 	}
 
@@ -47,20 +47,22 @@ public :
 	UPROPERTY(EditAnywhere, Category = "Selected Actor")
 	int32 LaneId;
 
-	UPROPERTY(EditAnywhere, Category = "Repeat Along Road")
+	UPROPERTY(EditAnywhere, Category = "Repeat Along Road", meta=(ForceUnits="cm"))
 	float Step = 200.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Repeat Along Road")
+	bool bAlignDuplicatesWithLaneDirection = false;
+	
 	/* Functions */
 	UFUNCTION(CallInEditor, Category = "Align with lane")
 	FORCEINLINE void AlignWithLane() const { if (IsValid(SelectedActor)) OnAlignActorWithLane.Execute(); }
 
 	UFUNCTION(CallInEditor, Category = "Repeat Along Road")
-	FORCEINLINE void RepeatAlongRoad() const { if (IsValid(SelectedActor)) OnRepeatAlongRoad.Execute(Step); }
+	FORCEINLINE void RepeatAlongRoad() const { if (IsValid(SelectedActor)) OnRepeatAlongRoad.Execute(Step, bAlignDuplicatesWithLaneDirection); }
 
 	/* Update Actor info */
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
-	void UpdateActorInfo(USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlag, ETeleportType Teleport);
-	void UpdateLaneInfo(const USceneComponent* SceneComponent);
+	void UpdateLaneInfo();
 
 	/* Delegates */
 	DECLARE_DELEGATE(FOnAlignActorWithLane)
@@ -69,7 +71,7 @@ public :
 	FOnUpdateActorTransform OnUpdateActorTransform;
 	DECLARE_DELEGATE_OneParam(FOnLaneChange, const int32 /*Direction*/)
 	FOnLaneChange OnLaneChange;
-	DECLARE_DELEGATE_OneParam(FOnRepeatAlongRoad, const float /*Step*/)
+	DECLARE_DELEGATE_TwoParams(FOnRepeatAlongRoad, const float /*Step*/, const bool /*AlignWithLaneDirection*/)
 	FOnRepeatAlongRoad OnRepeatAlongRoad;
 
 	FDelegateHandle ActorTransformInfoHandle;
@@ -100,19 +102,10 @@ protected:
 
 	UPROPERTY()
 	UWorld* TargetWorld;
-
-	/* Actor selection */
-	void OnActorSelected(UObject* SelectedObject);
-	FDelegateHandle OnActorSelectedHandle;
-
+	
 	/* OpenDRIVE functions */
-	void AlignActorWithLane() const;
 	void UpdateActorTransform() const;
-	void ChangeActorLane(int32 Direction) const;
-	void RepeatAlongRoad(float Step) const;
 
 	UOpenDriveEditorMode* GetEditorMode() const;
-
-	UPROPERTY()
-	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
+	FDelegateHandle SelectionChangedHandle;
 };

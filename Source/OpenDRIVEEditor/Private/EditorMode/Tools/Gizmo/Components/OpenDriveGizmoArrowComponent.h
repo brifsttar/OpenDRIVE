@@ -3,6 +3,8 @@
 #include "BaseGizmos/GizmoBaseComponent.h"
 #include "OpenDriveGizmoArrowComponent.generated.h"
 
+//todo look deeper into GizmoComponent to improve this one, which is just a clone of UGizmoBaseArrowComponent, without the annoying axes flipping
+
 UCLASS()
 class OPENDRIVEEDITOR_API UOpenDriveGizmoArrowComponent : public UGizmoBaseComponent
 {

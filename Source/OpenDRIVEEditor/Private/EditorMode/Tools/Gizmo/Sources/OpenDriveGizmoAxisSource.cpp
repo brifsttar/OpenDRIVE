@@ -16,46 +16,25 @@ FVector UOpenDriveGizmoAxisSource::GetDirection() const
 	{
 		return Direction;
 	}
-	/*
-	auto CheckRotation = [&](const FTransform& WorldTransform, const FTransform& OpenDriveTransform)-> bool
-	{
-		const FVector OpenDriveForwardVector = OpenDriveTransform.GetRotation().GetForwardVector();
-		const FVector WorldTransformForwardVector = WorldTransform.GetRotation().GetForwardVector();
-	
-		const float DotProduct = FVector::DotProduct(WorldTransformForwardVector, OpenDriveForwardVector);
-	
-		const float DotThreshold = FMath::Cos(45.0f);
-		
-		return DotProduct < -DotThreshold;
-	};
-	*/
 	
 	const FTransform WorldTransform = Component->GetComponentTransform();
-	OpenDrivePosition->SetTransform(WorldTransform);
+	const FTransform WorldTransformNoRot(FQuat::Identity, WorldTransform.GetLocation(), WorldTransform.GetScale3D());
+	OpenDrivePosition->SetTransform(WorldTransformNoRot);
 	OpenDrivePosition->SetH(0.);
-	FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
-
-	/*
-	if (CheckRotation(WorldTransform, OpenDriveTransform))
-	{
-		const FQuat AdjustedRotation = FQuat(FVector::UpVector, PI) * OpenDriveTransform.GetRotation();
-		OpenDriveTransform.SetRotation(AdjustedRotation);
-	}
-	*/
-
+	const FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
 	FVector NewDirection = Direction;
 	
 	switch (AxisIndex)
 	{
-		case 0:
+		case 0: //s
 			NewDirection = OpenDriveTransform.GetRotation().GetForwardVector();
 			OnDirectionChanged.Execute(NewDirection);
 			return NewDirection;
-		case 1:
+		case 1: //t
 			NewDirection = OpenDriveTransform.GetRotation().GetRightVector();
 			OnDirectionChanged.Execute(NewDirection);
         	return NewDirection;
-		case 2:
+		case 2: //lane 
 			NewDirection = OpenDriveTransform.GetRotation().GetRightVector();
 			OnDirectionChanged.Execute(NewDirection);
 			return NewDirection;

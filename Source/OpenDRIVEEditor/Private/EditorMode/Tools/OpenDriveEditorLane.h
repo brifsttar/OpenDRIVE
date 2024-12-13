@@ -28,13 +28,13 @@ public:
 	* Gets the road Id
 	* @return The Road Id
 	*/
-	FORCEINLINE int GetRoadId() const { return Road->GetId(); };
+	int GetRoadId() const { return Road->GetId(); };
 
 	/**
 	* Gets the junction Id
 	* @return The Junction Id
 	*/
-	FORCEINLINE int GetJunctionId() const { return Road->GetJunction(); };
+	int GetJunctionId() const { return Road->GetJunction(); };
 
 	/**
 	* Gets the lane type
@@ -46,7 +46,7 @@ public:
 	* Gets the lane Id
 	* @return The lane Id
 	*/
-	FORCEINLINE int GetLaneId() const { return Lane->GetId(); };
+	int GetLaneId() const { return Lane->GetId(); };
 
 	/**
 	* @return The successor's road Id

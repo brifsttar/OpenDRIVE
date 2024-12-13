@@ -1,8 +1,9 @@
 ﻿#include "OpenDriveAlignToLaneGizmo.h"
-#include "OpenDrivePosition.h"
+#include "EditorModeManager.h"
 #include "BaseBehaviors/MouseHoverBehavior.h"
 #include "BaseGizmos/GizmoBaseComponent.h"
 #include "BaseGizmos/TransformSubGizmoUtil.h"
+#include "EditorMode/OpenDriveEditorMode.h"
 #include "EditorMode/Tools/Gizmo/OpenDriveGizmo.h"
 
 UInteractiveGizmo* UOpenDriveAlignToLaneGizmoBuilder::BuildGizmo(const FToolBuilderState& SceneState) const
@@ -10,33 +11,13 @@ UInteractiveGizmo* UOpenDriveAlignToLaneGizmoBuilder::BuildGizmo(const FToolBuil
 	return NewObject<UOpenDriveAlignToLaneGizmo>(SceneState.GizmoManager);
 }
 
-bool UOpenDriveAlignToLaneGizmo::Initialize(UPrimitiveComponent* ComponentIn,UTransformProxy* TransformProxyIn ,IToolContextTransactionProvider* TransactionProvider,  FGizmoSharedState* SharedStateIn)
+bool UOpenDriveAlignToLaneGizmo::Initialize(UPrimitiveComponent* ComponentIn)
 {
 	if (!ComponentIn)
 	{
 		return false;
 	}
-
-	AActor* OwnerActor = ComponentIn->GetOwner();
 	
-	// Transform Source
-	UGizmoScaledAndUnscaledTransformSources* CastTransformSource;
-	if (SharedStateIn && SharedStateIn->TransformSource)
-	{
-		CastTransformSource = SharedStateIn->TransformSource;
-	}
-	else
-	{
-		CastTransformSource = UGizmoScaledAndUnscaledTransformSources::Construct(UGizmoTransformProxyTransformSource::Construct(
-			TransformProxyIn, GetTransientPackage()), OwnerActor->GetRootComponent(), GetTransientPackage());
-
-		if (SharedStateIn)
-		{
-			SharedStateIn->TransformSource = CastTransformSource;
-		}
-	}
-	TransformSource = CastTransformSource;
-
 	// HitTarget
 	UGizmoComponentHitTarget* CastHitTarget = UGizmoComponentHitTarget::Construct(ComponentIn, this);
 
@@ -48,25 +29,6 @@ bool UOpenDriveAlignToLaneGizmo::Initialize(UPrimitiveComponent* ComponentIn,UTr
 		}
 	};
 	HitTarget = CastHitTarget;
-
-	// Shared StateTarget
-	if (SharedStateIn && SharedStateIn->StateTarget)
-	{
-		StateTarget = SharedStateIn->StateTarget;
-	}
-	else
-	{
-		const FText DefaultTransactionName(NSLOCTEXT("UOpenDriveGizmo", "UOpenDriveGizmoTransaction", "Transform"));
-		
-		UGizmoTransformChangeStateTarget* CastStateTarget =  UGizmoTransformChangeStateTarget::Construct(OwnerActor->GetRootComponent(), DefaultTransactionName, TransactionProvider, GetTransientPackage() );
-		CastStateTarget->DependentChangeSources.Add(MakeUnique<FTransformProxyChangeSource>(TransformProxyIn));
-		StateTarget = CastStateTarget;
-
-		if (SharedStateIn)
-		{
-			SharedStateIn->StateTarget = CastStateTarget;
-		}
-	}
 	
 	return true;
 }
@@ -80,13 +42,12 @@ void UOpenDriveAlignToLaneGizmo::Setup()
 	ClickBehavior->SetDefaultPriority(FInputCapturePriority(FInputCapturePriority::DEFAULT_GIZMO_PRIORITY));
 	AddInputBehavior(ClickBehavior);
 
-	UMouseHoverBehavior* MouseHoverBehavior = NewObject<UMouseHoverBehavior>(this);
+	UMouseHoverBehavior* MouseHoverBehavior = NewObject<UMouseHoverBehavior>(this); //Mouse hover behavior
 	MouseHoverBehavior->Initialize(this);
 	MouseHoverBehavior->SetDefaultPriority(FInputCapturePriority(FInputCapturePriority::DEFAULT_GIZMO_PRIORITY));
 	AddInputBehavior(MouseHoverBehavior);
 
 	HitTarget = NewObject<UGizmoNilStateTarget>(this);
-	OpenDrivePosition = NewObject<UOpenDrivePosition>(this);
 }
 
 FInputRayHit UOpenDriveAlignToLaneGizmo::BeginHoverSequenceHitTest(const FInputDeviceRay& PressPos)
@@ -126,18 +87,9 @@ FInputRayHit UOpenDriveAlignToLaneGizmo::IsHitByClick(const FInputDeviceRay& Cli
 
 void UOpenDriveAlignToLaneGizmo::OnClicked(const FInputDeviceRay& ClickPos)
 {
-	StateTarget->BeginUpdate();
-	OpenDrivePosition->SetTransform(TransformSource->GetTransform());
-	OpenDrivePosition->AlignWithLaneCenter();
-	FTransform OdrTransform = OpenDrivePosition->GetTransform();
-	FVector OdrLocation = OdrTransform.GetLocation();
-	FTransform TargetT  = TransformSource->GetTransform();
-	FVector TargetLocation = TargetT.GetLocation();
-	FVector LocationWithInitialHeight = FVector(OdrLocation.X, OdrLocation.Y, TargetLocation.Z);
-	FTransform FinalTransform = FTransform(LocationWithInitialHeight);
-	FinalTransform.SetRotation(OdrTransform.GetRotation());
-	FinalTransform.SetScale3D(TargetT.GetScale3D());
-	TransformSource->SetTransform(FinalTransform);
+	if (UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode((UOpenDriveEditorMode::EM_OpenDriveEditorModeId))))
+	{
+		CastEditorMode->AlignActorWithLane();
+	}
 	OnClick.Broadcast(*this, ClickPos);
-	StateTarget->EndUpdate();
 }

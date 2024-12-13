@@ -19,6 +19,7 @@ void FOpenDriveEditorModule::ShutdownModule()
 {
 	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode);
 	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane);
+	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveOverrideActorHeight);
 	OpenDriveCommands.Reset();
 	IOpenDriveModuleInterface::ShutdownModule();
 }
@@ -38,14 +39,21 @@ void FOpenDriveEditorModule::RegisterMenuExtensions()
 		FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode,
 		FExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::ToggleEditorMode),
 		FCanExecuteAction(),
-		FGetActionCheckState::CreateRaw(this, &FOpenDriveEditorModule::GetOpenDriveModeStatus)
+		FGetActionCheckState::CreateRaw(this, &FOpenDriveEditorModule::IsOpenDriveModeActive_CheckState)
 	);
 
 	OpenDriveCommands->MapAction(
 		FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane,
 		FExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::ToggleAutoAlignWithLane),
-		FCanExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::CanToggleAutoAlignWithLane),
-		FGetActionCheckState::CreateRaw(this, &FOpenDriveEditorModule::GetActionCheckState)
+		FCanExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::IsOpenDriveEditorModeActive),
+		FGetActionCheckState::CreateRaw(this, &FOpenDriveEditorModule::IsAutoWithLaneChecked)
+	);
+
+	OpenDriveCommands->MapAction(
+		FOpenDriveEditorModeCommands::Get().OpenDriveOverrideActorHeight,
+		FExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::ToggleOverrideHeight),
+		FCanExecuteAction::CreateRaw(this, &FOpenDriveEditorModule::IsOpenDriveEditorModeActive),
+		FGetActionCheckState::CreateRaw(this, &FOpenDriveEditorModule::IsOverrideHeightChecked)
 	);
 	
 	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
@@ -84,6 +92,22 @@ void FOpenDriveEditorModule::AddToolbarExtension(FToolBarBuilder& Builder)
 			return FSlateIcon(FAppStyle::GetAppStyleSetName(), "Sequencer.UnlockSequence");
 		})
 	);
+	Builder.AddToolBarButton(
+		FOpenDriveEditorModeCommands::Get().OpenDriveOverrideActorHeight,
+		NAME_Default,
+		FText::FromString("Override Actor height"),
+		FText::FromString("Enables this to override Actor's height with OpenDrive's height while translating with Gizmo"),
+		TAttribute<FSlateIcon>::CreateLambda([]() -> FSlateIcon
+		{
+			if (const UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))
+			{
+				return CastEditorMode->bOverrideHeight ?
+					FSlateIcon(FAppStyle::GetAppStyleSetName(), "EditableComboBox.Accept"):
+					FSlateIcon(FAppStyle::GetAppStyleSetName(), "EditableComboBox.Delete");
+			}
+			return FSlateIcon(FAppStyle::GetAppStyleSetName(), "EditableComboBox.Delete");
+		})
+	);
 	Builder.EndBlockGroup();
 	Builder.EndSection();
 }  
@@ -100,7 +124,7 @@ void FOpenDriveEditorModule::ToggleEditorMode()
 	}
 }
 
-ECheckBoxState FOpenDriveEditorModule::GetOpenDriveModeStatus()
+ECheckBoxState FOpenDriveEditorModule::IsOpenDriveModeActive_CheckState()
 {
 	return GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 }
@@ -113,16 +137,33 @@ void FOpenDriveEditorModule::ToggleAutoAlignWithLane()
 	}
 }
 
-bool FOpenDriveEditorModule::CanToggleAutoAlignWithLane()
+bool FOpenDriveEditorModule::IsOpenDriveEditorModeActive()
 {
 	return GLevelEditorModeTools().IsModeActive(UOpenDriveEditorMode::EM_OpenDriveEditorModeId);
 }
 
-ECheckBoxState FOpenDriveEditorModule::GetActionCheckState()
+ECheckBoxState FOpenDriveEditorModule::IsAutoWithLaneChecked()
 {
 	if (const UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))
 	{
 		return CastEditorMode->bAutoAlignWithLane ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+	}
+	return ECheckBoxState::Unchecked;
+}
+
+void FOpenDriveEditorModule::ToggleOverrideHeight()
+{
+	if (UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))
+	{
+		CastEditorMode->ToggleOverrideHeight();
+	}
+}
+
+ECheckBoxState FOpenDriveEditorModule::IsOverrideHeightChecked()
+{
+	if (const UOpenDriveEditorMode* CastEditorMode = Cast<UOpenDriveEditorMode>(GLevelEditorModeTools().GetActiveScriptableMode(UOpenDriveEditorMode::EM_OpenDriveEditorModeId)))
+	{
+		return CastEditorMode->bOverrideHeight ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 	}
 	return ECheckBoxState::Unchecked;
 }

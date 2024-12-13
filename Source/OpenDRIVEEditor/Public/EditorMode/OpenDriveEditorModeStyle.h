@@ -22,7 +22,6 @@ private :
 
 	void Create();
 	void CreateIcons();
-	void CreateButtonsStyle();
 
 	static TSharedPtr<class FSlateStyleSet> OpenDriveStyleInstance;
 };

@@ -1,6 +1,6 @@
 ﻿#include "OpenDriveFloatParameterSource.h"
-
 #include "OpenDriveGizmoAxisSource.h"
+#include "OpenDriveUtils.h"
 
 float UOpenDriveFloatParameterSource::GetParameter() const
 {
@@ -14,20 +14,21 @@ void UOpenDriveFloatParameterSource::BeginModify()
 	LastChange = FGizmoFloatParameterChange(Parameter);
 
 	InitialTransform = TransformSource->GetTransform();
+	
 	OpenDrivePosition = NewObject<UOpenDrivePosition>();
 	OpenDrivePosition->SetTransform(InitialTransform);
-	LaneId = OpenDrivePosition->GetLaneId();
-	//InitialT = OpenDrivePosition->GetOffsetFromCurrentLaneCenter();
+	
 	InitialT = OpenDrivePosition->GetRealT();
 	InitialS = OpenDrivePosition->GetS();
 	RoadId = OpenDrivePosition->GetRoadId();
+	
 	CurTranslationAxis = AxisSource->GetDirection();
 
 	if (SourceType == EOpenDriveSourceType::ChangeLane || SourceType == EOpenDriveSourceType::TranslateOnT)
 	{
 		if (UOpenDriveGizmoAxisSource* CastAxisSource = Cast<UOpenDriveGizmoAxisSource>(AxisSource.GetObject()))
 		{
-			CastAxisSource->SetUpdateDirection(true);
+			CastAxisSource->SetUpdateDirection(true); // if the axis we're dragging is updated, the case where we change lane could make its direction go in the opposite way, so it's frozen while interacting 
 		}
 	}
 }
@@ -36,7 +37,6 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 {
 	Parameter = NewValue;
 	LastChange.CurrentValue = NewValue;
-
 	const double Delta = LastChange.GetChangeDelta();
 
 	const FVector Translation = Delta * CurTranslationAxis;
@@ -45,13 +45,11 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	
 	OpenDrivePosition->SetTransform(TransformSource->GetTransform());
 
-	//if (OpenDrivePosition->OdrPosition().IsOffRoad()){return;} // Bug : always return true when on roads' edges
+	//if (OpenDrivePosition->OdrPosition().IsOffRoad()){return;} //always return true when on roads' edges
 	
 	OpenDrivePosition->SetTransform(NewTransform);
 	
-	if (OpenDrivePosition->OdrPosition().IsInJunction()){return;}
-	
-	if (OpenDrivePosition->GetRoadId() != RoadId){return;}
+	if (OpenDrivePosition->OdrPosition().IsInJunction() || OpenDrivePosition->GetRoadId() != RoadId){return;}
 
 	float S = 0;
 	float T = 0;
@@ -72,31 +70,13 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 		break;
 	}
 
-	const FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
-	
-	if (bAlignToLane)
-	{
-		const FVector OpenDriveForwardVector = OpenDriveTransform.GetRotation().GetForwardVector();
-		const FVector NewTransformForwardVector = NewTransform.GetRotation().GetForwardVector();
-		const float DotProduct = FVector::DotProduct(NewTransformForwardVector, OpenDriveForwardVector);
-		
-		if (const float DotThreshold = FMath::Cos(45.0f); DotProduct < -DotThreshold) // Avoid 180° yaw flip (if Actor is moving backward on a lane)
-		{
-			const FQuat ModifiedRotation = OpenDriveTransform.GetRotation();
-			const FQuat AdjustedRotation = FQuat(FVector::UpVector, PI) * ModifiedRotation;
-			NewTransform.SetRotation(AdjustedRotation);
-		}
-		else
-		{
-			NewTransform.SetRotation(OpenDriveTransform.GetRotation());
-		}
-	}
-	
-	NewTransform.SetLocation(OpenDriveTransform.GetLocation());
+	FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
 
-	if (FVector::Distance(NewTransform.GetLocation(), TransformSource->GetTransform().GetLocation()) > 1.f) //if location difference between NewTransform and current modified Actor does exceed threshold, apply NewTransform
+	const EAlignmentMethod AlignmentMethod = bAlignToLane ? AlignButKeepDirection : NoAlignment;
+	if (const FTransform FinalTransform = FOpenDriveUtils::OdrToUE(TransformSource->GetTransform(), OpenDriveTransform, AlignmentMethod, bOverrideHeight);
+		FVector::Distance(FinalTransform.GetLocation(), TransformSource->GetTransform().GetLocation()) > 1.f) // todo: add a customizable snap value ? 
 	{
-		TransformSource->SetTransform(NewTransform);
+		TransformSource->SetTransform(FinalTransform);
 		OnParameterChanged.Broadcast(this, LastChange);
 	}
 }
@@ -110,4 +90,6 @@ void UOpenDriveFloatParameterSource::EndModify()
 			CastAxisSource->SetUpdateDirection(false);
 		}
 	}
+
+	OpenDrivePosition = nullptr;
 }

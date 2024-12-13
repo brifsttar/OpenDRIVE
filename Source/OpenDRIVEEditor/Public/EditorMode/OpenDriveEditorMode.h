@@ -1,8 +1,9 @@
 #pragma once 
 #include "CoreMinimal.h"
 #include "Tools/UEdMode.h"
-#include "EditorMode/Tools/Gizmo/OpenDriveGizmo.h"
 #include "OpenDriveEditorMode.generated.h"
+
+class UOpenDriveGizmo;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogOpenDriveEditorMode, Log, All);
 
@@ -31,8 +32,8 @@ public :
 	virtual void ActorSelectionChangeNotify() override;
 	// UEdMode interface implementation end
 	
-	FORCEINLINE UInteractiveToolManager* GetToolkitManager() const { return GetToolManager(); }
-	
+	UInteractiveToolManager* GetToolkitManager() const { return GetToolManager(); }
+
 	// Gizmos' builders identifiers
 	const static FString OpenDriveChangeLaneBuilderIdentifier;
 	const static FString OpenDriveMoveAlongLaneBuilderIdentifier;
@@ -41,19 +42,33 @@ public :
 	// Gizmo
 	const static FString OpenDriveGizmoIdentifier;
 	UPROPERTY()
-	TObjectPtr<UOpenDriveGizmo> OpenDriveGizmo;
-	UPROPERTY()
 	bool bAutoAlignWithLane;
-
+	UPROPERTY()
+	bool bOverrideHeight;
+	
+	// Utilities methods
+	void AlignActorWithLane();
+	void ChangeActorLane(int NewLaneId);
+	void RepeatAlongRoad(float Step, bool bAlignWithLaneDirection);
 	void ToggleAutoAlignWithLane();
+	void ToggleOverrideHeight();
+	AActor* GetSelectedActor() { return SelectedActor; }
+	void ResetGizmo() const;
+
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOdrActorSelectionChanged, AActor*)
+	FOdrActorSelectionChanged OnActorSelectionChanged;
 	
 protected :
-	
+
 	UPROPERTY()
-	TObjectPtr<UOpenDrivePosition> OpenDrivePosition;
+	TObjectPtr<AActor> SelectedActor;
+
+	UPROPERTY()
+	TObjectPtr<UOpenDriveGizmo> OpenDriveGizmo;
 
 private :
 
 	void InitializeOpenDriveGizmo();
 	void DeInitializeOpenDriveGizmo() const;
 };
+

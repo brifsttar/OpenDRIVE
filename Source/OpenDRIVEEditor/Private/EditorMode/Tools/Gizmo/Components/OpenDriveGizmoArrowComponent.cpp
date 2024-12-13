@@ -10,7 +10,7 @@ namespace OpenDriveGizmoLocals
 		TFunctionRef<FVector(const FVector&)> VectorTransform, 
 		FVector& StartPointOut, FVector& EndPointOut, float& PixelToWorldScaleOut)
 	{
-		FVector ArrowDirection = bUseWorldAxes ? Direction : VectorTransform(Direction);
+		const FVector ArrowDirection = bUseWorldAxes ? Direction : VectorTransform(Direction);
 		float LengthScale = 1.0f; // Default scale if not view-dependent
 
 		if (bIsViewDependent)

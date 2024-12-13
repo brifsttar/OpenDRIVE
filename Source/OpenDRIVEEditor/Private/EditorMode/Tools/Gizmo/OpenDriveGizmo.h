@@ -6,11 +6,16 @@
 #include "BaseGizmos/TransformProxy.h"
 #include "BaseGizmos/TransformSubGizmoUtil.h"
 #include "OpenDrivePosition.h"
+#include "EditorMode/OpenDriveEditorMode.h"
 #include "OpenDriveGizmo.generated.h"
 
 class UOpenDriveTranslationGizmo;
 class UOpenDriveGizmoAxisSource;
 
+/**
+ * Similar to an existing class inside the interacting tool framework used for their CombinedTransformGizmo, but simplified for our usage
+ * Allows to pass and share Sources, StateTarget, TransformSource between all subGizmos
+ */
 struct FGizmoSharedState
 {
 	UOpenDriveGizmoAxisSource *AxisSSource = nullptr;
@@ -48,6 +53,8 @@ public :
 	virtual void Setup() override;
 	virtual void Shutdown() override;
 	virtual void Tick(float DeltaTime) override;
+	
+	void ResetGizmo(const FTransform& ActorTransform) const;
 
 	void SetActiveTarget(UTransformProxy* Target, IToolContextTransactionProvider* TransactionProvider);
 	void ClearActiveTarget();
@@ -55,8 +62,8 @@ public :
 	void SetVisibility(bool bVisible) const;
 
 	void AutoAlignWithLane(const bool bAutoAlignWithLane) const;
-
-	FORCEINLINE bool GetShouldAlignWithLane() const {return bAlignWithLane;}
+	bool GetShouldAlignWithLane() const {return bAlignWithLane;}
+	void SetOverrideHeight(bool bOverrideHeight) const;
 
 	UPROPERTY()
 	FString LaneChangeGizmoBuilderIdentifier;
@@ -109,6 +116,10 @@ protected :
 
 	UPROPERTY()
 	bool bAlignWithLane;
+
+private :
+	void UpdateSubGizmosAxesDirections() const;
+	void SetGizmoLocation() const;
 };
 
 

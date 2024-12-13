@@ -25,7 +25,7 @@ public:
 	}
 
 protected:
-	
+
 	void RegisterMenuExtensions();
 	void AddToolbarExtension(FToolBarBuilder& Builder);
 	
@@ -33,10 +33,15 @@ protected:
 
 	// switch to EdMode
 	void ToggleEditorMode();
-	ECheckBoxState GetOpenDriveModeStatus();
+	ECheckBoxState IsOpenDriveModeActive_CheckState();
 
 	// auto align with lane
 	void ToggleAutoAlignWithLane();
-	bool CanToggleAutoAlignWithLane();
-	ECheckBoxState GetActionCheckState();
+	ECheckBoxState IsAutoWithLaneChecked();
+
+	// override height
+	void ToggleOverrideHeight();
+	ECheckBoxState IsOverrideHeightChecked();
+
+	bool IsOpenDriveEditorModeActive();
 };

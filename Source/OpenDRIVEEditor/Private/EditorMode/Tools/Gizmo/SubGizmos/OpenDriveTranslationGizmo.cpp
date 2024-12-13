@@ -13,6 +13,7 @@
 #include "OpenDrivePosition.h"
 #include "EditorMode/Tools/Gizmo/OpenDriveGizmo.h"
 #include "EditorMode/Tools/Gizmo/Sources/OpenDriveFloatParameterSource.h"
+#include "EditorMode/Tools/Gizmo/Sources/OpenDriveGizmoAxisSource.h"
 
 UInteractiveGizmo* UOpenDriveTranslationGizmoBuilder::BuildGizmo(const FToolBuilderState& SceneState) const
 {
@@ -23,7 +24,7 @@ bool UOpenDriveTranslationGizmo::Initialize(UPrimitiveComponent* ComponentIn, UT
                                           IToolContextTransactionProvider* TransactionProvider, FGizmoSharedState* SharedStateIn,
                                           const int AxisIndex, const EOpenDriveSourceType SourceType)
 {
-	AActor* OwnerActor = ComponentIn->GetOwner();
+	const AActor* OwnerActor = ComponentIn->GetOwner();
 	
 	// Shared Axis Source
 	UOpenDriveGizmoAxisSource* CastAxisSource = UOpenDriveGizmoAxisSource::Construct(OwnerActor->GetRootComponent(), AxisIndex, GetTransientPackage());
@@ -261,5 +262,13 @@ void UOpenDriveTranslationGizmo::AutoAlignToLane(const bool bShouldAlign) const
 	if (UOpenDriveFloatParameterSource* CastParameterSource = Cast<UOpenDriveFloatParameterSource>(ParameterSource.GetObject()))
 	{
 		CastParameterSource->AutoAlignToLane(bShouldAlign);
+	}
+}
+
+void UOpenDriveTranslationGizmo::OverrideHeight(bool bOverrideHeight)
+{
+	if (UOpenDriveFloatParameterSource* CastParameterSource = Cast<UOpenDriveFloatParameterSource>(ParameterSource.GetObject()))
+	{
+		CastParameterSource->OverrideHeight(bOverrideHeight);
 	}
 }

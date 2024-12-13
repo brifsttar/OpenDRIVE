@@ -1,6 +1,7 @@
 #include "EditorMode/OpenDriveEditorMode.h"
 #include "ContextObjectStore.h"
 #include "EdModeInteractiveToolsContext.h"
+#include "OpenDriveFuncLib.h"
 #include "Selection.h"
 #include "BaseGizmos/GizmoViewContext.h"
 #include "EditorMode/OpenDriveEditorModeToolkit.h"
@@ -11,6 +12,7 @@
 #include "Tools/Gizmo/SubGizmos/OpenDriveAlignToLaneGizmo.h"
 #include "Tools/Gizmo/OpenDriveGizmo.h"
 #include "Tools/Gizmo/SubGizmos/OpenDriveTranslationGizmo.h"
+#include "OpenDriveUtils.h"
 
 DEFINE_LOG_CATEGORY(LogOpenDriveEditorMode);
 
@@ -27,12 +29,16 @@ const FString UOpenDriveEditorMode::OpenDriveGizmoBuilderIdentifier = TEXT("Open
 
 const FString UOpenDriveEditorMode::OpenDriveGizmoIdentifier = TEXT("OpenDriveGizmo");
 
-UOpenDriveEditorMode::UOpenDriveEditorMode()
+UOpenDriveEditorMode::UOpenDriveEditorMode(): bAutoAlignWithLane(false)
 {
 	Info = FEditorModeInfo(
-		UOpenDriveEditorMode::EM_OpenDriveEditorModeId,
+				EM_OpenDriveEditorModeId,
 		LOCTEXT("OpenDrive", "OpenDrive"),
-		FSlateIcon(FOpenDriveEditorModeStyleSet::GetStyleSetName(), "OpenDriveEditorModeCommands.OpenDriveSwitchToEditorMode", "OpenDriveEditorModeCommands.OpenDriveSwitchToEditorMode.Small"),
+		FSlateIcon(
+				FOpenDriveEditorModeStyleSet::GetStyleSetName(),
+	"OpenDriveEditorModeCommands.OpenDriveSwitchToEditorMode",
+"OpenDriveEditorModeCommands.OpenDriveSwitchToEditorMode.Small"
+					),
 		true);
 }
 
@@ -41,9 +47,7 @@ void UOpenDriveEditorMode::Enter()
 	UEdMode::Enter();
 	
 	const FOpenDriveEditorModeCommands& ToolCommands = FOpenDriveEditorModeCommands::Get();
-
-	OpenDrivePosition = NewObject<UOpenDrivePosition>();
-
+	
 	/* Register tools */
 	RegisterTool(ToolCommands.OpenDriveVisualizerTool, OpenDriveVisualizerToolName, NewObject<UOpenDriveVisualizerToolBuilder>(this),EToolsContextScope::EdMode);
 	RegisterTool(ToolCommands.OpenDriveUtilsTool, OpenDriveUtilsToolName, NewObject<UOpenDriveUtilsToolBuilder>(this),EToolsContextScope::EdMode);
@@ -60,9 +64,7 @@ void UOpenDriveEditorMode::Enter()
 void UOpenDriveEditorMode::Exit()
 {
 	DeInitializeOpenDriveGizmo();
-	
 	UE_LOG(LogOpenDriveEditorMode, Log, TEXT("OpenDriveEditorMode exited."));
-	
 	UEdMode::Exit();
 }
 
@@ -91,12 +93,16 @@ void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 			OpenDriveGizmo->SetActiveTarget(TransformProxy, GetToolManager());
 			OpenDriveGizmo->SetVisibility(true);
 			OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
+			OpenDriveGizmo->SetOverrideHeight(bOverrideHeight);
+			SelectedActor = SelectedActors[0];
 		}
 		else
 		{
 			OpenDriveGizmo->ClearActiveTarget();
 			OpenDriveGizmo->SetVisibility(false);
+			SelectedActor = nullptr;
 		}
+		OnActorSelectionChanged.Broadcast(SelectedActor);
 	}
 }
 
@@ -107,6 +113,72 @@ void UOpenDriveEditorMode::ToggleAutoAlignWithLane()
 	{
 		OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
 	}
+}
+
+void UOpenDriveEditorMode::ToggleOverrideHeight()
+{
+	bOverrideHeight = !bOverrideHeight;
+	if (IsValid(OpenDriveGizmo))
+	{
+		OpenDriveGizmo->SetOverrideHeight(bOverrideHeight);
+	}
+}
+
+void UOpenDriveEditorMode::ResetGizmo() const
+{
+	if (OpenDriveGizmo && SelectedActor)
+	{
+		OpenDriveGizmo->ResetGizmo(SelectedActor->GetRootComponent()->GetComponentTransform());
+	}
+}
+
+void UOpenDriveEditorMode::AlignActorWithLane()
+{
+	if (SelectedActor == nullptr) return;
+	
+	const FTransform InitialTransform = FOpenDriveUtils::UEToOdr(SelectedActor);
+	UOpenDrivePosition* OpenDrivePosition = NewObject<UOpenDrivePosition>(this);
+	OpenDrivePosition->SetTransform(InitialTransform);
+	OpenDrivePosition->AlignWithLaneCenter();
+	FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
+	const FTransform FinalTransform = FOpenDriveUtils::OdrToUE(SelectedActor, OpenDriveTransform, AlignToLane, bOverrideHeight);
+	SelectedActor->SetActorTransform(FinalTransform);
+	ResetGizmo();
+}
+
+void UOpenDriveEditorMode::ChangeActorLane(const int NewLaneId)
+{
+	if (SelectedActor == nullptr) return;
+	
+	const FTransform InitialTransform = FOpenDriveUtils::UEToOdr(SelectedActor);
+	UOpenDrivePosition* OpenDrivePosition = NewObject<UOpenDrivePosition>(this);
+	OpenDrivePosition->SetTransform(InitialTransform);
+	OpenDrivePosition->SetLaneById(NewLaneId);
+	OpenDrivePosition->AlignWithLaneCenter();
+	FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
+	const FTransform FinalTransform = FOpenDriveUtils::OdrToUE(SelectedActor, OpenDriveTransform, AlignButKeepDirection, bOverrideHeight);
+	SelectedActor->SetActorTransform(FinalTransform);
+	ResetGizmo();
+}
+
+void UOpenDriveEditorMode::RepeatAlongRoad(const float Step, const bool bAlignWithLaneDirection)
+{
+	const FTransform InitialTransform = FOpenDriveUtils::UEToOdr(SelectedActor);
+	UOpenDrivePosition* OpenDrivePosition = NewObject<UOpenDrivePosition>(this);
+	OpenDrivePosition->SetTransform(InitialTransform);
+	const int StartingRoadId = OpenDrivePosition->GetRoadId();
+	const EAlignmentMethod AlignToLaneDirection = bAlignWithLaneDirection ? AlignToLane : NoAlignment;
+	do
+	{
+		OpenDrivePosition->MoveAlongS(Step);
+		AActor* NewActor = UOpenDriveFuncLib::CloneActor(SelectedActor);
+		FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
+		const FTransform FinalTransform = FOpenDriveUtils::OdrToUE(NewActor, OpenDriveTransform, AlignToLaneDirection);
+		NewActor->SetActorTransform(FinalTransform);
+		NewActor->SetFolderPath("/RoadDuplicates");
+	}
+	while (StartingRoadId == OpenDrivePosition->GetRoadId());
+	
 }
 
 void UOpenDriveEditorMode::InitializeOpenDriveGizmo()
