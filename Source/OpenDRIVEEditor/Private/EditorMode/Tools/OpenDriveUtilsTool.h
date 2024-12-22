@@ -8,6 +8,12 @@
 class UOpenDrivePosition;
 class UOpenDriveEditorMode;
 
+UENUM()
+enum class EOpenDriveTranslateType : uint8 {
+	TranslateOnS = 0,
+	TranslateOnT = 1
+};
+
 UCLASS()
 class OPENDRIVEEDITOR_API UOpenDriveUtilsToolBuilder : public UInteractiveToolBuilder
 {
@@ -52,6 +58,12 @@ public :
 
 	UPROPERTY(EditAnywhere, Category = "Repeat Along Road")
 	bool bAlignDuplicatesWithLaneDirection = false;
+
+	UPROPERTY()
+	TObjectPtr<UOpenDrivePosition> OpenDrivePosition = nullptr;
+
+	UPROPERTY()
+	FTransform LastKnownTransform;
 	
 	/* Functions */
 	UFUNCTION(CallInEditor, Category = "Align with lane")
@@ -67,7 +79,7 @@ public :
 	/* Delegates */
 	DECLARE_DELEGATE(FOnAlignActorWithLane)
 	FOnAlignActorWithLane OnAlignActorWithLane;
-	DECLARE_DELEGATE(FOnUpdateActorTransform)
+	DECLARE_DELEGATE_OneParam(FOnUpdateActorTransform, const EOpenDriveTranslateType /*TranslateType*/)
 	FOnUpdateActorTransform OnUpdateActorTransform;
 	DECLARE_DELEGATE_OneParam(FOnLaneChange, const int32 /*Direction*/)
 	FOnLaneChange OnLaneChange;
@@ -104,7 +116,9 @@ protected:
 	UWorld* TargetWorld;
 	
 	/* OpenDRIVE functions */
-	void UpdateActorTransform() const;
+	void UpdateActorT() const;
+	void UpdateActorS() const;
+	void UpdateActorTransform(EOpenDriveTranslateType TranslateType) const;
 
 	UOpenDriveEditorMode* GetEditorMode() const;
 	FDelegateHandle SelectionChangedHandle;

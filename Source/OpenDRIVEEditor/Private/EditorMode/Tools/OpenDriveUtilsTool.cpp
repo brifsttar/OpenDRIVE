@@ -49,7 +49,7 @@ void UOpenDriveUtilsTool::Setup()
 			GetEditorMode()->RepeatAlongRoad(Step, bAlignWithLaneDirection);
 		}
 	});
-	
+
 	Properties->OnUpdateActorTransform.BindUObject(this, &UOpenDriveUtilsTool::UpdateActorTransform);
 	
 	SelectionChangedHandle = GetEditorMode()->OnActorSelectionChanged.AddLambda([this](AActor* SelectedActor)
@@ -94,15 +94,23 @@ UOpenDriveEditorMode* UOpenDriveUtilsTool::GetEditorMode() const
 	return nullptr;
 }
 
-void UOpenDriveUtilsTool::UpdateActorTransform() const
+void UOpenDriveUtilsTool::UpdateActorTransform(EOpenDriveTranslateType TranslateType) const
 {
-	if (Properties->SelectedActor == nullptr || GetEditorMode() == nullptr) return;
+	if (
+		Properties->SelectedActor == nullptr ||
+		Properties->OpenDrivePosition == nullptr ||
+		GetEditorMode() == nullptr
+	) {
+		return;
+	}
 	
-	UOpenDrivePosition* OpenDrivePosition = NewObject<UOpenDrivePosition>();
-	OpenDrivePosition->SetTrackPosition(roadmanager::Position::Position(Properties->RoadId, Properties->S, Properties->T));
+	UOpenDrivePosition* OpenDrivePosition = Properties->OpenDrivePosition;
+	double S = TranslateType == EOpenDriveTranslateType::TranslateOnS ? Properties->S : OpenDrivePosition->OdrPosition().GetS();
+	double T = TranslateType == EOpenDriveTranslateType::TranslateOnT ? Properties->T : OpenDrivePosition->OdrPosition().GetT();
+	OpenDrivePosition->SetTrackPosition(Properties->RoadId, S, T);
 	FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
-	const FTransform FinalTransform = FOpenDriveUtils::OdrToUE(Properties->SelectedActor, OpenDriveTransform, NoAlignment, GetEditorMode()->bOverrideHeight);
-	Properties->SelectedActor->SetActorTransform(FinalTransform);
+	Properties->LastKnownTransform = FOpenDriveUtils::OdrToUE(Properties->SelectedActor, OpenDriveTransform, NoAlignment, GetEditorMode()->bOverrideHeight);
+	Properties->SelectedActor->SetActorTransform(Properties->LastKnownTransform);
 	GetEditorMode()->ResetGizmo();
 }
 
@@ -117,32 +125,42 @@ void UOpenDriveUtilsToolProperties::PostEditChangeProperty(FPropertyChangedEvent
 	{
 		OnLaneChange.Execute(LaneId);
 	}
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S) || PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, T))
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, S))
 	{
-		OnUpdateActorTransform.Execute();
+		OnUpdateActorTransform.Execute(EOpenDriveTranslateType::TranslateOnS);
+	}
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UOpenDriveUtilsToolProperties, T)) {
+		OnUpdateActorTransform.Execute(EOpenDriveTranslateType::TranslateOnT);
 	}
 }
 
 void UOpenDriveUtilsToolProperties::UpdateLaneInfo()
 {
-	if (SelectedActor == nullptr) return;
+	if (SelectedActor == nullptr) {
+		return;
+	}
+	if (OpenDrivePosition == nullptr) {
+		OpenDrivePosition = NewObject<UOpenDrivePosition>();
+	}
+	if (!SelectedActor->GetActorTransform().Equals(LastKnownTransform)) {
+		LastKnownTransform = SelectedActor->GetActorTransform();
+		OpenDrivePosition->SetTransform(LastKnownTransform);
+	}
+
+	RoadId = OpenDrivePosition->GetRoadId();
+	LaneId = OpenDrivePosition->GetLaneId();
+	S = UuToMeters(OpenDrivePosition->GetS());
+	T = UuToMeters(OpenDrivePosition->GetRealT());
 	
-	UOpenDrivePosition* Position = NewObject<UOpenDrivePosition>();
-	Position->SetTransform(SelectedActor->GetActorTransform());
-	RoadId = Position->GetRoadId();
-	LaneId = Position->GetLaneId();
-	S = UuToMeters(Position->GetS());
-	T = UuToMeters(Position->GetRealT());
-	
-	if (const roadmanager::Road* Road = Position->OdrPosition().GetRoad(); Road != nullptr)
+	if (const roadmanager::Road* Road = OpenDrivePosition->OdrPosition().GetRoad(); Road != nullptr)
 	{
 		const roadmanager::LaneSection* LaneSection = Road->GetLaneSectionByS(S);
 		
 		const int32 Left = LaneSection->GetNUmberOfLanesLeft();
 		const int32 Right = -LaneSection->GetNUmberOfLanesRight();
 		const float LaneLenght = Road->GetLength();
-		const float RightWidth = Road->GetWidth(UuToMeters(Position->GetS()), -1);
-		const float LeftWidth = Road->GetWidth(UuToMeters(Position->GetS()), 1);
+		const float RightWidth = Road->GetWidth(UuToMeters(OpenDrivePosition->GetS()), -1);
+		const float LeftWidth = Road->GetWidth(UuToMeters(OpenDrivePosition->GetS()), 1);
 		
 		FindFProperty<FProperty>(StaticClass(), "LaneId")->AppendMetaData(
 			TMap<FName, FString>{
