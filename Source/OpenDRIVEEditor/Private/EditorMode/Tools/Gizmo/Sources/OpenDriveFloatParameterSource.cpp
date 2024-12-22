@@ -63,12 +63,12 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	{
 	case EOpenDriveSourceType::TranslateOnS :
 		S  = UuToMeters(OpenDrivePosition->GetS());
-		OpenDrivePosition->SetTrackPosition(roadmanager::Position(RoadId, S , UuToMeters(InitialT)));
+		OpenDrivePosition->SetTrackPosition(RoadId, S , UuToMeters(InitialT));
 		break;
 
 	case EOpenDriveSourceType::TranslateOnT :
 		T  = UuToMeters(OpenDrivePosition->GetRealT());
-		OpenDrivePosition->SetTrackPosition(roadmanager::Position(RoadId, UuToMeters(InitialS), T));
+		OpenDrivePosition->SetTrackPosition(RoadId, UuToMeters(InitialS), T);
 		break;
 
 	case EOpenDriveSourceType::ChangeLane :
