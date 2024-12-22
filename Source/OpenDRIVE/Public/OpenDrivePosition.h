@@ -96,6 +96,15 @@ public:
 	void SetTrackPosition(int TrackId, int LaneId, float S, float Offset, float H);
 
 	/**
+	* Sets the OpenDRIVE position
+	* @param TrackId Track (road) ID
+	* @param S       S-coordinate (cm) along the road
+	* @param T       T-coordinate (cm) along the road
+	*/
+	//UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetTrackPosition(int TrackId, float S, float T);
+
+	/**
 	* Moves the object along its S coordinate
 	* @param  S       S-coordinate offset (cm)
 	* @param Strategy Strategy to follow in case of junctions (-1=left, 0=forward, 1=right)

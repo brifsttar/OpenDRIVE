@@ -42,6 +42,9 @@ void UOpenDrivePosition::SetTrackPosition(int TrackId, int LaneId, float S, floa
 	SetTrackPosition(p);
 }
 
+void UOpenDrivePosition::SetTrackPosition(int TrackId, float S, float T) {
+	_TrackPos.SetTrackPos(TrackId, S, T);
+}
 
 bool UOpenDrivePosition::MoveAlongS(float S, int Strategy) {
 	roadmanager::Position p = OdrPosition();
