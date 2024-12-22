@@ -49,7 +49,13 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	
 	OpenDrivePosition->SetTransform(NewTransform);
 	
-	if (OpenDrivePosition->OdrPosition().IsInJunction() || OpenDrivePosition->GetRoadId() != RoadId){return;}
+	if (
+		OpenDrivePosition->OdrPosition().IsInJunction() ||
+		OpenDrivePosition->GetRoadId() != RoadId ||
+		OpenDrivePosition->OdrPosition().IsOffRoad()
+	) {
+		return;
+	}
 
 	float S = 0;
 	float T = 0;
