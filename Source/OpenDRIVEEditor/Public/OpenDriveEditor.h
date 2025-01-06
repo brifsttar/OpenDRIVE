@@ -1,27 +1,22 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 #include "CoreMinimal.h"
-#include "UnrealEd.h"
-#include "SlateBasics.h"
-#include "SlateExtras.h"
-#include "Editor/LevelEditor/Public/LevelEditor.h"
-#include "Editor/PropertyEditor/Public/PropertyEditing.h"
-#include "IAssetTypeActions.h"
 #include "IOpenDriveModuleInterface.h"
 
-class FOpenDRIVEEditorModule : public IOpenDRIVEModuleInterface
+class FOpenDriveEditorModule : public IOpenDriveModuleInterface
 {
 public:
-	/** IModuleInterface implementation **/
+	// IModuleInterface implementation start
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+	// IModuleInterface implementation end
 
+	// IOpenDriveModuleInterface implementation start
 	virtual void AddModuleListeners() override;
+	// IOpenDriveModuleInterface implementation end
 
-	static inline FOpenDRIVEEditorModule& Get()
+	static inline FOpenDriveEditorModule& Get()
 	{
-		return FModuleManager::LoadModuleChecked<FOpenDRIVEEditorModule>("OpenDriveEditor");
+		return FModuleManager::LoadModuleChecked<FOpenDriveEditorModule>("OpenDriveEditor");
 	}
 
 	static inline bool IsAvailable()
@@ -29,16 +24,24 @@ public:
 		return FModuleManager::Get().IsModuleLoaded("OpenDriveEditor");
 	}
 
-	TSharedRef<FWorkspaceItem> GetMenuRoot() { return MenuRoot; };
-
 protected:
 
-	TSharedPtr<FExtensibilityManager> LevelEditorMenuExtensibilityManager;
-	TSharedPtr<FExtender> MenuExtender;
+	void RegisterMenuExtensions();
+	void AddToolbarExtension(FToolBarBuilder& Builder);
+	
+	TSharedPtr<FUICommandList> OpenDriveCommands;
 
-	static TSharedRef<FWorkspaceItem> MenuRoot;
+	// switch to EdMode
+	void ToggleEditorMode();
+	ECheckBoxState IsOpenDriveModeActive_CheckState();
 
-private:
+	// auto align with lane
+	void ToggleAutoAlignWithLane();
+	ECheckBoxState IsAutoWithLaneChecked();
 
-	TSharedPtr<IAssetTypeActions> OpenDRIVEAssetTypeActions;
+	// override height
+	void ToggleOverrideHeight();
+	ECheckBoxState IsOverrideHeightChecked();
+
+	bool IsOpenDriveEditorModeActive();
 };

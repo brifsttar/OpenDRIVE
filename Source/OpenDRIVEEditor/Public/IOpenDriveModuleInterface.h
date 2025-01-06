@@ -1,18 +1,19 @@
 #pragma once 
 #include "Modules/ModuleManager.h"
 
-class IOpenDRIVEModuleListenerInterface
+class IOpenDriveModuleListenerInterface
 {
 public :
+	virtual ~IOpenDriveModuleListenerInterface(){}
 	virtual void OnStartupModule() {};
 	virtual void OnShutdownModule() {};
 };
 
-class IOpenDRIVEModuleInterface : public IModuleInterface
+class IOpenDriveModuleInterface : public IModuleInterface
 {
 public :
-
-	void StartupModule() override
+	
+	virtual void StartupModule() override
 	{
 		if (!IsRunningCommandlet())
 		{
@@ -25,7 +26,7 @@ public :
 		}
 	}
 
-	void ShutdownModule() override
+	virtual void ShutdownModule() override
 	{
 		for (int i = 0; i < ModuleListeners.Num(); i++)
 		{
@@ -37,5 +38,5 @@ public :
 
 protected : 
 
-	TArray<TSharedRef<IOpenDRIVEModuleListenerInterface>> ModuleListeners;
+	TArray<TSharedRef<IOpenDriveModuleListenerInterface>> ModuleListeners;
 };

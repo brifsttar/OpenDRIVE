@@ -11,8 +11,7 @@ public class OpenDRIVEEditor : ModuleRules
 
 		PublicIncludePaths.AddRange(
 			new string[] {
-				ModuleDirectory,
-				Path.Combine(ModuleDirectory, "Public"),
+				Path.Combine(ModuleDirectory, "Public")
 			}
 		);
 		
@@ -41,7 +40,11 @@ public class OpenDRIVEEditor : ModuleRules
 				"AnimGraph",
 				"ComponentVisualizers",
 				"OpenDRIVE",
-				"RoadManager",
+				"InputCore",
+				"LevelEditor",
+				"EditorSubsystem",
+				"OpenDRIVE",
+				"RoadManager"
 			}
 		);
 			
@@ -55,7 +58,9 @@ public class OpenDRIVEEditor : ModuleRules
 				"AppFramework",
 				"Slate",
 				"SlateCore",
+				"ToolMenus",
 				"EditorFramework",
+				"EditorStyle",
 				"AnimGraph",
 				"Blutility",
 				"UnrealEd",
@@ -65,6 +70,10 @@ public class OpenDRIVEEditor : ModuleRules
 				"ComponentVisualizers",
 				"Landscape",
 				"EditorScriptingUtilities",
+				"NavigationSystem",
+				"InteractiveToolsFramework",
+				"EditorInteractiveToolsFramework",
+				"LevelEditor"
 			}
 		);
     }

@@ -1,7 +1,5 @@
 #pragma once
-
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "CoordTranslate.h"
 #include "OpenDrivePosition.generated.h"
 
@@ -90,10 +88,19 @@ public:
 	* @param LaneId  Lane ID
 	* @param S       S-coordinate (cm) along the road
 	* @param Offset  Lateral offset (cm) from the lane center
-	* @param H       Heading offset (°) from the lane orientation
+	* @param H       Heading offset (ï¿½) from the lane orientation
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	void SetTrackPosition(int TrackId, int LaneId, float S, float Offset, float H);
+
+	/**
+	* Sets the OpenDRIVE position
+	* @param TrackId Track (road) ID
+	* @param S       S-coordinate (cm) along the road
+	* @param T       T-coordinate (cm) along the road
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void UpdateTrackPosition(int TrackId, float S, float T);
 
 	/**
 	* Moves the object along its S coordinate
@@ -133,6 +140,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	int GetLaneId() const;
 
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetLaneById(int NewLaneId);
+
 	/**
 	* Returns the current S-coordinate (cm)
 	*/
@@ -140,16 +150,53 @@ public:
 	float GetS() const;
 
 	/**
+	 * @param S New S value (cm)
+	 */
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetS(float S);
+
+	/**
 	* Returns the current lateral offset (cm) from the lane center
 	*/
-	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", DeprecatedFunction, DeprecationMessage = "This method is deprecated, use GetOffset() instead."))
 	float GetT() const;
 
-	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	/**
+	 * @param T New offset from lane value (cm)
+	 */
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", DeprecatedFunction, DeprecationMessage = "This method is deprecated, use SetOffset() instead."))
 	void SetT(float T);
 
 	/**
-	* Returns the current heading offset (°) from the lane orientation
+	 * @return The lateral offset for reference lane id=0 in centimeters
+	 * todo: change function name to GetT()
+	 */
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	float GetRealT() const {return MetersToUu(OdrPosition().GetT());}
+
+	/**
+	 * Adds a lateral offset from reference lane id=0
+	 * @param T The lateral offset (cm) from reference lane id=0
+	 * todo: change function name to SetT()
+	 */
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetRealT(float T);
+
+	/**
+	* @return The lateral offset from current lane center in centimeters 
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	float GetOffset() const {return MetersToUu(OdrPosition().GetOffset());}
+
+	/**
+	 * Adds a lateral from current lane center
+	 * @param  Offset The desired Offset from current lane (cm)
+	 */
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void SetOffset(float Offset);
+
+	/**
+	* Returns the current heading offset (ï¿½) from the lane orientation
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetH() const;
