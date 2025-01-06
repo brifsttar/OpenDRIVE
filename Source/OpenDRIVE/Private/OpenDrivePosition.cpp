@@ -42,8 +42,8 @@ void UOpenDrivePosition::SetTrackPosition(int TrackId, int LaneId, float S, floa
 	SetTrackPosition(p);
 }
 
-void UOpenDrivePosition::SetTrackPosition(int TrackId, float S, float T) {
-	_TrackPos.SetTrackPos(TrackId, S, T);
+void UOpenDrivePosition::UpdateTrackPosition(int TrackId, float S, float T) {
+	_TrackPos.SetTrackPos(TrackId, UuToMeters(S), UuToMeters(T));
 }
 
 bool UOpenDrivePosition::MoveAlongS(float S, int Strategy) {
@@ -121,10 +121,7 @@ float UOpenDrivePosition::GetS() const {
 }
 
 void UOpenDrivePosition::SetS(float S) {
-	roadmanager::Position p = OdrPosition();
-	p.SetS(S);
-	p.MoveAlongS(0.);
-	SetTrackPosition(p);
+	_TrackPos.SetTrackPos(GetRoadId(), UuToMeters(S), _TrackPos.GetT()); //Used to force Coordinates update
 }
 
 float UOpenDrivePosition::GetT() const {
@@ -139,13 +136,9 @@ void UOpenDrivePosition::SetT(float T) {
 	SetTrackPosition(p);
 }
 
-void UOpenDrivePosition::SetRealT(const float T)
+void UOpenDrivePosition::SetRealT(float T)
 {
-	roadmanager::Position p = OdrPosition();
-	p.SetT(UuToMeters(T));
-	// Ugly trick to force refresh of internal T value
-	p.MoveAlongS(0.);
-	SetTrackPosition(p);
+	_TrackPos.SetTrackPos(GetRoadId(), _TrackPos.GetS(), UuToMeters(T));  //Used to force Coordinates update
 }
 
 void UOpenDrivePosition::SetOffset(const float Offset)

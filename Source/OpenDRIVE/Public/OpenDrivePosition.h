@@ -1,7 +1,5 @@
 #pragma once
-
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "CoordTranslate.h"
 #include "OpenDrivePosition.generated.h"
 
@@ -101,8 +99,8 @@ public:
 	* @param S       S-coordinate (cm) along the road
 	* @param T       T-coordinate (cm) along the road
 	*/
-	//UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
-	void SetTrackPosition(int TrackId, float S, float T);
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void UpdateTrackPosition(int TrackId, float S, float T);
 
 	/**
 	* Moves the object along its S coordinate
@@ -151,6 +149,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetS() const;
 
+	/**
+	 * @param S New S value (cm)
+	 */
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	void SetS(float S);
 
@@ -160,6 +161,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", DeprecatedFunction, DeprecationMessage = "This method is deprecated, use GetOffset() instead."))
 	float GetT() const;
 
+	/**
+	 * @param T New offset from lane value (cm)
+	 */
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE", DeprecatedFunction, DeprecationMessage = "This method is deprecated, use SetOffset() instead."))
 	void SetT(float T);
 
