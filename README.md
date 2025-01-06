@@ -50,6 +50,16 @@ Once that is done, your OpenDRIVE file should be properly loaded, and you can st
 
 ## Features
 
+### OpenDRIVE Gizmo
+
+https://github.com/user-attachments/assets/58d85bd4-fc87-48e8-b886-61685a5529d7
+
+This gizmo is part of the OpenDRIVE Editor Mode, and it allows you to move any object based on the underlying OpenDRIVE network
+* 🟦 Center and align with lane
+* 🟨 Translate along S
+* 🟥 Translate along T
+* 🟩 Translate along T to next lane
+
 ### OpenDRIVE Viewer
 
 ![OpenDRIVE Viewer](Resources/odr_viewer.gif)
