@@ -21,6 +21,7 @@ void UOpenDriveFloatParameterSource::BeginModify()
 	InitialT = OpenDrivePosition->GetRealT();
 	InitialS = OpenDrivePosition->GetS();
 	RoadId = OpenDrivePosition->GetRoadId();
+	LaneId = OpenDrivePosition->GetLaneId();
 	
 	CurTranslationAxis = AxisSource->GetDirection();
 
@@ -37,17 +38,23 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 {
 	Parameter = NewValue;
 	LastChange.CurrentValue = NewValue;
-	const double Delta = LastChange.GetChangeDelta();
-
-	const FVector Translation = Delta * CurTranslationAxis;
-	FTransform NewTransform = InitialTransform;
-	NewTransform.AddToTranslation(Translation); 
+	const double Delta = CalculateDelta();
 	
-	OpenDrivePosition->SetTransform(TransformSource->GetTransform());
+	switch(SourceType)
+	{
+	case EOpenDriveSourceType::TranslateOnS :
+		OpenDrivePosition->SetS(InitialS + Delta); 
+		break;
 
-	//if (OpenDrivePosition->OdrPosition().IsOffRoad()){return;} //always return true when on roads' edges
-	
-	OpenDrivePosition->SetTransform(NewTransform);
+	case EOpenDriveSourceType::TranslateOnT :
+		OpenDrivePosition->SetRealT(InitialT - Delta);
+		break;
+
+	case EOpenDriveSourceType::ChangeLane :
+		OpenDrivePosition->SetRealT(InitialT - Delta);
+		OpenDrivePosition->AlignWithLaneCenter(); 
+		break;
+	}
 	
 	if (
 		OpenDrivePosition->OdrPosition().IsInJunction() ||
@@ -56,28 +63,9 @@ void UOpenDriveFloatParameterSource::SetParameter(float NewValue)
 	) {
 		return;
 	}
-
-	float S = 0;
-	float T = 0;
-	switch(SourceType)
-	{
-	case EOpenDriveSourceType::TranslateOnS :
-		S  = UuToMeters(OpenDrivePosition->GetS());
-		OpenDrivePosition->SetTrackPosition(RoadId, S , UuToMeters(InitialT));
-		break;
-
-	case EOpenDriveSourceType::TranslateOnT :
-		T  = UuToMeters(OpenDrivePosition->GetRealT());
-		OpenDrivePosition->SetTrackPosition(RoadId, UuToMeters(InitialS), T);
-		break;
-
-	case EOpenDriveSourceType::ChangeLane :
-		OpenDrivePosition->AlignWithLaneCenter(); 
-		break;
-	}
-
+	
 	FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
-
+	
 	const EAlignmentMethod AlignmentMethod = bAlignToLane ? AlignButKeepDirection : NoAlignment;
 	if (const FTransform FinalTransform = FOpenDriveUtils::OdrToUE(TransformSource->GetTransform(), OpenDriveTransform, AlignmentMethod, bOverrideHeight);
 		FVector::Distance(FinalTransform.GetLocation(), TransformSource->GetTransform().GetLocation()) > 1.f) // todo: add a customizable snap value ? 

@@ -36,6 +36,9 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 	int RoadId;
 
 	UPROPERTY()
+	int LaneId;
+
+	UPROPERTY()
 	float InitialT;
 
 	UPROPERTY()
@@ -76,4 +79,8 @@ class OPENDRIVEEDITOR_API UOpenDriveFloatParameterSource : public UGizmoBaseFloa
 		NewSource->OpenDrivePosition = NewObject<UOpenDrivePosition>(NewSource);
 		return NewSource;
 	}
+
+private :
+
+	double CalculateDelta() const {return LaneId > 0 ? -LastChange.GetChangeDelta() : LastChange.GetChangeDelta();}
 };
