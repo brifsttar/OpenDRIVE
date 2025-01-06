@@ -56,6 +56,7 @@ void UOpenDriveUtilsTool::Setup()
 	{
 		Properties->SelectedActor = SelectedActor;
 		Properties->UpdateLaneInfo();
+		
 		if (Properties->SelectedActor != nullptr)
 		{
 			Properties->ActorTransformInfoHandle.Reset();
@@ -107,7 +108,7 @@ void UOpenDriveUtilsTool::UpdateActorTransform(EOpenDriveTranslateType Translate
 	UOpenDrivePosition* OpenDrivePosition = Properties->OpenDrivePosition;
 	double S = TranslateType == EOpenDriveTranslateType::TranslateOnS ? Properties->S : OpenDrivePosition->OdrPosition().GetS();
 	double T = TranslateType == EOpenDriveTranslateType::TranslateOnT ? Properties->T : OpenDrivePosition->OdrPosition().GetT();
-	OpenDrivePosition->SetTrackPosition(Properties->RoadId, S, T);
+	OpenDrivePosition->UpdateTrackPosition(Properties->RoadId, MetersToUu(S), MetersToUu(T));
 	FTransform OpenDriveTransform = OpenDrivePosition->GetTransform();
 	Properties->LastKnownTransform = FOpenDriveUtils::OdrToUE(Properties->SelectedActor, OpenDriveTransform, NoAlignment, GetEditorMode()->bOverrideHeight);
 	Properties->SelectedActor->SetActorTransform(Properties->LastKnownTransform);
