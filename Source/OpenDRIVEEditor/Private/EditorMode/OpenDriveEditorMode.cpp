@@ -64,6 +64,7 @@ void UOpenDriveEditorMode::Enter()
 void UOpenDriveEditorMode::Exit()
 {
 	DeInitializeOpenDriveGizmo();
+	SelectedActor = nullptr;
 	UE_LOG(LogOpenDriveEditorMode, Log, TEXT("OpenDriveEditorMode exited."));
 	UEdMode::Exit();
 }
@@ -207,13 +208,14 @@ void UOpenDriveEditorMode::InitializeOpenDriveGizmo()
 	ActorSelectionChangeNotify();
 }
 
-void UOpenDriveEditorMode::DeInitializeOpenDriveGizmo() const
+void UOpenDriveEditorMode::DeInitializeOpenDriveGizmo()
 {
 	if (UInteractiveGizmo* Gizmo = GetToolManager()->GetPairedGizmoManager()->FindGizmoByInstanceIdentifier(OpenDriveGizmoIdentifier))
 	{
 		GetToolManager()->GetPairedGizmoManager()->DestroyGizmo(Gizmo);
+		OpenDriveGizmo = nullptr;
 	}
-	
+
 	GetToolManager()->GetPairedGizmoManager()->DeregisterGizmoType(*OpenDriveGizmoBuilderIdentifier);
 	GetToolManager()->GetPairedGizmoManager()->DeregisterGizmoType(*OpenDriveChangeLaneBuilderIdentifier);
 	

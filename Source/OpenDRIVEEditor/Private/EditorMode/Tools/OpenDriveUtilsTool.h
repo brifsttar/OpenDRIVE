@@ -100,6 +100,11 @@ public:
 	{
 	}
 
+	void OnAlignActorWithLane();
+	void OnLaneChange(int NewLaneId);
+	void OnRepeatAlongRoad(float Step, bool bAlignWithLaneDirection);
+	void ActorSelectionChanged(AActor* Actor);
+	
 	/* Interactive tool interface */
 	virtual void Setup() override;
 	virtual void Shutdown(EToolShutdownType ShutdownType) override;

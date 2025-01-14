@@ -19,54 +19,60 @@ void UOpenDriveUtilsTool::SetWorld(UWorld* World)
 	TargetWorld = World;
 }
 
+void UOpenDriveUtilsTool::OnAlignActorWithLane()
+{
+	if (GetEditorMode())
+	{
+		GetEditorMode()->AlignActorWithLane();
+	}
+}
+
+void UOpenDriveUtilsTool::OnLaneChange(int NewLaneId)
+{
+	if (GetEditorMode())
+	{
+		GetEditorMode()->ChangeActorLane(NewLaneId);
+	}
+}
+
+void UOpenDriveUtilsTool::OnRepeatAlongRoad(float Step, bool bAlignWithLaneDirection)
+{
+	if (GetEditorMode())
+	{
+		GetEditorMode()->RepeatAlongRoad(Step, bAlignWithLaneDirection);
+	}
+}
+
+void UOpenDriveUtilsTool::ActorSelectionChanged(AActor* Actor)
+{
+	Properties->SelectedActor = Actor;
+	Properties->UpdateLaneInfo();
+		
+	if (Properties->SelectedActor != nullptr)
+	{
+		Properties->ActorTransformInfoHandle.Reset();
+		Properties->ActorTransformInfoHandle = Properties->SelectedActor->GetRootComponent()->TransformUpdated.AddLambda([this](USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
+		{
+			Properties->UpdateLaneInfo();
+		});
+	}
+	else
+	{
+		Properties->ActorTransformInfoHandle.Reset();
+	}
+}
+
 void UOpenDriveUtilsTool::Setup()
 {
 	UInteractiveTool::Setup();
 	
 	Properties = NewObject<UOpenDriveUtilsToolProperties>(this); 
 	AddToolPropertySource(Properties);
-	
-	Properties->OnAlignActorWithLane.BindLambda([this]()
-	{
-		if (GetEditorMode())
-		{
-			GetEditorMode()->AlignActorWithLane();
-		}
-	});
-
-	Properties->OnLaneChange.BindLambda([this](const int NewLaneId)
-	{
-		if (GetEditorMode())
-		{
-			GetEditorMode()->ChangeActorLane(NewLaneId);
-		}
-	});
-
-	Properties->OnRepeatAlongRoad.BindLambda([this] (const float Step, const bool bAlignWithLaneDirection)
-	{
-		if (GetEditorMode())
-		{
-			GetEditorMode()->RepeatAlongRoad(Step, bAlignWithLaneDirection);
-		}
-	});
-
+	Properties->OnAlignActorWithLane.BindUObject(this, &UOpenDriveUtilsTool::OnAlignActorWithLane);
+	Properties->OnLaneChange.BindUObject(this, &UOpenDriveUtilsTool::OnLaneChange);
+	Properties->OnRepeatAlongRoad.BindUObject(this, &UOpenDriveUtilsTool::OnRepeatAlongRoad);
 	Properties->OnUpdateActorTransform.BindUObject(this, &UOpenDriveUtilsTool::UpdateActorTransform);
-	
-	SelectionChangedHandle = GetEditorMode()->OnActorSelectionChanged.AddLambda([this](AActor* SelectedActor)
-	{
-		Properties->SelectedActor = SelectedActor;
-		Properties->UpdateLaneInfo();
-		
-		if (Properties->SelectedActor != nullptr)
-		{
-			Properties->ActorTransformInfoHandle.Reset();
-			Properties->ActorTransformInfoHandle = Properties->SelectedActor->GetRootComponent()->TransformUpdated.AddLambda([this](USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
-			{
-				Properties->UpdateLaneInfo();
-			});
-		}
-	});
-
+	SelectionChangedHandle = GetEditorMode()->OnActorSelectionChanged.AddUObject(this, &UOpenDriveUtilsTool::ActorSelectionChanged);
 	Properties->SelectedActor = GetEditorMode()->GetSelectedActor();
 }
 
@@ -77,6 +83,7 @@ void UOpenDriveUtilsTool::Shutdown(EToolShutdownType ShutdownType)
 	Properties->OnLaneChange.Unbind();
 	Properties->OnRepeatAlongRoad.Unbind();
 	Properties->ActorTransformInfoHandle.Reset();
+	Properties->SelectedActor = nullptr;
 
 	if (GetEditorMode())
 	{

@@ -71,6 +71,8 @@ public :
 	UPROPERTY()
 	FString MoveAlongLaneGizmoBuilderIdentifier;
 
+	TSharedPtr<FOpenDriveGizmoActorFactory> GizmoActorBuilder;
+
 	UPROPERTY()
 	UWorld* World;
 

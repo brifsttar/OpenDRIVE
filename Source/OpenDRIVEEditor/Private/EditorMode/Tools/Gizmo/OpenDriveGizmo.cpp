@@ -19,6 +19,7 @@ UInteractiveGizmo* UOpenDriveGizmoBuilder::BuildGizmo(const FToolBuilderState& S
 	Gizmo->GizmoViewContext = GizmoViewContext;
 	Gizmo->LaneChangeGizmoBuilderIdentifier = LaneChangeGizmoBuilderIdentifier;
 	Gizmo->MoveAlongLaneGizmoBuilderIdentifier = MoveAlongLaneGizmoBuilderIdentifier;
+	Gizmo->GizmoActorBuilder = MakeShared<FOpenDriveGizmoActorFactory>(GizmoViewContext);
 	return Gizmo;
 }
 
@@ -26,7 +27,7 @@ void UOpenDriveGizmo::Setup()
 {
 	Super::Setup();
 	OpenDrivePosition = NewObject<UOpenDrivePosition>();
-	GizmoActor = AOpenDriveGizmoActor::ConstructOpenDriveGizmoActor(World, GizmoViewContext);
+	GizmoActor = GizmoActorBuilder->CreateNewGizmoActor(World);
 }
 
 void UOpenDriveGizmo::Shutdown()
@@ -38,8 +39,6 @@ void UOpenDriveGizmo::Shutdown()
 		GizmoActor->Destroy();
 		GizmoActor = nullptr;
 	}
-	
-	Super::Shutdown();
 }
 
 void UOpenDriveGizmo::Tick(float DeltaTime)

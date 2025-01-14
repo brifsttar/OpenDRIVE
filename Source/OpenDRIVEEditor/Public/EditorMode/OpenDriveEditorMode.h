@@ -69,6 +69,6 @@ protected :
 private :
 
 	void InitializeOpenDriveGizmo();
-	void DeInitializeOpenDriveGizmo() const;
+	void DeInitializeOpenDriveGizmo();
 };
 

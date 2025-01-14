@@ -11,7 +11,7 @@ AOpenDriveGizmoActor::AOpenDriveGizmoActor()
 	SphereComponent->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 }
 
-AOpenDriveGizmoActor* AOpenDriveGizmoActor::ConstructOpenDriveGizmoActor(UWorld* World, UGizmoViewContext* GizmoViewContext)
+AOpenDriveGizmoActor* FOpenDriveGizmoActorFactory::CreateNewGizmoActor(UWorld* World) const
 {
 	AOpenDriveGizmoActor* NewActor = World->SpawnActor<AOpenDriveGizmoActor>(FVector::ZeroVector, FRotator::ZeroRotator);
 	
@@ -30,7 +30,3 @@ AOpenDriveGizmoActor* AOpenDriveGizmoActor::ConstructOpenDriveGizmoActor(UWorld*
 	NewActor->AlignWithLane =  MakeAxisCompFunc(FLinearColor::Blue, FVector(0,0,1), 10.0f, 0.0f, 10.0f);
 	return NewActor;
 }
-
-
-
-
