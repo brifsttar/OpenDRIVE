@@ -63,8 +63,10 @@ protected :
 	UPROPERTY()
 	TObjectPtr<AActor> SelectedActor;
 
+	/*
 	UPROPERTY()
-	TObjectPtr<UOpenDriveGizmo> OpenDriveGizmo;
+	TObjectPtr<UOpenDriveGizmo> OpenDriveGizmo; //memory leak 
+	*/
 
 private :
 

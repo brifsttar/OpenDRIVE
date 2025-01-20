@@ -46,15 +46,11 @@ void UOpenDriveUtilsTool::OnRepeatAlongRoad(float Step, bool bAlignWithLaneDirec
 void UOpenDriveUtilsTool::ActorSelectionChanged(AActor* Actor)
 {
 	Properties->SelectedActor = Actor;
-	Properties->UpdateLaneInfo();
 		
 	if (Properties->SelectedActor != nullptr)
 	{
 		Properties->ActorTransformInfoHandle.Reset();
-		Properties->ActorTransformInfoHandle = Properties->SelectedActor->GetRootComponent()->TransformUpdated.AddLambda([this](USceneComponent* SceneComponent, EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
-		{
-			Properties->UpdateLaneInfo();
-		});
+		Properties->ActorTransformInfoHandle = Properties->SelectedActor->GetRootComponent()->TransformUpdated.AddUObject(this, &UOpenDriveUtilsTool::OnActorTransformChanged);
 	}
 	else
 	{
@@ -62,10 +58,14 @@ void UOpenDriveUtilsTool::ActorSelectionChanged(AActor* Actor)
 	}
 }
 
+void UOpenDriveUtilsTool::OnActorTransformChanged(USceneComponent* UpdatedComponent, EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport)
+{
+	Properties->UpdateLaneInfo();
+}
+
 void UOpenDriveUtilsTool::Setup()
 {
 	UInteractiveTool::Setup();
-	
 	Properties = NewObject<UOpenDriveUtilsToolProperties>(this); 
 	AddToolPropertySource(Properties);
 	Properties->OnAlignActorWithLane.BindUObject(this, &UOpenDriveUtilsTool::OnAlignActorWithLane);

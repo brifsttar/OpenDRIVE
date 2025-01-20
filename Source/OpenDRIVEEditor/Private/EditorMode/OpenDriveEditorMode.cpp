@@ -86,23 +86,29 @@ void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 	{
 		TArray<AActor*> SelectedActors;
 		Selection->GetSelectedObjects<AActor>(SelectedActors);
-		if (SelectedActors.Num() > 0)
+		if (UOpenDriveGizmo* OpenDriveGizmo = Cast<UOpenDriveGizmo>(GetToolManager()->GetPairedGizmoManager()->FindGizmoByInstanceIdentifier(OpenDriveGizmoIdentifier)))
 		{
-			UTransformProxy* TransformProxy = NewObject<UTransformProxy>(this);
-			TransformProxy->SetTransform(SelectedActors[0]->GetRootComponent()->GetComponentTransform());
-			TransformProxy->AddComponent(SelectedActors[0]->GetRootComponent());
-			OpenDriveGizmo->SetActiveTarget(TransformProxy, GetToolManager());
-			OpenDriveGizmo->SetVisibility(true);
-			OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
-			OpenDriveGizmo->SetOverrideHeight(bOverrideHeight);
-			SelectedActor = SelectedActors[0];
+			if (SelectedActors.Num() > 0)
+			{
+
+				UTransformProxy* TransformProxy = NewObject<UTransformProxy>(this);
+				TransformProxy->SetTransform(SelectedActors[0]->GetRootComponent()->GetComponentTransform());
+				TransformProxy->AddComponent(SelectedActors[0]->GetRootComponent());
+			
+				OpenDriveGizmo->SetActiveTarget(TransformProxy, GetToolManager());
+				OpenDriveGizmo->SetVisibility(true);
+				OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
+				OpenDriveGizmo->SetOverrideHeight(bOverrideHeight);
+				SelectedActor = SelectedActors[0];
+			}
+			else
+			{
+				OpenDriveGizmo->ClearActiveTarget();
+				OpenDriveGizmo->SetVisibility(false);
+				SelectedActor = nullptr;
+			}	
 		}
-		else
-		{
-			OpenDriveGizmo->ClearActiveTarget();
-			OpenDriveGizmo->SetVisibility(false);
-			SelectedActor = nullptr;
-		}
+		
 		OnActorSelectionChanged.Broadcast(SelectedActor);
 	}
 }
@@ -110,7 +116,7 @@ void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 void UOpenDriveEditorMode::ToggleAutoAlignWithLane()
 {
 	bAutoAlignWithLane = !bAutoAlignWithLane;
-	if (IsValid(OpenDriveGizmo))
+	if (UOpenDriveGizmo* OpenDriveGizmo = Cast<UOpenDriveGizmo>(GetToolManager()->GetPairedGizmoManager()->FindGizmoByInstanceIdentifier(OpenDriveGizmoIdentifier)))
 	{
 		OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
 	}
@@ -119,7 +125,7 @@ void UOpenDriveEditorMode::ToggleAutoAlignWithLane()
 void UOpenDriveEditorMode::ToggleOverrideHeight()
 {
 	bOverrideHeight = !bOverrideHeight;
-	if (IsValid(OpenDriveGizmo))
+	if (UOpenDriveGizmo* OpenDriveGizmo = Cast<UOpenDriveGizmo>(GetToolManager()->GetPairedGizmoManager()->FindGizmoByInstanceIdentifier(OpenDriveGizmoIdentifier)))
 	{
 		OpenDriveGizmo->SetOverrideHeight(bOverrideHeight);
 	}
@@ -127,9 +133,12 @@ void UOpenDriveEditorMode::ToggleOverrideHeight()
 
 void UOpenDriveEditorMode::ResetGizmo() const
 {
-	if (OpenDriveGizmo && SelectedActor)
+	if (UOpenDriveGizmo* OpenDriveGizmo = Cast<UOpenDriveGizmo>(GetToolManager()->GetPairedGizmoManager()->FindGizmoByInstanceIdentifier(OpenDriveGizmoIdentifier)))
 	{
-		OpenDriveGizmo->ResetGizmo(SelectedActor->GetRootComponent()->GetComponentTransform());
+		if (IsValid(SelectedActor))
+		{
+			OpenDriveGizmo->ResetGizmo(SelectedActor->GetRootComponent()->GetComponentTransform());
+		}
 	}
 }
 
@@ -203,8 +212,10 @@ void UOpenDriveEditorMode::InitializeOpenDriveGizmo()
 	GizmoBuilder->MoveAlongLaneGizmoBuilderIdentifier = OpenDriveMoveAlongLaneBuilderIdentifier;
 	GetToolManager()->GetPairedGizmoManager()->RegisterGizmoType(*OpenDriveGizmoBuilderIdentifier, GizmoBuilder);
 
-	OpenDriveGizmo = Cast<UOpenDriveGizmo>(GetToolManager()->GetPairedGizmoManager()->CreateGizmo(*OpenDriveGizmoBuilderIdentifier, OpenDriveGizmoIdentifier));
-	OpenDriveGizmo->SetVisibility(false);
+	if (UOpenDriveGizmo* OpenDriveGizmo = Cast<UOpenDriveGizmo>(GetToolManager()->GetPairedGizmoManager()->CreateGizmo(*OpenDriveGizmoBuilderIdentifier, OpenDriveGizmoIdentifier)))
+	{
+		OpenDriveGizmo->SetVisibility(false);
+	}
 	ActorSelectionChangeNotify();
 }
 
@@ -213,8 +224,10 @@ void UOpenDriveEditorMode::DeInitializeOpenDriveGizmo()
 	if (UInteractiveGizmo* Gizmo = GetToolManager()->GetPairedGizmoManager()->FindGizmoByInstanceIdentifier(OpenDriveGizmoIdentifier))
 	{
 		GetToolManager()->GetPairedGizmoManager()->DestroyGizmo(Gizmo);
-		OpenDriveGizmo = nullptr;
+		
 	}
+
+	//OpenDriveGizmo = nullptr;
 
 	GetToolManager()->GetPairedGizmoManager()->DeregisterGizmoType(*OpenDriveGizmoBuilderIdentifier);
 	GetToolManager()->GetPairedGizmoManager()->DeregisterGizmoType(*OpenDriveChangeLaneBuilderIdentifier);

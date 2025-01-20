@@ -104,6 +104,7 @@ public:
 	void OnLaneChange(int NewLaneId);
 	void OnRepeatAlongRoad(float Step, bool bAlignWithLaneDirection);
 	void ActorSelectionChanged(AActor* Actor);
+	void OnActorTransformChanged(USceneComponent* UpdatedComponent, EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport);
 	
 	/* Interactive tool interface */
 	virtual void Setup() override;
