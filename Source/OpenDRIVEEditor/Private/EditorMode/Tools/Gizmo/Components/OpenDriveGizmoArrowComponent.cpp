@@ -157,9 +157,21 @@ bool UOpenDriveGizmoArrowComponent::LineTraceComponent(FHitResult& OutHit, const
 	FVector UseOrigin = Transform.TransformPosition(FVector::ZeroVector);
 	FVector StartPoint = FVector::ZeroVector, EndPoint = FVector::ZeroVector;
 	float PixelToWorldScale = 0;
-	bool bRenderVisibility = GetWorldEndpoints(bIsViewDependent, ToRawPtr(GizmoViewContext), UseOrigin, Direction, Gap, Length, bWorld,
-		[&Transform](const FVector& VectorIn) { return Transform.TransformVector(VectorIn); },
-		StartPoint, EndPoint, PixelToWorldScale);
+	bool bRenderVisibility = GetWorldEndpoints(
+		bIsViewDependent,
+		(UE::GizmoRenderingUtil::ISceneViewInterface*) ToRawPtr(GizmoViewContext),
+		UseOrigin,
+		Direction,
+		Gap,
+		Length,
+		bWorld,
+		[&Transform](const FVector& VectorIn) {
+			return Transform.TransformVector(VectorIn);
+		},
+		StartPoint,
+		EndPoint,
+		PixelToWorldScale
+	);
 
 	if (!bRenderVisibility)
 	{
