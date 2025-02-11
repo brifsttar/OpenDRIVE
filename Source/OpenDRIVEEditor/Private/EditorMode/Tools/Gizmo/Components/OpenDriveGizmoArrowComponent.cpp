@@ -1,13 +1,39 @@
 ﻿#include "OpenDriveGizmoArrowComponent.h"
 #include "BaseGizmos/GizmoRenderingUtil.h"
+#include "BaseGizmos/GizmoViewContext.h"
 
 namespace OpenDriveGizmoLocals
 {
-	template <typename SceneViewOrGizmoViewContext>
-	bool GetWorldEndpoints(bool bIsViewDependent, const SceneViewOrGizmoViewContext* View,
+	bool GetWorldEndpoints(bool bIsViewDependent, const FSceneView* View,
 		const FVector& WorldOrigin, const FVector& Direction, float Gap, 
 		float Length, bool bUseWorldAxes,
 		TFunctionRef<FVector(const FVector&)> VectorTransform, 
+		FVector& StartPointOut, FVector& EndPointOut, float& PixelToWorldScaleOut)
+	{
+		const FVector ArrowDirection = bUseWorldAxes ? Direction : VectorTransform(Direction);
+		float LengthScale = 1.0f; // Default scale if not view-dependent
+
+		if (bIsViewDependent)
+		{
+			// Keep the scaling based on the view
+			LengthScale = UE::GizmoRenderingUtil::CalculateLocalPixelToWorldScale(View, WorldOrigin);
+		}
+
+		PixelToWorldScaleOut = LengthScale;
+
+		double StartDist = LengthScale * Gap;
+		double EndDist = LengthScale * (Gap + Length);
+
+		StartPointOut = WorldOrigin + StartDist * ArrowDirection;
+		EndPointOut = WorldOrigin + EndDist * ArrowDirection;
+
+		return true;  // Always render the arrow
+	}
+
+	bool GetWorldEndpoints(bool bIsViewDependent, const UGizmoViewContext* View,
+		const FVector& WorldOrigin, const FVector& Direction, float Gap,
+		float Length, bool bUseWorldAxes,
+		TFunctionRef<FVector(const FVector&)> VectorTransform,
 		FVector& StartPointOut, FVector& EndPointOut, float& PixelToWorldScaleOut)
 	{
 		const FVector ArrowDirection = bUseWorldAxes ? Direction : VectorTransform(Direction);
@@ -70,7 +96,7 @@ public:
 				float PixelToWorldScale = 0;
 
 				bool bIsViewDependent = (bExternalIsViewDependent) ? (*bExternalIsViewDependent) : false;
-				bool bRenderVisibility = GetWorldEndpoints(bIsViewDependent, View, Origin, 
+				bool bRenderVisibility = GetWorldEndpoints(bIsViewDependent,View, Origin,
 					Direction, Gap, Length, bWorldAxis,
 					[&LocalToWorldMatrix](const FVector& VectorIn) {
 						return FVector{ LocalToWorldMatrix.TransformVector(VectorIn) };
@@ -157,9 +183,10 @@ bool UOpenDriveGizmoArrowComponent::LineTraceComponent(FHitResult& OutHit, const
 	FVector UseOrigin = Transform.TransformPosition(FVector::ZeroVector);
 	FVector StartPoint = FVector::ZeroVector, EndPoint = FVector::ZeroVector;
 	float PixelToWorldScale = 0;
+
 	bool bRenderVisibility = GetWorldEndpoints(
 		bIsViewDependent,
-		(UE::GizmoRenderingUtil::ISceneViewInterface*) ToRawPtr(GizmoViewContext),
+		ToRawPtr(GizmoViewContext),
 		UseOrigin,
 		Direction,
 		Gap,
@@ -172,6 +199,7 @@ bool UOpenDriveGizmoArrowComponent::LineTraceComponent(FHitResult& OutHit, const
 		EndPoint,
 		PixelToWorldScale
 	);
+	
 
 	if (!bRenderVisibility)
 	{

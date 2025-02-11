@@ -44,8 +44,9 @@ public class OpenDRIVEEditor : ModuleRules
 				"LevelEditor",
 				"EditorSubsystem",
 				"OpenDRIVE",
-				"RoadManager"
-			}
+				"RoadManager",
+                "InteractiveToolsFramework"
+            }
 		);
 			
 		
