@@ -4,8 +4,8 @@
 #include "OpenDriveSolver.generated.h"
 
 /*
- * The UOpenDriveSolver class is designed to handle 
- * and manipulate road network data based on the OpenDRIVE format. 
+ * The UOpenDriveSolver class is designed to handle
+ * and manipulate road network data based on the OpenDRIVE format.
  * This class provides various functionalities to work with roads, lanes, and their geometries.
  */
 UCLASS()
@@ -17,27 +17,27 @@ public:
 
 	struct LaneId;
 
-	struct LaneRef 
+	struct LaneRef
 	{
 		roadmanager::Road* Road;
 		roadmanager::LaneSection* LaneSection;
 		roadmanager::Lane* Lane;
 	};
 
-	struct LaneData 
+	struct LaneData
 	{
 		roadmanager::Lane* LaneRef;
 		roadmanager::Lane::LaneType LaneType;
 		TArray<FTransform> A_Transform;
 	};
 
-	struct LaneSectionData 
+	struct LaneSectionData
 	{
 		roadmanager::LaneSection* SectionRef;
 		TArray<LaneData> A_Lane;
 	};
 
-	struct RoadData 
+	struct RoadData
 	{
 		roadmanager::Road* RoadRef;
 		TArray<LaneSectionData> A_LaneSection;
@@ -64,6 +64,7 @@ public:
 	TArray<UOpenDriveSolver::RoadData> getAllRoad(roadmanager::Lane::LaneType laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
 	TArray<FTransform> extractRoadTransform(TArray<RoadData>& A_road);
 
+	int32 GetLaneIDFromLane(const roadmanager::Lane* Lane);
 private:
 
 	TArray<UOpenDriveSolver::LaneData> GetLane(roadmanager::Road* roadRef, roadmanager::LaneSection*, roadmanager::Lane::LaneType laneTypeMask = roadmanager::Lane::LANE_TYPE_ANY);
