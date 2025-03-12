@@ -17,10 +17,12 @@ void FOpenDriveEditorModule::StartupModule()
 
 void FOpenDriveEditorModule::ShutdownModule() 
 {
-	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode);
-	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane);
-	FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveOverrideActorHeight);
-	OpenDriveCommands.Reset();
+	if (UObjectInitialized()) {
+		FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveSwitchToEditorMode);
+		FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveAutoAlignToLane);
+		FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetGlobalLevelEditorActions()->UnmapAction(FOpenDriveEditorModeCommands::Get().OpenDriveOverrideActorHeight);
+		OpenDriveCommands.Reset();
+	}
 	IOpenDriveModuleInterface::ShutdownModule();
 }
 
