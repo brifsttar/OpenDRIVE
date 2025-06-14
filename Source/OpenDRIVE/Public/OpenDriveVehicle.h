@@ -30,8 +30,6 @@ private:
 
 protected:
 	class AWheeledVehiclePawn* _Car;
-	double _SpeedOverride = 0.;
-	double _AccOverride = 0.;
 	double LengthFront() const;
 	double LengthBack() const;
 
@@ -50,10 +48,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable);
 	FOnNewRoad OnNewRoad;
-
-	// Overrides speed value for cluster slaves, since they don't have PhysX vehicle model
-	void SetSpeedOverride(double Speed) { _SpeedOverride = Speed; }
-	void SetAccOverride(double Acc) { _AccOverride = Acc; }
 
 	/**
 	* Returns the longitudinal distance (cm, also known as "pk" or "S" distance) to another vehicle

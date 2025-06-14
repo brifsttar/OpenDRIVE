@@ -56,17 +56,10 @@ double UOpenDriveVehicle::LengthBack() const {
 }
 
 double UOpenDriveVehicle::OdrSpeed() const {
-	if (_Car->GetMesh()->IsSimulatingPhysics()) {
-		return CoordTranslate::UuToMeters(_MovComp->GetForwardSpeed());
-	} else {
-		return _SpeedOverride;
-	}
+	return CoordTranslate::UuToMeters(_MovComp->GetForwardSpeed());
 }
 
 double UOpenDriveVehicle::OdrAcceleration() const {
-	if (!_Car->GetMesh()->IsSimulatingPhysics()) {
-		return _AccOverride;
-	}
 	float t = _Car->GetGameTimeSinceCreation();
 	if (_PrevTime == 0.0) {
 		_PrevTime = t;
