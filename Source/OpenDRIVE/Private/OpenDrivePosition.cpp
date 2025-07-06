@@ -71,6 +71,7 @@ bool UOpenDrivePosition::MoveAlongS(float S, int Strategy) {
 bool UOpenDrivePosition::MoveAlongLanes(int LaneOffset, LaneType LaneFilter) {
 	if (LaneOffset == 0) return false;
 	roadmanager::Position p = OdrPosition();
+	if (p.GetRoad() == nullptr) return false;
 	roadmanager::LaneSection* ls = p.GetRoad()->GetLaneSectionByS(p.GetS());
 	roadmanager::Lane* targetLane = nullptr;
 	int laneId = p.GetLaneId();
@@ -85,7 +86,7 @@ bool UOpenDrivePosition::MoveAlongLanes(int LaneOffset, LaneType LaneFilter) {
 	) {
 		targetLane = ls->GetLaneById(i);
 		if (targetLane == nullptr) break;
-		if (targetLane->GetLaneType() == laneTypeFilter) {
+		if (targetLane->IsType(laneTypeFilter)) {
 			currentLaneOffset += laneOffsetUnit;
 		}
 	}
