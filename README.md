@@ -128,3 +128,12 @@ No material are included with the plugin, but many can be found for free on [Qui
 This Editor Utility Blueprint allows any actor to be duplicated along any road at a fixed step. The process runs until it encounters a junction, so it can actually span multiple roads.
 
 For this to work, actors are assumed to use the standard Unreal Engine alignment (X+ forward, Z+ up), except Decals, for which Y- forward and X- up are expected.
+
+### Spawn Along S
+
+<img width="1920" height="1050" alt="ScreenShot00030" src="https://github.com/user-attachments/assets/f50db1ad-22ad-4378-b7be-746b3307e2db" />
+
+`BP_SpawnAlongS` is fairly similar to *Duplicate Actor Along Road*, except 
+* It's contained within an actor
+* It spawns [Hierarchical Instanced Static Mesh](https://dev.epicgames.com/documentation/en-us/unreal-engine/instanced-static-mesh-component-in-unreal-engine#hierarchicalinstancedstaticmesh)
+* You can configure random ranges for multiple coordinates (S, T, RZ, Scale)
