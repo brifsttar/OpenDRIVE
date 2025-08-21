@@ -30,8 +30,6 @@ private:
 
 protected:
 	class AWheeledVehiclePawn* _Car;
-	double LengthFront() const;
-	double LengthBack() const;
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -45,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
 	FBoxSphereBounds GetBounds() const;
+
+	virtual double LengthFront() const override;
+	virtual double LengthBack() const override;
 
 	UPROPERTY(BlueprintAssignable);
 	FOnNewRoad OnNewRoad;
@@ -115,7 +116,7 @@ public:
 	float Speed() const { return MetersToUu(OdrSpeed()); }
 
 	/**
-	* Returns the current acceleration (cm/s²)
+	* Returns the current acceleration (cm/sï¿½)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "OpenDRIVE Vehicle|Indicators")
 	float Acceleration() const { return MetersToUu(OdrAcceleration()); }

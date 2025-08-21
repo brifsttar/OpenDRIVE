@@ -41,14 +41,16 @@ FBoxSphereBounds UOpenDriveVehicle::GetBounds() const {
 	);
 }
 
-double UOpenDriveVehicle::LengthFront() const {
+double UOpenDriveVehicle::LengthFront() const
+{
 	FBoxSphereBounds b = GetBounds();
 	float x = b.BoxExtent.X;
 	float o = b.Origin.X;
 	return o + x;
 }
 
-double UOpenDriveVehicle::LengthBack() const {
+double UOpenDriveVehicle::LengthBack() const
+{
 	FBoxSphereBounds b = GetBounds();
 	float x = b.BoxExtent.X;
 	float o = b.Origin.X;

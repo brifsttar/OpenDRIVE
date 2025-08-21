@@ -27,6 +27,9 @@ public:
 
 	void SetTrackPosition(const roadmanager::Position &p);
 
+	virtual double LengthFront() const {return 0.;}
+	virtual double LengthBack() const {return 0.;}
+
 	UFUNCTION(BlueprintCallable)
 	class UOpenDrivePosition* GetTrackPosition() const;
 
@@ -48,7 +51,7 @@ public:
 	* @param LaneId  Lane ID
 	* @param S       S-coordinate (cm) along the road
 	* @param Offset  Lateral offset (cm) from the lane center
-	* @param H       Heading offset (°) from the lane orientation
+	* @param H       Heading offset (ï¿½) from the lane orientation
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	void SetTrackPosition(int TrackId, int LaneId, float S, float Offset, float H);
@@ -93,7 +96,7 @@ public:
 	float GetT() const;
 
 	/**
-	* Returns the current heading offset (°) from the lane orientation
+	* Returns the current heading offset (ï¿½) from the lane orientation
 	*/
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetH() const;
