@@ -137,3 +137,11 @@ For this to work, actors are assumed to use the standard Unreal Engine alignment
 * It's contained within an actor
 * It spawns [Hierarchical Instanced Static Mesh](https://dev.epicgames.com/documentation/en-us/unreal-engine/instanced-static-mesh-component-in-unreal-engine#hierarchicalinstancedstaticmesh)
 * You can configure random ranges for multiple coordinates (S, T, RZ, Scale)
+
+### Mover
+
+https://github.com/user-attachments/assets/c0b0a694-8884-40bd-9b5a-f5942564330c
+
+<img width="798" height="486" alt="image" src="https://github.com/user-attachments/assets/8dd729bc-07bb-4815-a6f4-66cead5baf73" />
+
+`BP_OpenDrive_Mover` makes it easy to define relative track coordinates for multiple Scene Components. It's perfect for repetitive signage, like toll booth approach. Drop the main actor, and every component snaps right into place!
