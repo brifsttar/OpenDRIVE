@@ -83,7 +83,8 @@ bool UOpenDrivePosition::MoveAlongLanes(
 	int currentLaneOffset = 0;
 	int laneOffsetUnit = LaneOffset / abs(LaneOffset);
 	if (bIsRelativeToHeading &&
-		std::abs(p.GetHRelative()) > FMath::DegreesToRadians(90.f)
+		std::abs(p.GetHRelative()) > FMath::DegreesToRadians( 90.f) &&
+		std::abs(p.GetHRelative()) < FMath::DegreesToRadians(270.f)
 	) {
 		laneOffsetUnit = -laneOffsetUnit;
 	}
