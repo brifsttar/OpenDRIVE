@@ -113,9 +113,10 @@ public:
 
 	/**
 	* Moves the object along the lanes on the road
-	* @param LaneOffset Lane Offset
-	* @param LaneFilter Which type of lane to include in the move
-	* @param bClamp     If true, offset will be clamped at max possible value
+	* @param LaneOffset           Lane Offset
+	* @param LaneFilter           Which type of lane to include in the move
+	* @param bClamp               If true, offset will be clamped at max possible value
+	* @param bIsRelativeToHeading Whether the LaneOffset is absolute, or relative to current heading
 	* TODO: Set LaneFilter default to ANY, which isn't currently possible due to UnrealPython not
 	*       handling signed (or non-uint8) enums. It causes a crash at startup.
 	* @return Success
@@ -124,7 +125,8 @@ public:
 	bool MoveAlongLanes(
 		int LaneOffset,
 		LaneType LaneFilter/*=ANY*/,
-		bool bClamp=false
+		bool bClamp=false,
+		bool bIsRelativeToHeading=false
 	);
 
 	/**

@@ -71,7 +71,8 @@ bool UOpenDrivePosition::MoveAlongS(float S, int Strategy) {
 bool UOpenDrivePosition::MoveAlongLanes(
 	int LaneOffset,
 	LaneType LaneFilter,
-	bool bClamp
+	bool bClamp,
+	bool bIsRelativeToHeading
 ) {
 	if (LaneOffset == 0) return false;
 	roadmanager::Position p = OdrPosition();
@@ -81,11 +82,16 @@ bool UOpenDrivePosition::MoveAlongLanes(
 	int laneId = p.GetLaneId();
 	int currentLaneOffset = 0;
 	int laneOffsetUnit = LaneOffset / abs(LaneOffset);
+	if (bIsRelativeToHeading &&
+		std::abs(p.GetHRelative()) > FMath::DegreesToRadians(90.f)
+	) {
+		laneOffsetUnit = -laneOffsetUnit;
+	}
 
 	roadmanager::Lane::LaneType laneTypeFilter = (roadmanager::Lane::LaneType)LaneFilter;
 	for (
 		int i = laneId + laneOffsetUnit;
-		currentLaneOffset != LaneOffset;
+		std::abs(currentLaneOffset) != std::abs(LaneOffset);
 		i += laneOffsetUnit
 	) {
 		targetLane = ls->GetLaneById(i);
