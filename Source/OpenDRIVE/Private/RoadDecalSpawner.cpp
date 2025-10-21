@@ -47,7 +47,7 @@ void ARoadDecalSpawner::SpawnDecals() {
 			roadmanager::Position p;
 			p.SetSnapLaneTypes(roadmanager::Lane::LaneType::LANE_TYPE_ANY);
 			p.SetTrackPos(road->GetId(), j, t);
-			p.SetH(FMath::RandRange(-PI, PI));
+			p.SetHeading(FMath::RandRange(-PI, PI));
 
 			// For roundabouts with inner sidewalks
 			roadmanager::Lane* lane = p.GetLane();

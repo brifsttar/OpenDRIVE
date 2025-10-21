@@ -165,7 +165,7 @@ void UOpenDriveUtilsToolProperties::UpdateLaneInfo()
 		const roadmanager::LaneSection* LaneSection = Road->GetLaneSectionByS(S);
 		
 		const int32 Left = LaneSection->GetNUmberOfLanesLeft();
-		const int32 Right = -LaneSection->GetNUmberOfLanesRight();
+		const int32 Right = -(int)LaneSection->GetNUmberOfLanesRight();
 		const float LaneLenght = Road->GetLength();
 		const float RightWidth = Road->GetWidth(UuToMeters(OpenDrivePosition->GetS()), -1);
 		const float LeftWidth = Road->GetWidth(UuToMeters(OpenDrivePosition->GetS()), 1);

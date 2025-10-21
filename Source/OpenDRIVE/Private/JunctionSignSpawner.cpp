@@ -49,7 +49,7 @@ void AJunctionSignSpawner::SpawnJunctionSigns() {
 	int junctionId = p.GetRoad()->GetJunction();
 	roadmanager::Junction *j = p.GetOpenDrive()->GetJunctionById(junctionId);
 	if (!j)  return;
-	for (int i = 0; i < j->GetNumberOfConnections(); i++)
+	for (unsigned int i = 0; i < j->GetNumberOfConnections(); i++)
 	{
 		roadmanager::Connection* c = j->GetConnectionByIdx(i);
 		roadmanager::Road* r = c->GetIncomingRoad();

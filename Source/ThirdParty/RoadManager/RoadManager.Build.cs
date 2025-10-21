@@ -17,6 +17,7 @@ public class RoadManager : ModuleRules
 				Path.Combine(RoadManagerSrcDir, "RoadManager"),
 				Path.Combine(RoadManagerSrcDir, "CommonMini"),
 				Path.Combine(RoadManagerDir, "externals/pugixml"),
+				Path.Combine(RoadManagerDir, "externals/fmt/include"),
 			}
 		);
 
