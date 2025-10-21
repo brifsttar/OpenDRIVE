@@ -248,3 +248,7 @@ float UOpenDrivePosition::GetRoadCurvatureAngle(float LookaheadDist) const {
 	float h2 = p2.GetH();
 	return FMath::RadiansToDegrees(h2 - h1);
 }
+
+void UOpenDrivePosition::ResetPitchRoll() {
+	SetTrackPosition(GetRoadId(), GetLaneId(), GetS(), GetOffset(), GetH());
+}

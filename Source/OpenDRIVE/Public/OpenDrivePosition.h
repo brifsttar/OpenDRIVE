@@ -277,4 +277,10 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
 	float GetRoadCurvatureAngle(float LookaheadDist) const;
 
+	/**
+	* Resets pitch and roll to align with the road
+	*/
+	UFUNCTION(BlueprintCallable, meta = (Category = "OpenDRIVE"))
+	void ResetPitchRoll();
+
 };
