@@ -28,5 +28,12 @@ public class RoadManager : ModuleRules
 			PublicDelayLoadDLLs.Add("RoadManager.dll");
 			RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "bin", "RelWithDebInfo", "RoadManager.dll"));
         }
+
+		if (Target.Platform == UnrealTargetPlatform.Android)
+		{
+			PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "lib","libRoadManager.so"));
+			RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "lib", "libRoadManager.so"));
+			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(ModuleDirectory, "RoadManager_APL.xml"));
+		}
 	}
 }

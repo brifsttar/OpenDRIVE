@@ -30,7 +30,8 @@ FVector CoordTranslate::OdrToUe::Location(const FVector &P) {
 }
 
 FVector CoordTranslate::OdrToUe::Rotation(const FVector &P) {
-	throw std::exception("CoordTranslate::OdrToUe::Rotation is not implemented yet.");
+	//throw std::exception("CoordTranslate::OdrToUe::Rotation is not implemented yet.");
+	return FVector();
 }
 
 roadmanager::Position CoordTranslate::UeToOdr::FromTransfrom(const FTransform &P) {

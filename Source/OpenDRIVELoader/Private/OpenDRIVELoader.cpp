@@ -6,13 +6,26 @@
 #define LOCTEXT_NAMESPACE "FOpenDRIVELoaderModule"
 
 void FOpenDRIVELoaderModule::StartupModule() {
+#if PLATFORM_WINDOWS
 	FString BaseDir = IPluginManager::Get().FindPlugin("OpenDRIVE")->GetBaseDir();
-	FString LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/RoadManager/bin/RelWithDebInfo/RoadManager.dll"));
-	RoadManagerHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
+	FString LibraryPath = FPaths::Combine(
+		*BaseDir,
+		TEXT("Source/ThirdParty/RoadManager/bin/RelWithDebInfo/RoadManager.dll")
+	);
+
+	RoadManagerHandle = FPlatformProcess::GetDllHandle(*LibraryPath);
+#else
+	RoadManagerHandle = nullptr;
+#endif
 }
 
 void FOpenDRIVELoaderModule::ShutdownModule() {
-	FPlatformProcess::FreeDllHandle(RoadManagerHandle);
+#if PLATFORM_WINDOWS
+	if (RoadManagerHandle)
+	{
+		FPlatformProcess::FreeDllHandle(RoadManagerHandle);
+	}
+#endif
 	RoadManagerHandle = nullptr;
 }
 

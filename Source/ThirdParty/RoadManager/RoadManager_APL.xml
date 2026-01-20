@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    <init> 
+        <log text="RoadManager Android initialization" />
+    </init>
+    
+    <soLoadLibrary>
+        <loadLibrary name="RoadManager" failmsg="libRoadManager.so not loaded"/>
+    </soLoadLibrary>
+    
+    <resourceCopies>
+        <copyFile src="$S(PluginDir)/lib/libRoadManager.so"
+                  dst="$S(BuildDir)/libs/arm64-v8a/libRoadManager.so" />
+    </resourceCopies>
+</root>
