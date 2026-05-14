@@ -4,7 +4,7 @@
 UOpenDriveSolver::UOpenDriveSolver()
 	: _odr(roadmanager::Position::GetOpenDrive()),
 	_currentLane{ 0, 0, 0 },
-	_position(), 
+	_position(),
 	_blockCount(0),
 	_blockSize(0.f)
 {
@@ -231,7 +231,7 @@ void UOpenDriveSolver::FindPoint(double offset, roadmanager::Road* road, roadman
 
 int32 UOpenDriveSolver::GetLaneIDFromLane(const roadmanager::Lane* Lane) {
 	if (!Lane) {
-		UE_LOG(LogTemp, Warning, TEXT("Lane est null, ID non récupéré"));
+		UE_LOG(LogTemp, Warning, TEXT("Lane est null, ID non rÃ©cupÃ©rÃ©"));
 		return -100;
 	}
 
