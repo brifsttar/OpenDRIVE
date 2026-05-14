@@ -1,4 +1,4 @@
-#include "OpenDRIVEAssetActions.h"
+#include "OpenDriveAssetActions.h"
 #include "EditorReimportHandler.h"
 
 void FOpenDriveAssetActions::OnStartupModule()
@@ -9,7 +9,7 @@ void FOpenDriveAssetActions::OnStartupModule()
 
 void FOpenDriveAssetActions::OnShutdownModule()
 {
-	if (FModuleManager::Get().IsModuleLoaded("AssetTools")) 
+	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
 		IAssetTools& AssetTools = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools").Get();
 		AssetTools.UnregisterAssetTypeActions(this->AsShared());
