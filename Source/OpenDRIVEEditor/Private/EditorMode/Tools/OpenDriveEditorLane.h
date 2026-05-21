@@ -6,6 +6,8 @@
 #include "RoadManager.hpp"
 #include "OpenDriveEditorLane.generated.h"
 
+class UProceduralMeshComponent;
+
 UCLASS(Transient, Hidden, NotBlueprintable, NotBlueprintType, NotPlaceable)
 class OPENDRIVEEDITOR_API AOpenDriveEditorLane : public AInternalToolFrameworkActor
 {
@@ -62,47 +64,13 @@ public:
 protected : 
 
 	/**
-	 * Draws the lane
-	 * @param Step The distance between each lane's points
-	 * @param Offset The road's Z's offset
+	 * Builds the lane mesh
+	 * @param SampleStepMeters The step used to sample the lane (meters)
+	 * @param ZOffset The Z offset applied to the lane's mesh (centimeters)
 	 */
-	void DrawLane(double Step, float Offset);
-
-	/**
-	* Sets a lane's spline point
-	* @param LaneSpline The lane spline where the point is added
-	* @param Position Reference to roadmanager::Position
-	* @param S Distance to move along lane
-	* @param Offset
-	*/
-	void SetLanePoint(USplineComponent* LaneSpline, roadmanager::Position& Position, double S, float Offset) const;
-
-	/**
-	* Checks the distance between the last spline point and his predecessor : if the distance is too short, we remove its predecessor.
-	* @param LaneSpline The Lane's spline
-	* @param Step The step used
-	*/
-	static void CheckLastTwoPointsDistance(USplineComponent* LaneSpline, float Step);
-	
-	/**
-	* Sets the colored spline meshes along the lane's spline
-	* @param LaneSpline The lane's spline
-	*/
-	void SetColoredLaneMeshes(USplineComponent* LaneSpline);
+	void BuildLaneMesh(float SampleStepMeters = 0.01f, float ZOffset = 50.0f);
 
 private : 
-
-	UPROPERTY()
-	TArray<TObjectPtr<UStaticMeshComponent>> ArrowMeshes;
-
-	UPROPERTY()
-	TObjectPtr<UStaticMesh> LaneMeshPtr;
-
-	UPROPERTY()
-	float BaseMeshSize;
-
-	UPROPERTY()
-	int RoadDirection = 0;
 
 	roadmanager::Road* Road;
 	roadmanager::LaneSection* LaneSection;

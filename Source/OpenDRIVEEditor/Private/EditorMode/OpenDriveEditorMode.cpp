@@ -13,6 +13,7 @@
 #include "Tools/Gizmo/OpenDriveGizmo.h"
 #include "Tools/Gizmo/SubGizmos/OpenDriveTranslationGizmo.h"
 #include "OpenDriveUtils.h"
+#include "Tools/OpenDriveEditorLane.h"
 
 DEFINE_LOG_CATEGORY(LogOpenDriveEditorMode);
 
@@ -90,16 +91,24 @@ void UOpenDriveEditorMode::ActorSelectionChangeNotify()
 		{
 			if (SelectedActors.Num() > 0)
 			{
+				if (Cast<AOpenDriveEditorLane>(SelectedActors[0]))
+				{
+					OpenDriveGizmo->ClearActiveTarget();
+					OpenDriveGizmo->SetVisibility(false);
+					SelectedActor = nullptr;
+				}
+				else 
+				{
+					UTransformProxy* TransformProxy = NewObject<UTransformProxy>(this);
+					TransformProxy->SetTransform(SelectedActors[0]->GetRootComponent()->GetComponentTransform());
+					TransformProxy->AddComponent(SelectedActors[0]->GetRootComponent());
 
-				UTransformProxy* TransformProxy = NewObject<UTransformProxy>(this);
-				TransformProxy->SetTransform(SelectedActors[0]->GetRootComponent()->GetComponentTransform());
-				TransformProxy->AddComponent(SelectedActors[0]->GetRootComponent());
-			
-				OpenDriveGizmo->SetActiveTarget(TransformProxy, GetToolManager());
-				OpenDriveGizmo->SetVisibility(true);
-				OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
-				OpenDriveGizmo->SetOverrideHeight(bOverrideHeight);
-				SelectedActor = SelectedActors[0];
+					OpenDriveGizmo->SetActiveTarget(TransformProxy, GetToolManager());
+					OpenDriveGizmo->SetVisibility(true);
+					OpenDriveGizmo->AutoAlignWithLane(bAutoAlignWithLane);
+					OpenDriveGizmo->SetOverrideHeight(bOverrideHeight);
+					SelectedActor = SelectedActors[0];
+				}
 			}
 			else
 			{

@@ -45,7 +45,8 @@ public class OpenDRIVEEditor : ModuleRules
 				"EditorSubsystem",
 				"OpenDRIVE",
 				"RoadManager",
-                "InteractiveToolsFramework"
+                "InteractiveToolsFramework",
+                "ProceduralMeshComponent"
             }
 		);
 			
@@ -74,8 +75,9 @@ public class OpenDRIVEEditor : ModuleRules
 				"NavigationSystem",
 				"InteractiveToolsFramework",
 				"EditorInteractiveToolsFramework",
-				"LevelEditor"
-			}
+				"LevelEditor",
+                "ProceduralMeshComponent"
+            }
 		);
     }
 }

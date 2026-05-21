@@ -51,6 +51,7 @@ void UOpenDriveUtilsTool::ActorSelectionChanged(AActor* Actor)
 	{
 		Properties->ActorTransformInfoHandle.Reset();
 		Properties->ActorTransformInfoHandle = Properties->SelectedActor->GetRootComponent()->TransformUpdated.AddUObject(this, &UOpenDriveUtilsTool::OnActorTransformChanged);
+		Properties->UpdateLaneInfo();
 	}
 	else
 	{
@@ -163,6 +164,8 @@ void UOpenDriveUtilsToolProperties::UpdateLaneInfo()
 	if (const roadmanager::Road* Road = OpenDrivePosition->OdrPosition().GetRoad(); Road != nullptr)
 	{
 		const roadmanager::LaneSection* LaneSection = Road->GetLaneSectionByS(S);
+
+		if (!LaneSection) return;
 		
 		const int32 Left = LaneSection->GetNUmberOfLanesLeft();
 		const int32 Right = -(int)LaneSection->GetNUmberOfLanesRight();

@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, Category="Parameters", meta = (Tooltip = "Road's height above ground (useful if you have road meshes)", UIMin="0.0", UIMax="50.0"))
 	float RoadOffset = 20.0f;
 	UPROPERTY(EditAnywhere, Category="Parameters", meta = (Tooltip = "road's drawn precision (don't go to low with that value...)", UIMin = "1.0", UIMax = "20.0"))
-	float Step = 5.0f;
+	float Step = 0.05f;
 
 	/* OpenDrive lane informations */
 	UPROPERTY(VisibleAnywhere, Category = "Info")
