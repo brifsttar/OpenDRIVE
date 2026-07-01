@@ -61,18 +61,22 @@ double UOpenDriveVehicle::OdrSpeed() const {
 	return CoordTranslate::UuToMeters(_MovComp->GetForwardSpeed());
 }
 
+namespace PrivateAccess {
+	template<typename> struct TClass_GetForwardAcceleration; template<> struct TClass_GetForwardAcceleration<UChaosWheeledVehicleMovementComponent> {
+		template<auto FunctionPtr> struct TFunction_GetForwardAcceleration {
+			friend auto GetForwardAcceleration(UChaosWheeledVehicleMovementComponent& Object) {
+				return[&Object]<typename... ArgTypes>(ArgTypes&&... Args) {
+					return (Object.*FunctionPtr)(Forward<ArgTypes>(Args)...);
+				};
+			}
+		};
+	}; template struct TClass_GetForwardAcceleration<UChaosWheeledVehicleMovementComponent>::TFunction_GetForwardAcceleration<&UChaosWheeledVehicleMovementComponent::GetForwardAcceleration>; auto GetForwardAcceleration(UChaosWheeledVehicleMovementComponent& Object); auto GetForwardAcceleration(const UChaosWheeledVehicleMovementComponent& Object) {
+		return GetForwardAcceleration(const_cast<UChaosWheeledVehicleMovementComponent&>(Object));
+	}
+}
+
 double UOpenDriveVehicle::OdrAcceleration() const {
-	float t = _Car->GetGameTimeSinceCreation();
-	if (_PrevTime == 0.0) {
-		_PrevTime = t;
-		_PrevSpeed = OdrSpeed();
-	}
-	if (_PrevTime != t) {
-		_Acc = (OdrSpeed() - _PrevSpeed) / (t - _PrevTime);
-		_PrevTime = t;
-		_PrevSpeed = OdrSpeed();
-	}
-	return _Acc;
+	return CoordTranslate::UuToMeters(PrivateAccess::GetForwardAcceleration(*_MovComp)());
 }
 
 double UOpenDriveVehicle::OdrSteerAngle() const {
