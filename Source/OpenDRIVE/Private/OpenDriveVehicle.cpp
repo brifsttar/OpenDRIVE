@@ -6,7 +6,9 @@
 #include "PhysicsEngine/PhysicsAsset.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 
-UOpenDriveVehicle::UOpenDriveVehicle() {
+UOpenDriveVehicle::UOpenDriveVehicle(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
 	PrimaryComponentTick.bCanEverTick = true;
 }
 

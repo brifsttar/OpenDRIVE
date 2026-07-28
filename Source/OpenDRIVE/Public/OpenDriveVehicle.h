@@ -16,7 +16,7 @@ class OPENDRIVE_API UOpenDriveVehicle : public UOpenDriveComponent
 
 public:	
 	// Sets default values for this component's properties
-	UOpenDriveVehicle();
+	UOpenDriveVehicle(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostLoad() override;
 

@@ -21,7 +21,7 @@ protected:
 	void MoveActorToPosition();
 
 public:
-	UOpenDriveComponent();
+	UOpenDriveComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual roadmanager::Position OdrPosition() const;
 

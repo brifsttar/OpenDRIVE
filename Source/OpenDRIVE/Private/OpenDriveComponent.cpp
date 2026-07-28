@@ -1,6 +1,8 @@
 #include "OpenDriveComponent.h"
 
-UOpenDriveComponent::UOpenDriveComponent() {
+UOpenDriveComponent::UOpenDriveComponent(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
 	_TrackPosition = CreateDefaultSubobject<UOpenDrivePosition>(FName("TrackPosition"));
 	PrimaryComponentTick.bCanEverTick = true;
 }
