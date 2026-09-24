@@ -72,7 +72,8 @@ bool UOpenDrivePosition::MoveAlongLanes(
 	int LaneOffset,
 	LaneType LaneFilter,
 	bool bClamp,
-	bool bIsRelativeToHeading
+	bool bIsRelativeToHeading,
+	bool bAlignHeading
 ) {
 	if (LaneOffset == 0) return false;
 	roadmanager::Position p = OdrPosition();
@@ -107,8 +108,9 @@ bool UOpenDrivePosition::MoveAlongLanes(
 		}
 	}
 	if (targetLane == nullptr) return false;
+	double h = p.GetH();
 	p.SetLanePos(p.GetTrackId(), targetLane->GetId(), p.GetS(), p.GetOffset());
-	p.SetHeading(p.GetDrivingDirection());
+	p.SetHeading(bAlignHeading ? p.GetDrivingDirection() : h);
 	SetTrackPosition(p);
 	return true;
 }
